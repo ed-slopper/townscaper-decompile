@@ -117,6 +117,12 @@ pub fn sqrt(x: f32) -> f32 {
     (x as f64).sqrt() as f32
 }
 
+/// `Unity.Mathematics.math.atan2(float, float)` (inlined): `(float)Math.Atan2((double)y, (double)x)` (the CRT's
+/// `_CIatan2`).
+pub fn atan2(y: f32, x: f32) -> f32 {
+    (y as f64).atan2(x as f64) as f32
+}
+
 /// `Unity.Mathematics.math.length(float2)` 0x3246C0.
 pub fn length2(v: Float2) -> f32 {
     sqrt(v.x * v.x + v.y * v.y)

@@ -418,8 +418,8 @@ rva,va,namespace,type,method,signature,status,notes
 0x1EEF60,0x101EEF60,Placemaker,FastCoroutines.<FastCoroutine>d__9,.ctor,public void .ctor(int <>1__state),dumped,
 0x1EFAF0,0x101EFAF0,Placemaker,FastCoroutines.<FastCoroutine>d__9,MoveNext,private bool MoveNext(),dumped,
 0x1EFC10,0x101EFC10,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0xE285F0,0x10E285F0,Placemaker,GridBit,.ctor,public void .ctor(),dumped,
-0xE28660,0x10E28660,Placemaker,GridBit,get_done,public bool get_done(),dumped,
+0xE285F0,0x10E285F0,Placemaker,GridBit,.ctor,public void .ctor(),ported,ts_game::placemaker::grid_generator::GridBit
+0xE28660,0x10E28660,Placemaker,GridBit,get_done,public bool get_done(),ported,ts_game::placemaker::grid_generator::GridBit
 0xE289A0,0x10E289A0,Placemaker,GridGenerator,AppendQuadList,"public bool AppendQuadList(List<Quad> nodes, Vector2 planeCameraDir, ref int hoverIndex, int steps)",dumped,
 0xE29AB0,0x10E29AB0,Placemaker,GridGenerator,GetAdjecentQuad,public Quad GetAdjecentQuad(Quad quad),dumped,
 0xE2A0E0,0x10E2A0E0,Placemaker,GridGenerator,GetClosestClusterPos,private int3 GetClosestClusterPos(int3 hexPos),dumped,
@@ -1276,40 +1276,40 @@ rva,va,namespace,type,method,signature,status,notes
 0x4FD9B0,0x104FD9B0,Placemaker.Props,Window.Timer,Stop,public void Stop(),dumped,
 0x4FD9C0,0x104FD9C0,Placemaker.Props,Window.Timer,get_finished,public bool get_finished(),dumped,
 0x4FDA00,0x104FDA00,Placemaker.Props,Window.Timer,get_remaining,public float get_remaining(),dumped,
-0x840A70,0x10840A70,Placemaker.Quads,Quad,ContainsVert,public bool ContainsVert(int2 v),dumped,
-0x840AD0,0x10840AD0,Placemaker.Quads,Quad,GetPlanePos,public float2 GetPlanePos(int index),dumped,
-0x840BB0,0x10840BB0,Placemaker.Quads,Quad,GetVert,public int2 GetVert(int index),dumped,
-0x840C40,0x10840C40,Placemaker.Quads,Quad,IsValid,public bool IsValid(),dumped,
-0x840C70,0x10840C70,Placemaker.Quads,Quad,Rotate2,public void Rotate2(),dumped,
-0x840CD0,0x10840CD0,Placemaker.Quads,Quad,Rotate3,public void Rotate3(),dumped,
-0x840D60,0x10840D60,Placemaker.Quads,Quad,Rotate,public void Rotate(),dumped,
-0x840DD0,0x10840DD0,Placemaker.Quads,Quad,ToString,public override string ToString(),dumped,
-0x841160,0x10841160,Placemaker.Quads,Quad,get_hexPosSum,public int2 get_hexPosSum(),dumped,
-0x8411A0,0x108411A0,Placemaker.Quads,Quad,get_planePos,public float2 get_planePos(),dumped,
-0x3D4500,0x103D4500,Placemaker.Quads,Vert,AddQuad,public void AddQuad(Quad quad),dumped,
-0x3D47C0,0x103D47C0,Placemaker.Quads,Vert,ContainsVert,public bool ContainsVert(int2 v),dumped,
-0x3D4A20,0x103D4A20,Placemaker.Quads,Vert,GetQuad,public Quad GetQuad(int index),dumped,
-0x3D4BA0,0x103D4BA0,Placemaker.Quads,Vert,SetQuad,"public void SetQuad(int index, Quad quad)",dumped,
-0x3D4D10,0x103D4D10,Placemaker.Quads,Vert,get_full,public bool get_full(),dumped,
-0x3D4D30,0x103D4D30,Placemaker.Quads,Vert,get_validPosition,public bool get_validPosition(),dumped,
-0x3D4D50,0x103D4D50,Placemaker.Quads,Vert,get_worldPos,public float3 get_worldPos(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Quads.GridGeneration,CustomGridImporter,.ctor,public void .ctor(),dumped,
-0x449820,0x10449820,Placemaker.Quads.GridGeneration,CustomGridLibrary,GetRandom,"public CustomGridPatch GetRandom(List<byte> list, ref Random random)",dumped,
-0x4498E0,0x104498E0,Placemaker.Quads.GridGeneration,CustomGridLibrary,.ctor,public void .ctor(),dumped,
-0x4499C0,0x104499C0,Placemaker.Quads.GridGeneration,CustomGridPatch,.ctor,public void .ctor(),dumped,
-0x3DBFE0,0x103DBFE0,Placemaker.Quads.GridGeneration,HexCluster,.ctor,public void .ctor(),dumped,
-0x3DE030,0x103DE030,Placemaker.Quads.GridGeneration,HexPatch,.ctor,public void .ctor(),dumped,
-0x3DE0D0,0x103DE0D0,Placemaker.Quads.GridGeneration,HexPatch,get_done,public bool get_done(),dumped,
-0x334480,0x10334480,Placemaker.Quads.GridGeneration,MotivationCounter,AddMotivation,public int AddMotivation(int2 source),dumped,
-0x3344A0,0x103344A0,Placemaker.Quads.GridGeneration,MotivationCounter,GetEnumerator,public IEnumerator<int2> GetEnumerator(),dumped,
-0x3344A0,0x103344A0,Placemaker.Quads.GridGeneration,MotivationCounter,System.Collections.IEnumerable.GetEnumerator,private IEnumerator System.Collections.IEnumerable.GetEnumerator(),dumped,
-0x334500,0x10334500,Placemaker.Quads.GridGeneration,MotivationCounter,RemoveMotivation,public int RemoveMotivation(int2 source),dumped,
-0x1D4430,0x101D4430,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E6DA0,0x101E6DA0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.Generic.IEnumerator<Unity.Mathematics.int2>.get_Current,private int2 System.Collections.Generic.IEnumerator<Unity.Mathematics.int2>.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,.ctor,public void .ctor(int <>1__state),dumped,
-0x1F0980,0x101F0980,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,MoveNext,private bool MoveNext(),dumped,
-0x1F09A0,0x101F09A0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1F09D0,0x101F09D0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
+0x840A70,0x10840A70,Placemaker.Quads,Quad,ContainsVert,public bool ContainsVert(int2 v),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840AD0,0x10840AD0,Placemaker.Quads,Quad,GetPlanePos,public float2 GetPlanePos(int index),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840BB0,0x10840BB0,Placemaker.Quads,Quad,GetVert,public int2 GetVert(int index),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840C40,0x10840C40,Placemaker.Quads,Quad,IsValid,public bool IsValid(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840C70,0x10840C70,Placemaker.Quads,Quad,Rotate2,public void Rotate2(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840CD0,0x10840CD0,Placemaker.Quads,Quad,Rotate3,public void Rotate3(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840D60,0x10840D60,Placemaker.Quads,Quad,Rotate,public void Rotate(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x840DD0,0x10840DD0,Placemaker.Quads,Quad,ToString,public override string ToString(),read,debug text; waits on E13 (float.ToString)
+0x841160,0x10841160,Placemaker.Quads,Quad,get_hexPosSum,public int2 get_hexPosSum(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x8411A0,0x108411A0,Placemaker.Quads,Quad,get_planePos,public float2 get_planePos(),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
+0x3D4500,0x103D4500,Placemaker.Quads,Vert,AddQuad,public void AddQuad(Quad quad),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D47C0,0x103D47C0,Placemaker.Quads,Vert,ContainsVert,public bool ContainsVert(int2 v),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D4A20,0x103D4A20,Placemaker.Quads,Vert,GetQuad,public Quad GetQuad(int index),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D4BA0,0x103D4BA0,Placemaker.Quads,Vert,SetQuad,"public void SetQuad(int index, Quad quad)",checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D4D10,0x103D4D10,Placemaker.Quads,Vert,get_full,public bool get_full(),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D4D30,0x103D4D30,Placemaker.Quads,Vert,get_validPosition,public bool get_validPosition(),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x3D4D50,0x103D4D50,Placemaker.Quads,Vert,get_worldPos,public float3 get_worldPos(),checked,"ts_game::placemaker::quads::Vert; tests/placemaker_quads.rs (AddQuad sorts by math.atan2(d.x, d.y))"
+0x1F53D0,0x101F53D0,Placemaker.Quads.GridGeneration,CustomGridImporter,.ctor,public void .ctor(),read,editor-only import tool (no body in a build); not ported
+0x449820,0x10449820,Placemaker.Quads.GridGeneration,CustomGridLibrary,GetRandom,"public CustomGridPatch GetRandom(List<byte> list, ref Random random)",checked,CustomGridLibrary::get_random; tests/placemaker_quads.rs
+0x4498E0,0x104498E0,Placemaker.Quads.GridGeneration,CustomGridLibrary,.ctor,public void .ctor(),ported,grid_generation records (Default = the .ctor's lists); data from ts_data::grid
+0x4499C0,0x104499C0,Placemaker.Quads.GridGeneration,CustomGridPatch,.ctor,public void .ctor(),ported,grid_generation records (Default = the .ctor's lists); data from ts_data::grid
+0x3DBFE0,0x103DBFE0,Placemaker.Quads.GridGeneration,HexCluster,.ctor,public void .ctor(),ported,grid_generation records (Default = the .ctor's lists); data from ts_data::grid
+0x3DE030,0x103DE030,Placemaker.Quads.GridGeneration,HexPatch,.ctor,public void .ctor(),ported,grid_generation records (Default = the .ctor's lists); data from ts_data::grid
+0x3DE0D0,0x103DE0D0,Placemaker.Quads.GridGeneration,HexPatch,get_done,public bool get_done(),ported,grid_generation records (Default = the .ctor's lists); data from ts_data::grid
+0x334480,0x10334480,Placemaker.Quads.GridGeneration,MotivationCounter,AddMotivation,public int AddMotivation(int2 source),checked,ts_game::placemaker::quads::grid_generation::MotivationCounter; tests/placemaker_quads.rs
+0x3344A0,0x103344A0,Placemaker.Quads.GridGeneration,MotivationCounter,GetEnumerator,public IEnumerator<int2> GetEnumerator(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x3344A0,0x103344A0,Placemaker.Quads.GridGeneration,MotivationCounter,System.Collections.IEnumerable.GetEnumerator,private IEnumerator System.Collections.IEnumerable.GetEnumerator(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x334500,0x10334500,Placemaker.Quads.GridGeneration,MotivationCounter,RemoveMotivation,public int RemoveMotivation(int2 source),checked,ts_game::placemaker::quads::grid_generation::MotivationCounter; tests/placemaker_quads.rs
+0x1D4430,0x101D4430,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x1E6DA0,0x101E6DA0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.Generic.IEnumerator<Unity.Mathematics.int2>.get_Current,private int2 System.Collections.Generic.IEnumerator<Unity.Mathematics.int2>.get_Current(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x1EEF60,0x101EEF60,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,.ctor,public void .ctor(int <>1__state),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x1F0980,0x101F0980,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,MoveNext,private bool MoveNext(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x1F09A0,0x101F09A0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),ported,MotivationCounter::iter: always empty (the sources are not kept)
+0x1F09D0,0x101F09D0,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),ported,MotivationCounter::iter: always empty (the sources are not kept)
 0x1F53D0,0x101F53D0,Placemaker.SceneProcessing,PlatformDependent,.ctor,public void .ctor(),dumped,
 0x6FF550,0x106FF550,Placemaker.SceneProcessing,PlatformDependent,Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess,"private void Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess(bool isBuild, TargetPlatformFlags platform)",dumped,
 0x1D4430,0x101D4430,Placemaker.Ui,ActionInputManager,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,

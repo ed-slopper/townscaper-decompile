@@ -146,3 +146,17 @@ Rules, as proven by the exact-size test (`data/tests/layout.rs`):
 Result: **all 2,611 MonoBehaviours with a script read to their exact size.** `ModuleLibrary` (sharedassets1,
 2.8 MB) holds 2,072 modules, 128 decor modules, 892 module meshes (packed integer positions, normals, ...),
 4,769 corner lookups and 14,519 side lookups: the building geometry is here, not in Unity meshes (C2).
+
+## The grid's patch library (E3a, proven 2026-10-16)
+
+`GridGenerator.customGridLibrary` points at the one `CustomGridLibrary` (`Placemaker.Quads.GridGeneration`, a
+`ScriptableObject`) in `sharedassets1.assets`, path id 1117: 40 hand-made `CustomGridPatch`es and four lists of
+patch indexes (`genericPatches` 70, `straightPatches` 14, `centroidPatches` 15, `centroidCurvePatches` 6;
+255 = no patch). A patch's `verts` are hex positions × `GridConstants.hexScale` (12); its `quads` byte list is
+corner indexes, triangles (three each) up to `quadTriCutoff`, then quads (four each); true for all 40.
+`ts_data::grid::custom_grid_library` reads it. `CustomGridLibrary.GetRandom` 0x449820 is
+`list[random.NextUInt(count)]` on a `Unity.Mathematics.Random` passed by `ref`.
+
+The asset is not resident in a running game outside generation, so the harness checks `GetRandom` on a
+`ScriptableObject.CreateInstance` copy (the `on` lookup also falls back to `Resources.FindObjectsOfTypeAll`).
+`Vert.AddQuad` keeps a corner's quads sorted by `math.atan2(d.x, d.y)` (x first) of the quad centre's offset.

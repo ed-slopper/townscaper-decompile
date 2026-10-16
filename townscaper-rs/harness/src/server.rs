@@ -4,10 +4,12 @@
 //!             "param_types":["System.Single"], "main":true, "on":"Placemaker.WorldMaster"}`
 //!   - `call`: `Namespace.Class.Method` (the class is looked up in every loaded image);
 //!   - `args`: `{"raw": hex}` value-type bytes (little-endian, as in memory), `{"string": s}`,
-//!     `{"array": "System.Single", "raw": hex}` a new array of a value type, `{"null": true}`;
+//!     `{"array": "System.Single", "raw": hex}` a new array of a value type, `{"null": true}`,
+//!     `{"handle": n}` an object made by `new` (or kept);
 //!   - `param_types` (optional): picks the overload by il2cpp's parameter type names;
 //!   - `main` (optional): run on Unity's main thread (needed by most UnityEngine APIs);
-//!   - `on` (optional): call on the first object of that type in the scene (`FindObjectOfType`, inactive too);
+//!   - `on` (optional): call on the first object of that type in the scene (`FindObjectOfType`, inactive too),
+//!     else the first loaded one (`Resources.FindObjectsOfTypeAll`: assets such as `ScriptableObject`s);
 //!   - `this_raw` (optional): `{"class": "UnityEngine.Vector3", "raw": hex}`: an instance method of a value type
 //!     on that value (boxed); the value after the call comes back as `this_after`.
 //! Raw arguments are passed by pointer, so `ref` / `out` parameters work: every raw argument's bytes after the
@@ -145,10 +147,21 @@ impl Ctx {
         if !exc.is_null() {
             return Err(self.exception_text(exc));
         }
-        if r.is_null() {
-            return Err(format!("no {type_name} in the scene"));
+        if !r.is_null() {
+            return Ok(r);
         }
-        Ok(r)
+        // Not in a scene: a loaded asset (a `ScriptableObject`, ...), `Resources.FindObjectsOfTypeAll(type)[0]`.
+        let res = self.find_class("UnityEngine.Resources")?;
+        let m = self.find_method(res, "FindObjectsOfTypeAll", 1, None)?;
+        let mut args: [Ptr; 1] = [ty];
+        let arr = (self.api.il2cpp_runtime_invoke)(m, std::ptr::null_mut(), args.as_mut_ptr(), &mut exc);
+        if !exc.is_null() {
+            return Err(self.exception_text(exc));
+        }
+        if arr.is_null() || (self.api.il2cpp_array_length)(arr) == 0 {
+            return Err(format!("no {type_name} in the scene or loaded"));
+        }
+        Ok(*((arr as *const u8).add(ARRAY_DATA) as *const Ptr))
     }
 
     unsafe fn native(&self, req: &Value) -> Result<Value, String> {
@@ -311,6 +324,8 @@ impl Ctx {
                 ptrs.push((self.api.il2cpp_string_new)(c(s).as_ptr()));
             } else if a.get("null").is_some() {
                 ptrs.push(std::ptr::null_mut());
+            } else if let Some(h) = a.get("handle").and_then(Value::as_u64) {
+                ptrs.push((self.api.il2cpp_gchandle_get_target)(h as u32));
             } else {
                 return Err(format!("bad arg {a}"));
             }
