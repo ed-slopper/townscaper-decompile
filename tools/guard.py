@@ -97,6 +97,8 @@ DOC_REF = re.compile(r"`((?:Placemaker|Os)(?:\.\w+)+)\.([\w.<>]+)(?:\([^`]*\))?`
 
 
 def check_doc_refs(files: list[str], index: dict[tuple[str, str], set[str]]) -> int:
+    # by the full `Type.Method` name: explicit interface methods have dots in the method part
+    full = {(rva, f"{typ}.{m}") for (rva, typ), methods in index.items() for m in methods}
     n = 0
     for rel in files:
         if not (rel.startswith("townscaper-rs/") and rel.endswith(".rs")) or not (ROOT / rel).is_file():
@@ -107,7 +109,7 @@ def check_doc_refs(files: list[str], index: dict[tuple[str, str], set[str]]) -> 
             for m in DOC_REF.finditer(line):
                 typ, method, rva = m.group(1), m.group(2), int(m.group(3), 16)
                 n += 1
-                if method not in index.get((rva, typ), set()):
+                if (rva, f"{typ}.{method}") not in full:
                     errors.append(f"{rel}:{lineno}: `{typ}.{method}` {m.group(3)} is not a row of function-index.csv")
     return n
 

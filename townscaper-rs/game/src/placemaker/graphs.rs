@@ -299,7 +299,7 @@ pub fn single_compare_to(a: f32, b: f32) -> i32 {
 }
 
 impl OrientedModuleSides {
-    /// `Placemaker.Graphs.OrientedModuleSides.System.IComparable<...>.CompareTo` 0x6FC550: by cost.
+    /// `Placemaker.Graphs.OrientedModuleSides.System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo` 0x6FC550: by cost.
     pub fn compare_to(&self, other: &OrientedModuleSides) -> i32 {
         single_compare_to(self.cost, other.cost)
     }
