@@ -16,6 +16,14 @@
 //!   `{"array": elem type, "raw": hex, "n": len}`, `{"object": class}`, `{"null": true}`, `{"void": true}`;
 //!   errors: `{"ok":false, "error": text}` (managed exceptions formatted by il2cpp).
 //! `{"cmd":"ping"}` → `{"ok":true}`; `{"cmd":"quit"}` ends the game process.
+//! Native engine functions (stripped from the managed side, e.g. `Random.InitState`):
+//! `{"native": "UnityPlayer.dll", "va": "0x107A74A0", "args": [{"u32": 5}, {"buf": hex}]}`: a `cdecl` function at
+//! its address in the PDB-based Ghidra project (image base 0x10000000, rebased to the loaded module), up to 6
+//! 32-bit arguments; `buf` arguments are pointers to a copy of the bytes, returned in `bufs_after`; `eax` is the
+//! 32-bit return value.
+//! `{"batch": [request, ...], "main": true}` runs the requests one after another in the same main-thread job
+//! (no game frame in between: e.g. `Random` draws, which the game itself also makes every frame); the reply's
+//! `results` has one reply per request.
 
 use std::collections::VecDeque;
 use std::io::{BufRead, BufReader, Write};
@@ -113,8 +121,50 @@ impl Ctx {
         Ok(r)
     }
 
+    unsafe fn native(&self, req: &Value) -> Result<Value, String> {
+        use windows_sys::Win32::System::LibraryLoader::GetModuleHandleA;
+        let module = req["native"].as_str().ok_or("native: module")?;
+        let va = u32::from_str_radix(req["va"].as_str().ok_or("native: va")?.trim_start_matches("0x"), 16).map_err(|e| e.to_string())?;
+        let base = GetModuleHandleA(c(module).as_ptr() as *const u8);
+        if base.is_null() {
+            return Err(format!("{module} not loaded"));
+        }
+        let f = (base as usize).wrapping_add(va as usize).wrapping_sub(0x1000_0000);
+        let mut bufs: Vec<Vec<u8>> = Vec::new();
+        let mut words: Vec<u32> = Vec::new();
+        for a in req["args"].as_array().cloned().unwrap_or_default() {
+            if let Some(n) = a.get("u32").and_then(Value::as_u64) {
+                words.push(n as u32);
+            } else if let Some(h) = a.get("buf").and_then(Value::as_str) {
+                bufs.push(unhex(h)?);
+                words.push(bufs.last_mut().unwrap().as_mut_ptr() as usize as u32);
+            } else {
+                return Err(format!("bad native arg {a}"));
+            }
+        }
+        let w = |i: usize| words.get(i).copied().unwrap_or(0);
+        type F6 = unsafe extern "C" fn(u32, u32, u32, u32, u32, u32) -> u32;
+        // cdecl: the caller cleans the stack, so passing unused trailing words is harmless
+        let fp: F6 = std::mem::transmute(f);
+        let eax = fp(w(0), w(1), w(2), w(3), w(4), w(5));
+        Ok(json!({"eax": eax, "bufs_after": bufs.iter().map(|b| hex(b)).collect::<Vec<_>>()}))
+    }
+
     /// Run one call request (on whatever thread this is).
     pub unsafe fn call(&self, req: &Value) -> Value {
+        if let Some(list) = req.get("batch").and_then(Value::as_array) {
+            let results: Vec<Value> = list.iter().map(|r| self.call(r)).collect();
+            return json!({"ok": true, "results": results});
+        }
+        if req.get("native").is_some() {
+            return match self.native(req) {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
         match self.call_inner(req) {
             Ok(mut v) => {
                 v["ok"] = json!(true);

@@ -97,6 +97,23 @@ impl Harness {
         }
     }
 
+    /// Run several requests in one main-thread job (no game frame between them); one reply per request.
+    pub fn batch(&mut self, requests: Vec<Value>) -> Vec<Value> {
+        let r = self.request(json!({"batch": requests, "main": true}));
+        r["results"].as_array().cloned().unwrap_or_default()
+    }
+
+    /// Call a native `cdecl` engine function by its Ghidra address (UnityPlayer.dll, image base 0x10000000), on
+    /// the main thread; `args`: `{"u32": n}` or `{"buf": hex}` (see `harness/src/server.rs`).
+    pub fn native(&mut self, module: &str, va: u32, args: Vec<Value>) -> Result<Value, CallError> {
+        let r = self.request(json!({"native": module, "va": format!("0x{va:X}"), "args": args, "main": true}));
+        if r["ok"] == json!(true) {
+            Ok(r)
+        } else {
+            Err(CallError(r["error"].as_str().unwrap_or("?").to_string()))
+        }
+    }
+
     /// Call `Namespace.Class.Method` with arguments built by [`arg`]; returns the reply or the error.
     pub fn call(&mut self, method: &str, args: Vec<Value>, param_types: &[&str], main: bool) -> Result<Value, CallError> {
         let mut req = json!({"call": method, "args": args, "main": main});

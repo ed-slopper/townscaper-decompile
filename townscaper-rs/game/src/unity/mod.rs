@@ -7,4 +7,5 @@ pub mod conv;
 pub mod geometry;
 pub mod mathf;
 pub mod quaternion;
+pub mod random;
 pub mod vector;

@@ -50,3 +50,20 @@ inputs with zeros, axes, NaN, huge values (`game/tests/unity_vectors.rs`: 6 grou
   `Matrix4x4.LookAt` then returns uninitialised stack. Our port uses identity there (STANDIN) and the test skips
   those inputs (`LookMatrix::Unwritten`).
 - The harness passes value-type `this` unboxed (il2cpp's value-type methods take the data pointer).
+
+## UnityEngine.Random (F11c, proven)
+
+`unity::random::Rand`: the engine's generator (UnityPlayer.dll `Random_CUSTOM_*`), Marsaglia's xorshift128.
+Equal to the game on 7,200 draws from 300 random states plus 300 `InitState` seeds, the state compared after
+every round (`game/tests/unity_random.rs`).
+
+- `InitState(seed)`: `s0 = seed`, `sᵢ = sᵢ₋₁ · 0x6C078965 + 1`.
+- `value` = `(next & 0x7FFFFF) · f32::from_bits(0x34000001)` (1/8388607, so 0..=1 inclusive).
+- `Range(min, max)` (float) = `(1 − v)·max + v·min`; `Range(int)` = `min + next % (max − min)` (unsigned), the
+  mirror when `max < min`, no draw when equal.
+- `insideUnitSphere`: a unit vector (z = `(1 − v) − v`, θ = `(1 − v')·2π`, `cos`/`sin`/`sqrt` in double) times
+  `pow(v'', (double)(1f/3f))`.
+- The game never seeds it and draws from it every frame (birds, butterflies, click effects, audio pitch, the
+  loading screen): runs can't repeat the original's draws, only the generator's behaviour. The harness compares
+  inside one main-thread `batch` so no game frame draws in between; `InitState` and the state accessors are
+  stripped from the managed side, so the test calls the engine's icalls through the harness's `native` call.
