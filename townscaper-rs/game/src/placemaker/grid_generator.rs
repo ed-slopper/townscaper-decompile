@@ -1,15 +1,18 @@
 //! `Placemaker.GridGenerator` and its `GridBit`s: the irregular grid, generated around the camera in patches,
 //! clusters and bits (rows E3a–E3e). Row E3a: `GridBit`; row E3b: the coordinate maths (free functions here:
-//! the instance ones never read the generator's state). Checked against the running game by
+//! the instance ones never read the generator's state); row E3c: the patches (`GridGenerator`, `iterate_patch`). Checked against the running game by
 //! `tests/placemaker_grid.rs` (`TS_HARNESS=1`).
 //!
 //! Grid positions are hex positions × `GridConstants.hexScale` (12). Patch centres sit 72 apart
 //! (`hexDistance`), on a lattice of multiples of 216 (3 × 72) skewed back by `(p + rotate(p)) / 3`; grid
 //! centroids use a 2304 lattice.
 
+use std::collections::HashMap;
+
 use crate::os::hex;
 use crate::placemaker::quads::grid_generation::grid_constants::{HEX_TO_PLANE, PLANE_TO_HEX};
-use crate::unity::mathematics::{f2, f3, i3, Float2, Float3, Int2, Int3, Int3x3};
+use crate::placemaker::quads::grid_generation::{CustomGridLibrary, CustomGridPatch, HexPatch, HexPatchState};
+use crate::unity::mathematics::{f2, f3, hash3, i3, mul_i3x3, Float2, Float3, Int2, Int3, Int3x3, Random};
 use crate::unity::mathf;
 
 /// `GridGenerator.bitRadius`.
@@ -314,4 +317,391 @@ pub fn is_new_grid(h: Int3) -> bool {
     let b = mathf::perlin_noise(y * 0.01123, z * -0.331);
     let c = mathf::perlin_noise(z * 0.01123, x * -0.331);
     1.55 < c + b + a
+}
+
+/// `Placemaker.GridGenerator`'s state, as far as the rows ported so far use it (E3c: the patches). Patches are
+/// kept in `patches` and found by position through `patch_dict` (an index into `patches`: the game's dictionary
+/// holds the same objects as its list, and patches are never removed from the list, only reused).
+#[derive(Clone, Debug, Default)]
+pub struct GridGenerator {
+    pub custom_grid_library: CustomGridLibrary,
+    pub patches: Vec<HexPatch>,
+    pub patch_dict: HashMap<Int2, usize>,
+}
+
+impl GridGenerator {
+    /// `Placemaker.GridGenerator.MotivatePatch` 0xE34FE0: one more reason for the patch at `patch_pos` to
+    /// exist. A new patch reuses the first unwanted one (no motivations left: its lists are cleared, its
+    /// `quadTriCutoff` and state reset, `subdivisions` kept), else is added.
+    pub fn motivate_patch(&mut self, patch_pos: Int2, source_pos: Int2) -> usize {
+        if let Some(&i) = self.patch_dict.get(&patch_pos) {
+            self.patches[i].motivations.add_motivation(source_pos);
+            return i;
+        }
+        let mut found = None;
+        for (i, q) in self.patches.iter_mut().enumerate() {
+            if q.motivations.count == 0 {
+                q.quads.clear();
+                q.verts.clear();
+                q.quad_tri_cutoff = 0;
+                q.state = HexPatchState::Verts;
+                let old = q.hex_pos;
+                self.patch_dict.remove(&old);
+                found = Some(i);
+                break;
+            }
+        }
+        let i = found.unwrap_or_else(|| {
+            self.patches.push(HexPatch::default());
+            self.patches.len() - 1
+        });
+        self.patches[i].hex_pos = patch_pos;
+        assert!(self.patch_dict.insert(patch_pos, i).is_none(), "MotivatePatch: Dictionary.Add of an existing key");
+        self.patches[i].motivations.add_motivation(source_pos);
+        i
+    }
+
+    /// `Placemaker.GridGenerator.UnmotivatePatch` 0xE392C0 (`patchDict[patchPos]`: a missing key throws).
+    pub fn unmotivate_patch(&mut self, patch_pos: Int2, source_pos: Int2) {
+        let i = *self.patch_dict.get(&patch_pos).expect("UnmotivatePatch: KeyNotFoundException");
+        self.patches[i].motivations.remove_motivation(source_pos);
+    }
+
+    /// `Placemaker.GridGenerator.IteratePatch` 0xE30F50 on `patches[index]`.
+    pub fn iterate_patch(&mut self, index: usize) {
+        iterate_patch(&self.custom_grid_library, &mut self.patches[index]);
+    }
+}
+
+/// `Unity.Mathematics.Random.NextUInt(uint)` (inlined in the game): the state before the step, times `n`, high
+/// word.
+fn next_uint(r: &mut Random, n: u32) -> u32 {
+    ((n as u64 * r.next_state() as u64) >> 32) as u32
+}
+
+fn list_index(i: i32) -> usize {
+    usize::try_from(i).expect("List<T> index: ArgumentOutOfRangeException")
+}
+
+/// `Placemaker.GridGenerator.IteratePatch` 0xE30F50: one step of the patch's `HexPatch.State` machine.
+/// Grid positions are × 12 hex positions; the patch's corners are indexed by bytes.
+///
+/// - `Verts`: a hand-made patch by where the patch sits relative to its grid centroid (seeded by the patch
+///   position's `int3` hash), rotated and maybe mirrored, then straight to `Quadrangulate`; or, without one, a
+///   hexagon of corners ring by ring (spacing 9 × 2^subdivisions), on to `Triangulate`.
+/// - `Triangulate`: the hexagon's triangles, ring by ring.
+/// - `Quadrangulate`: merges one pair of triangles into a quad per call, starting at a hashed offset; when no
+///   merge is left, on to `Subdivide`.
+/// - `Subdivide`: every quad into four and every triangle into three quads, `subdivisions` times (shared edge
+///   midpoints through a dictionary).
+/// - `Sort`: quads ordered by their lowest corner (`GetVertCost`), each rotated to start there.
+pub fn iterate_patch(library: &CustomGridLibrary, patch: &mut HexPatch) {
+    match patch.state {
+        HexPatchState::Verts => patch_verts(library, patch),
+        HexPatchState::Triangulate => patch_triangulate(patch),
+        HexPatchState::Quadrangulate => patch_quadrangulate(patch),
+        HexPatchState::Subdivide => patch_subdivide(patch),
+        HexPatchState::Sort => patch_sort(patch),
+        HexPatchState::Done => {}
+    }
+}
+
+fn patch_verts(library: &CustomGridLibrary, patch: &mut HexPatch) {
+    let h3 = hex::get_hex3(patch.hex_pos);
+    let c = hex_to_grid_centroid(h3);
+    let (dx, dy, dz) = (h3.x.wrapping_sub(c.x), h3.y.wrapping_sub(c.y), h3.z.wrapping_sub(c.z));
+    let mut random = Random::new(hash3(h3) as u32);
+    let mut rotation = 0u32;
+    let mut custom: Option<&CustomGridPatch> = None;
+    // the centroid-curve patches are seeded by the centroid instead
+    let along = |d: i32, base: u32, random: &mut Random| -> (Option<&CustomGridPatch>, u32) {
+        if mathf::abs_i32(d) == 72 {
+            *random = Random::new(hash3(c) as u32);
+            let p = library.get_random(&library.centroid_curve_patches, random);
+            (p, if 0 < dx { base + 3 } else { base })
+        } else {
+            let p = library.get_random(&library.straight_patches, random);
+            (p, next_uint(random, 4) * 3 + base)
+        }
+    };
+    if dx == dy && dy == dz {
+        custom = library.get_random(&library.centroid_patches, &mut random);
+        rotation = next_uint(&mut random, 12);
+    } else if dx == dy {
+        (custom, rotation) = along(dx, 0, &mut random);
+    } else if dy == dz {
+        (custom, rotation) = along(dy, 1, &mut random);
+    } else if dz == dx {
+        (custom, rotation) = along(dz, 2, &mut random);
+    } else if is_new_grid(h3) {
+        custom = library.get_random(&library.generic_patches, &mut random);
+        rotation = next_uint(&mut random, 12);
+    }
+    if let Some(custom) = custom {
+        apply_custom_patch(patch, custom, rotation);
+        return;
+    }
+    let subdivisions = get_subdivisions(patch.hex_pos);
+    patch.subdivisions = subdivisions as u8;
+    let step = 1i32 << subdivisions;
+    let layers = 8 / step + 1;
+    let mut it = hex::HexOnionIterator::default();
+    loop {
+        let p = it.hex_pos2();
+        patch.verts.push(Int2 {
+            x: p.x.wrapping_mul(9).wrapping_mul(step).wrapping_add(patch.hex_pos.x),
+            y: p.y.wrapping_mul(9).wrapping_mul(step).wrapping_add(patch.hex_pos.y),
+        });
+        it.increment();
+        if (it.layer_index as i64) >= layers as i64 {
+            break;
+        }
+    }
+    patch.state = HexPatchState::Triangulate;
+}
+
+/// The hand-made patch, turned `rotation` sixth-turns (past 5: mirrored first, by swapping the x and y axes),
+/// placed at the patch; a mirrored patch's corner order is reversed to keep its winding.
+fn apply_custom_patch(patch: &mut HexPatch, custom: &CustomGridPatch, rotation: u32) {
+    let (mut ax, mut ay, mut az) = (i3(1, 0, 0), i3(0, 1, 0), i3(0, 0, 1));
+    let mut mirrored = false;
+    let mut rotation = rotation;
+    if 5 < rotation {
+        for _ in 0..rotation / 6 {
+            std::mem::swap(&mut ax, &mut ay);
+            mirrored = !mirrored;
+        }
+        rotation %= 6;
+    }
+    for _ in 0..rotation {
+        ax = hex::rotate_cw(ax);
+        ay = hex::rotate_cw(ay);
+        az = hex::rotate_cw(az);
+    }
+    let m = Int3x3 { c: [ax, ay, az] };
+    for v in &custom.verts {
+        let p = hex::get_hex2(mul_i3x3(&m, hex::get_hex3(*v)));
+        patch.verts.push(Int2 { x: p.x.wrapping_add(patch.hex_pos.x), y: patch.hex_pos.y.wrapping_add(p.y) });
+    }
+    let q = &custom.quads;
+    if !mirrored {
+        patch.quads.extend_from_slice(q);
+    } else {
+        let cut = custom.quad_tri_cutoff as usize;
+        let mut t = 0;
+        while t < cut {
+            patch.quads.extend_from_slice(&[q[t + 2], q[t + 1], q[t]]);
+            t += 3;
+        }
+        let mut t = cut;
+        while t < q.len() {
+            patch.quads.extend_from_slice(&[q[t + 3], q[t + 2], q[t + 1], q[t]]);
+            t += 4;
+        }
+    }
+    patch.state = HexPatchState::Quadrangulate;
+    patch.subdivisions = custom.subdivisions;
+    patch.quad_tri_cutoff = custom.quad_tri_cutoff;
+}
+
+fn patch_triangulate(patch: &mut HexPatch) {
+    let layers = 8 / (1i32 << (patch.subdivisions & 31)) + 1;
+    let quads = &mut patch.quads;
+    // inner ring: `inner` corners from `base0`; outer ring: `outer` corners from `base1`
+    let (mut inner, mut base0, mut base1, mut ring) = (1i32, 0u8, 1u8, 1i32);
+    if 1 < layers {
+        let mut outer = 6i32;
+        loop {
+            let (mut i, mut j) = (0i32, 0i32);
+            for _side in 0..6 {
+                if 6 < outer {
+                    let k0 = 1 - i;
+                    loop {
+                        let t = ((i % inner) as u8).wrapping_add(base0);
+                        quads.push(t);
+                        quads.push(((j % outer) as u8).wrapping_add(base1));
+                        j += 1;
+                        let u = ((j % outer) as u8).wrapping_add(base1);
+                        quads.push(u);
+                        quads.push(u);
+                        i += 1;
+                        quads.push(((i % inner) as u8).wrapping_add(base0));
+                        quads.push(t);
+                        if k0 + i >= ring {
+                            break;
+                        }
+                    }
+                }
+                quads.push(((i % inner) as u8).wrapping_add(base0));
+                quads.push(((j % outer) as u8).wrapping_add(base1));
+                j += 1;
+                quads.push(((j % outer) as u8).wrapping_add(base1));
+            }
+            base0 = base1;
+            base1 = base1.wrapping_add(outer as u8);
+            ring += 1;
+            inner = outer;
+            outer += 6;
+            if ring >= layers {
+                break;
+            }
+        }
+    }
+    patch.quad_tri_cutoff = patch.quads.len() as u16;
+    patch.state = HexPatchState::Quadrangulate;
+}
+
+fn patch_quadrangulate(patch: &mut HexPatch) {
+    let cutoff = patch.quad_tri_cutoff as i32;
+    let mut u = (patch.hex_pos.x as u32)
+        .wrapping_mul(0x83B5_8237)
+        .wrapping_add(0xA9D9_19BF)
+        .wrapping_add((patch.hex_pos.y as u32).wrapping_mul(0x833E_3E29).wrapping_sub(cutoff as u32));
+    u ^= u << 13;
+    u ^= u >> 17;
+    // `((u ^ 0xFC000000) << 5) ^ u`: the constant's low bit survives the shift and flips bit 31
+    let offset = mathf::abs_i32((((u ^ 0xFC00_0000) << 5) ^ u) as i32);
+    let at = |quads: &Vec<u8>, i: i32| quads[list_index(i)];
+    for k in 0..cutoff {
+        let e = k.wrapping_add(offset) % cutoff;
+        let (t, o) = ((e / 3) * 3, e % 3);
+        let a = at(&patch.quads, o % 3 + t);
+        let b = at(&patch.quads, (o + 2) % 3 + t);
+        if is_border(patch.verts[a as usize]) && is_border(patch.verts[b as usize]) {
+            continue;
+        }
+        let c = at(&patch.quads, (o + 1) % 3 + t);
+        let mut s = 3;
+        while s < cutoff {
+            let t2 = (s + t) % cutoff;
+            for m in 1..=3 {
+                let p = at(&patch.quads, m + t2 - 1);
+                let q = at(&patch.quads, m % 3 + t2);
+                let r = at(&patch.quads, (m + 1) % 3 + t2);
+                if a == r && b == p {
+                    let (hi, lo) = (mathf::max_i32(t, t2), mathf::min_i32(t, t2));
+                    patch.quads.drain(list_index(hi)..list_index(hi) + 3);
+                    patch.quads.drain(list_index(lo)..list_index(lo) + 3);
+                    patch.quads.extend_from_slice(&[a, c, b, q]);
+                    patch.quad_tri_cutoff = patch.quad_tri_cutoff.wrapping_sub(6);
+                    return;
+                }
+            }
+            s += 3;
+        }
+    }
+    patch.state = HexPatchState::Subdivide;
+}
+
+/// The corner at the midpoint of `a`–`b`: the second quad to ask for an edge takes (and forgets) the corner
+/// the first one made.
+fn midpoint(patch: &mut HexPatch, mids: &mut HashMap<Int2, u8>, next: &mut u8, a: Int2, b: Int2) -> u8 {
+    let m = Int2 { x: a.x.wrapping_add(b.x) / 2, y: a.y.wrapping_add(b.y) / 2 };
+    if let Some(i) = mids.remove(&m) {
+        return i;
+    }
+    let i = *next;
+    mids.insert(m, i);
+    patch.verts.push(m);
+    *next = next.wrapping_add(1);
+    i
+}
+
+fn patch_subdivide(patch: &mut HexPatch) {
+    let mut mids: HashMap<Int2, u8> = HashMap::with_capacity(patch.verts.len() * 4);
+    let mut next = patch.verts.len() as u8;
+    let vert = |patch: &HexPatch, i: u8| patch.verts[i as usize];
+    for _ in 0..patch.subdivisions as i32 {
+        let start = patch.quad_tri_cutoff;
+        let end = patch.quads.len() as u16;
+        let mut i = start;
+        while i < end {
+            let k = i as usize;
+            let (q0, q1, q2, q3) = (patch.quads[k], patch.quads[k + 1], patch.quads[k + 2], patch.quads[k + 3]);
+            let (p0, p1, p2, p3) = (vert(patch, q0), vert(patch, q1), vert(patch, q2), vert(patch, q3));
+            let m01 = midpoint(patch, &mut mids, &mut next, p0, p1);
+            let m12 = midpoint(patch, &mut mids, &mut next, p1, p2);
+            let m23 = midpoint(patch, &mut mids, &mut next, p2, p3);
+            let m30 = midpoint(patch, &mut mids, &mut next, p3, p0);
+            let centre = next;
+            next = next.wrapping_add(1);
+            let sx = p0.x.wrapping_add(p1.x).wrapping_add(p2.x).wrapping_add(p3.x);
+            let sy = p0.y.wrapping_add(p1.y).wrapping_add(p2.y).wrapping_add(p3.y);
+            patch.verts.push(Int2 { x: sx / 4, y: sy / 4 });
+            patch.quads[k] = q0;
+            patch.quads[k + 1] = m01;
+            patch.quads[k + 2] = centre;
+            patch.quads[k + 3] = m30;
+            patch.quads.extend_from_slice(&[q1, m12, centre, m01, q2, m23, centre, m12, q3, m30, centre, m23]);
+            i = i.wrapping_add(4);
+        }
+        let cutoff = patch.quad_tri_cutoff;
+        let mut i = 0u16;
+        while i < cutoff {
+            let k = i as usize;
+            let (t0, t1, t2) = (patch.quads[k], patch.quads[k + 1], patch.quads[k + 2]);
+            let (p0, p1, p2) = (vert(patch, t0), vert(patch, t1), vert(patch, t2));
+            let m01 = midpoint(patch, &mut mids, &mut next, p0, p1);
+            let m12 = midpoint(patch, &mut mids, &mut next, p1, p2);
+            let m20 = midpoint(patch, &mut mids, &mut next, p2, p0);
+            let centre = next;
+            next = next.wrapping_add(1);
+            let sx = p0.x.wrapping_add(p1.x).wrapping_add(p2.x);
+            let sy = p0.y.wrapping_add(p1.y).wrapping_add(p2.y);
+            patch.verts.push(Int2 { x: sx / 3, y: sy / 3 });
+            patch.quads.extend_from_slice(&[t0, m01, centre, m20, t1, m12, centre, m01, t2, m20, centre, m12]);
+            i = i.wrapping_add(3);
+        }
+        patch.quads.drain(0..patch.quad_tri_cutoff as usize);
+        patch.quad_tri_cutoff = 0;
+    }
+    patch.state = HexPatchState::Sort;
+}
+
+fn patch_sort(patch: &mut HexPatch) {
+    let count = patch.quads.len() as i32;
+    let mut sorted: Vec<u8> = Vec::with_capacity(count as usize);
+    let cost = |patch: &HexPatch, i: u8| {
+        let v = patch.verts[i as usize];
+        get_vert_cost(f2(v.x as f32, v.y as f32))
+    };
+    let mut i = 0i32;
+    while i < count {
+        let k = i as usize;
+        let (a, b, c, d) = (patch.quads[k], patch.quads[k + 1], patch.quads[k + 2], patch.quads[k + 3]);
+        let (ca, cb, cc, cd) = (cost(patch, a), cost(patch, b), cost(patch, c), cost(patch, d));
+        // the game's lowest cost leaves out the fourth corner: Min(Min(a, b), Min(b, c))
+        let lowest = mathf::min(mathf::min(ca, cb), mathf::min(cb, cc));
+        let (mut lo, mut hi, mut mid, mut last) = (0i32, i / 4 - 1, 0i32, 0f32);
+        while lo <= hi {
+            mid = (lo + hi) / 2;
+            last = cost(patch, sorted[list_index(mid * 4)]);
+            if lowest == last {
+                break;
+            }
+            if lowest < last {
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        }
+        if last < lowest && 0 < i {
+            mid += 1;
+        }
+        let at = list_index(mid * 4);
+        let order = if !(cb <= ca || cc <= ca || cd <= ca) {
+            [a, b, c, d]
+        } else if !(cc <= cb || cd <= cb) {
+            [b, c, d, a]
+        } else if cc < cd {
+            [c, d, a, b]
+        } else {
+            [d, a, b, c]
+        };
+        sorted.splice(at..at, order);
+        i += 4;
+    }
+    patch.quads.clear();
+    patch.quads.extend_from_slice(&sorted);
+    patch.state = HexPatchState::Done;
 }

@@ -8,4 +8,5 @@ description = "Townscaper's game code (Placemaker, Os) ported 1:1; no Bevy"
 
 [dev-dependencies]
 ts_check = { path = "../check" }
+ts_data = { path = "../data" }
 serde_json = "1"

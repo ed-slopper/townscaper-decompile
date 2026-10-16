@@ -72,6 +72,8 @@ api! {
     il2cpp_field_static_get_value: fn(Ptr, Ptr) -> ();
     il2cpp_field_get_type: fn(Ptr) -> Ptr;
     il2cpp_runtime_class_init: fn(Ptr) -> ();
+    il2cpp_field_get_value: fn(Ptr, Ptr, Ptr) -> ();
+    il2cpp_field_set_value: fn(Ptr, Ptr, Ptr) -> ();
 }
 
 /// A C string from il2cpp (borrowed).

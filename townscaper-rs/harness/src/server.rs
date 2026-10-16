@@ -31,6 +31,8 @@
 //! `{"batch": [request, ...], "main": true}` runs the requests one after another in the same main-thread job
 //! (no game frame in between: e.g. `Random` draws, which the game itself also makes every frame); the reply's
 //! `results` has one reply per request.
+//! `{"field": "name", "handle": n, "main": true}` reads (and with `set_raw` / `set_handle` / `set_null`, first
+//! writes) an instance field: value types as `raw`, references as a kept `handle`.
 //! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
 //! the field's value as `{"type", "raw"}` (value types by value, references as the 4-byte pointer).
 
@@ -220,10 +222,62 @@ impl Ctx {
         Ok(json!({"type": self.type_name(t), "raw": hex(&buf)}))
     }
 
+    /// `{"field": "name", "handle": n}` (or `"on": class`): an instance field of an object. Value types come back
+    /// as `{"type", "raw"}`, references as a new kept `{"handle": n}` (or `{"null": true}`). With `"set_raw": hex`
+    /// (value types) or `"set_handle": n` / `"set_null": true` (references) the field is written first.
+    unsafe fn field(&self, req: &Value) -> Result<Value, String> {
+        let name = req["field"].as_str().ok_or("field")?;
+        let obj = match (req["handle"].as_u64(), req["on"].as_str()) {
+            (Some(h), _) => (self.api.il2cpp_gchandle_get_target)(h as u32),
+            (None, Some(t)) => self.find_object(t)?,
+            _ => return Err("field needs handle or on".into()),
+        };
+        if obj.is_null() {
+            return Err("field: null object".into());
+        }
+        let f = (self.api.il2cpp_class_get_field_from_name)((self.api.il2cpp_object_get_class)(obj), c(name).as_ptr());
+        if f.is_null() {
+            return Err(format!("no field {name}"));
+        }
+        let t = (self.api.il2cpp_field_get_type)(f);
+        let k = (self.api.il2cpp_class_from_type)(t);
+        let value_type = (self.api.il2cpp_class_is_valuetype)(k) != 0;
+        if let Some(r) = req["set_raw"].as_str() {
+            let mut raw = unhex(r)?;
+            (self.api.il2cpp_field_set_value)(obj, f, raw.as_mut_ptr() as Ptr);
+        } else if let Some(h) = req["set_handle"].as_u64() {
+            (self.api.il2cpp_field_set_value)(obj, f, (self.api.il2cpp_gchandle_get_target)(h as u32));
+        } else if req.get("set_null").is_some() {
+            (self.api.il2cpp_field_set_value)(obj, f, std::ptr::null_mut());
+        }
+        if value_type {
+            let size = (self.api.il2cpp_class_value_size)(k, std::ptr::null_mut()) as usize;
+            let mut buf = vec![0u8; size.max(4)];
+            (self.api.il2cpp_field_get_value)(obj, f, buf.as_mut_ptr() as Ptr);
+            buf.truncate(size);
+            return Ok(json!({"type": self.type_name(t), "raw": hex(&buf)}));
+        }
+        let mut p: Ptr = std::ptr::null_mut();
+        (self.api.il2cpp_field_get_value)(obj, f, &mut p as *mut Ptr as Ptr);
+        if p.is_null() {
+            return Ok(json!({"type": self.type_name(t), "null": true}));
+        }
+        Ok(json!({"type": self.type_name(t), "handle": (self.api.il2cpp_gchandle_new)(p, 0)}))
+    }
+
     /// Run one call request (on whatever thread this is).
     pub unsafe fn call(&self, req: &Value) -> Value {
         if req.get("static_field").is_some() {
             return match self.static_field(req) {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
+        if req.get("field").is_some() {
+            return match self.field(req) {
                 Ok(mut v) => {
                     v["ok"] = json!(true);
                     v
