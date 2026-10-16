@@ -82,3 +82,21 @@ code as plain arithmetic and is ported with each game function). Equal to the ga
   `NextFloat(min, max)` = `f·(max − min) + min`; `NextInt(min, max)` = `min + (range·s >> 32)`.
   `PropPlacer` uses `NextFloat(min, max)` and `StorageUtils` `NextInt(min, max)`: those draws are reproducible.
 - `int3.GetHashCode` = `x·0x4C7F6DD1 + y·0x4822A3E9 + z·0xAAC3C25D + 0xD21D0945` (wrapping).
+
+## Collections (F11e, proven)
+
+`unity::collections`, equal to the game's BCL (`game/tests/unity_collections.rs`): 514 sorts of tie-heavy
+`float` arrays (+0/−0 and NaN payloads compare equal but are told apart by their bits, so the permutation of
+equal keys is checked), whole arrays and sub-ranges, 4 adversarial inputs (McIlroy's antiqsort run against
+our port) that reach the heapsort fallback; `BinarySearch` with duplicates; 60 random add / indexer-set /
+remove / clear sequences on a real `Dictionary<int,int>` and `HashSet<int>` with the iteration order compared.
+
+- Sorting is the .NET reference introsort (`ArraySortHelper<T>`), not stable: insertion sort at ≤ 16, special
+  cases 2 and 3, median-of-three with the pivot parked at `hi − 1`, heapsort when the depth budget
+  `2 · FloorLog2(keys.Length)` runs out. `keys.Length` is the **backing array's** length (a `List<T>`'s
+  capacity: `unity::collections::list_grow`), and `FloorLog2` is really the bit length.
+- `BinarySearch` returns whichever equal element the halving meets first, else `~insertionPoint`.
+  `WaveFunctionCollapse` keeps its propagation queue sorted with `List<Propagation>.BinarySearch` + `Insert`.
+- `Dictionary` / `HashSet` enumerate their slots in order; a new key takes the most recently freed slot (LIFO),
+  else the next unused one; `Clear` empties everything (`unity::collections::SlotMap`). Hash codes decide
+  buckets only, never order.

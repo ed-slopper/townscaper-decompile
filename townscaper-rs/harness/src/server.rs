@@ -21,6 +21,11 @@
 //! its address in the PDB-based Ghidra project (image base 0x10000000, rebased to the loaded module), up to 6
 //! 32-bit arguments; `buf` arguments are pointers to a copy of the bytes, returned in `bufs_after`; `eax` is the
 //! 32-bit return value.
+//! Generic instantiations: `"class": "System.Collections.Generic.Dictionary`2[[System.Int32],[System.Int32]]"`
+//! (a `Type.GetType` name) in place of the class part of `call` (`"call": "Add"` is then just the method).
+//! Objects: `{"new": <class name or Type.GetType name>, "args": [...]}` makes an object (`.ctor` with the args)
+//! and returns `{"handle": n}` (a GC handle, kept alive); `"handle": n` in a call makes it the `this`.
+//! Array arguments come back after the call too, in `args_after` (their element bytes).
 //! `{"batch": [request, ...], "main": true}` runs the requests one after another in the same main-thread job
 //! (no game frame in between: e.g. `Random` draws, which the game itself also makes every frame); the reply's
 //! `results` has one reply per request.
@@ -71,6 +76,29 @@ impl Ctx {
             }
         }
         Err(format!("class {full} not found"))
+    }
+
+    /// A class by `Namespace.Name`, or by a `Type.GetType` name for generic instantiations (contains `` ` ``).
+    unsafe fn resolve_class(&self, name: &str) -> Result<Ptr, String> {
+        if !name.contains('`') {
+            return self.find_class(name);
+        }
+        let ty = self.find_class("System.Type")?;
+        let m = self.find_method(ty, "GetType", 1, Some(&vec![json!("System.String")]))?;
+        let mut args: [Ptr; 1] = [(self.api.il2cpp_string_new)(c(name).as_ptr())];
+        let mut exc: Ptr = std::ptr::null_mut();
+        let t = (self.api.il2cpp_runtime_invoke)(m, std::ptr::null_mut(), args.as_mut_ptr(), &mut exc);
+        if !exc.is_null() {
+            return Err(self.exception_text(exc));
+        }
+        if t.is_null() {
+            return Err(format!("Type.GetType({name}) is null (not in the build?)"));
+        }
+        let k = (self.api.il2cpp_class_from_system_type)(t);
+        if k.is_null() {
+            return Err(format!("no class for {name}"));
+        }
+        Ok(k)
     }
 
     unsafe fn type_name(&self, t: Ptr) -> String {
@@ -156,6 +184,27 @@ impl Ctx {
             let results: Vec<Value> = list.iter().map(|r| self.call(r)).collect();
             return json!({"ok": true, "results": results});
         }
+        if let Some(k) = req.get("new").and_then(Value::as_str) {
+            let made = (|| -> Result<Value, String> {
+                let class = self.resolve_class(k)?;
+                let obj = (self.api.il2cpp_object_new)(class);
+                let handle = (self.api.il2cpp_gchandle_new)(obj, 0);
+                let mut r = req.clone();
+                r["call"] = json!(".ctor");
+                r["class"] = json!(k);
+                r["handle"] = json!(handle);
+                r.as_object_mut().unwrap().remove("new");
+                let v = self.call_inner(&r)?;
+                Ok(json!({"handle": handle, "ctor": v}))
+            })();
+            return match made {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
         if req.get("native").is_some() {
             return match self.native(req) {
                 Ok(mut v) => {
@@ -179,13 +228,19 @@ impl Ctx {
         // constructors are `.ctor` / `.cctor`: `UnityEngine.Bounds..ctor`
         let (class_name, method) = match call.strip_suffix("..ctor").or(call.strip_suffix("..cctor")) {
             Some(c) => (c, if call.ends_with("..ctor") { ".ctor" } else { ".cctor" }),
-            None => call.rsplit_once('.').ok_or("call is Namespace.Class.Method")?,
+            None => call.rsplit_once('.').unwrap_or(("", call)),
         };
-        let class = self.find_class(class_name)?;
+        let (class, method) = match req["class"].as_str() {
+            Some(k) => (self.resolve_class(k)?, call),
+            None => (self.find_class(class_name)?, method),
+        };
         let args = req["args"].as_array().cloned().unwrap_or_default();
         let m = self.find_method(class, method, args.len(), req["param_types"].as_array())?;
         let mut this_size = 0usize;
         let this = match (req["on"].as_str(), req.get("this_raw")) {
+            _ if req.get("handle").and_then(Value::as_u64).is_some() => {
+                (self.api.il2cpp_gchandle_get_target)(req["handle"].as_u64().unwrap() as u32)
+            }
             (Some(t), _) => self.find_object(t)?,
             (None, Some(v)) if v.is_object() => {
                 let k = self.find_class(v["class"].as_str().ok_or("this_raw.class")?)?;
@@ -200,6 +255,7 @@ impl Ctx {
         // Argument storage must outlive the invoke.
         let mut store: Vec<Vec<u8>> = Vec::new();
         let mut ptrs: Vec<Ptr> = Vec::new();
+        let mut arrays: Vec<(usize, Ptr, usize)> = Vec::new(); // (arg index, array, bytes)
         for a in &args {
             if let Some(r) = a.get("array").and_then(Value::as_str) {
                 let elem = self.find_class(r)?;
@@ -208,6 +264,7 @@ impl Ctx {
                 let n = if size == 0 { 0 } else { raw.len() / size };
                 let arr = (self.api.il2cpp_array_new)(elem, n);
                 std::ptr::copy_nonoverlapping(raw.as_ptr(), (arr as *mut u8).add(ARRAY_DATA), n * size);
+                arrays.push((ptrs.len(), arr, n * size));
                 ptrs.push(arr);
             } else if let Some(r) = a.get("raw").and_then(Value::as_str) {
                 store.push(unhex(r)?);
@@ -228,8 +285,11 @@ impl Ctx {
         let mut store_i = 0;
         let args_after: Vec<Value> = args
             .iter()
-            .map(|a| {
-                if a.get("raw").is_some() && a.get("array").is_none() {
+            .enumerate()
+            .map(|(i, a)| {
+                if let Some(&(_, arr, bytes)) = arrays.iter().find(|x| x.0 == i) {
+                    json!(hex(std::slice::from_raw_parts((arr as *const u8).add(ARRAY_DATA), bytes)))
+                } else if a.get("raw").is_some() {
                     store_i += 1;
                     json!(hex(&store[store_i - 1]))
                 } else {
@@ -243,6 +303,13 @@ impl Ctx {
             Value::Null
         };
         let mut v = self.reply(m, r, &tname_of(self, m))?;
+        // `"keep": true`: keep a returned object alive and return its handle
+        if req["keep"].as_bool() == Some(true)
+            && !r.is_null()
+            && (self.api.il2cpp_class_is_valuetype)((self.api.il2cpp_object_get_class)(r)) == 0
+        {
+            v["handle"] = json!((self.api.il2cpp_gchandle_new)(r, 0));
+        }
         v["args_after"] = json!(args_after);
         if this_size > 0 {
             v["this_after"] = this_after;

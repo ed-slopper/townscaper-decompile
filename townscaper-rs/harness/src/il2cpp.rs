@@ -64,6 +64,10 @@ api! {
     il2cpp_type_get_object: fn(Ptr) -> Ptr;
     il2cpp_format_exception: fn(Ptr, *mut c_char, i32) -> ();
     il2cpp_value_box: fn(Ptr, Ptr) -> Ptr;
+    il2cpp_class_from_system_type: fn(Ptr) -> Ptr;
+    il2cpp_object_new: fn(Ptr) -> Ptr;
+    il2cpp_gchandle_new: fn(Ptr, u8) -> u32;
+    il2cpp_gchandle_get_target: fn(u32) -> Ptr;
 }
 
 /// A C string from il2cpp (borrowed).

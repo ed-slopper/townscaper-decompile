@@ -3,6 +3,7 @@
 //! Addresses are of the engine code as compiled into the reference `GameAssembly.dll`, or `UnityPlayer.dll`
 //! for native engine code (notes: `docs/notes/unity.md`).
 
+pub mod collections;
 pub mod conv;
 pub mod geometry;
 pub mod mathematics;
