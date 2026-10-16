@@ -46,3 +46,35 @@ One call advances one `HexPatch.State` step (Quadrangulate: one merge per call).
 `MotivatePatch` 0xE34FE0 reuses the first patch with no motivations left (lists cleared, `quadTriCutoff` and
 state reset, `subdivisions` kept, re-keyed in `patchDict`); `UnmotivatePatch` 0xE392C0 only decrements (the
 count is a byte and wraps).
+
+## Clusters and bits (proven, E3d)
+
+A **bit** (`GridBit`, a `GameObject` under `bitContainer`) sits at a patch centre; its **clusters** are the six
+neighbours `RotateCW^i((72, -72))` around it, each made of three patches (`GetPatchOffset`, `RotateCW2`).
+`MotivateBit` / `MotivateCluster` / `MotivatePatch` count reasons to exist and reuse the first unwanted object.
+A reused bit's child `MeshFilter`s go back to `WorldMeshes` only when it was done. A new bit's `GameObject` is
+named "New Game Object": `UnityFunctions.GetNewGameObject` 0x3CCE80 drops the `"Bit " + n` name it is given.
+
+`IterateBit` 0xE2D6A0: finishes the bit's patch first, then one `GridBit.State` step per call:
+- **Verts**: the patch's corners, `HexToPlane(v - patch.hexPos)`.
+- **Relax**: squaring passes while `keepGoing()` holds, up to 255 (`relaxationSteps`). Per quad the centre is
+  `((r1 + r0) + r2) + r3) / 4`; the corners' offsets from it, turned onto corner 0 (270°, 180°, 90°), are summed,
+  normalised (`math.normalize`) and scaled by `diagonal` (√2/2). Each corner's delta in the shared
+  `GridGenerator.deltas` grows by `(centre + rotate(n)) - corner`; then every corner moves by `0.4 × delta` and
+  the delta is zeroed.
+- **Clusters**: `IterateCluster` on each of the six until done. A cluster finishes its three patches (one step
+  per call), gathers their corners once (only corners on the three lines through the cluster centre are merged
+  between patches), relaxes them like a bit (same centre order), and on the call after 255 steps lets go of its
+  patches and is done.
+- **Compose**: each corner takes the sixth `s = FloorToInt(fmod(SignedAngle(p, HexToPlane(1,-1)) + 360, 360) /
+  60)` it lies in, and blends the bit's own relaxed corner with the matching relaxed corners of the clusters at
+  `RotateCW^s((72,-72))` and one step on (their `patchVertOffsets` component by `s % 3` and `(s + 1) % 3`), with
+  weights from `ModuleMath.baryVectors[s, s+2, s+4]`: `bitPlane + ((f0·w + f1·ra) + f2·rb)`. A corner off the
+  bit lattice indexes past the cluster's list: `ArgumentOutOfRangeException` in the game.
+- **Mesh**: per quad 5 vertices (corners, centre `(((0+1)+2)+3)/4`), relative to the bit; UV0 the grid hex
+  positions, UV1 `(±1, ±1)` / `(0, 0)`, triangles round the centre; a new mesh every 35 quads.
+
+`IterateFocus` 0xE30990 recentres `hexOrigo` on the patch at the centre of `Graph.genBounds`, motivates every bit
+whose hex lies in the bounds grown by `bitExtent` (84), walking an onion one ring past the last ring used, then
+releases the bits wanted before. `IterateGenerateCenter` motivates the centre bit on every call (its count is
+the number of calls). `Measure` 0xE333E0 has no callers.

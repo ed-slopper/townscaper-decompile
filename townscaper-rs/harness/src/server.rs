@@ -33,6 +33,8 @@
 //! `results` has one reply per request.
 //! `{"field": "name", "handle": n, "main": true}` reads (and with `set_raw` / `set_handle` / `set_null`, first
 //! writes) an instance field: value types as `raw`, references as a kept `handle`.
+//! `static_field` with `"keep": true` also returns a reference field's object as a `handle`; `{"array_raw": n}`
+//! returns the element bytes of a value-type array held by handle `n`.
 //! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
 //! the field's value as `{"type", "raw"}` (value types by value, references as the 4-byte pointer).
 
@@ -219,7 +221,26 @@ impl Ctx {
         let mut buf = vec![0u8; size.max(4)];
         (self.api.il2cpp_field_static_get_value)(f, buf.as_mut_ptr() as Ptr);
         buf.truncate(size);
-        Ok(json!({"type": self.type_name(t), "raw": hex(&buf)}))
+        let mut out = json!({"type": self.type_name(t), "raw": hex(&buf)});
+        if (self.api.il2cpp_class_is_valuetype)(k) == 0 && req["keep"].as_bool() == Some(true) {
+            let p = u32::from_le_bytes(buf[..4].try_into().unwrap()) as usize as Ptr;
+            if !p.is_null() {
+                out["handle"] = json!((self.api.il2cpp_gchandle_new)(p, 0));
+            }
+        }
+        Ok(out)
+    }
+
+    /// `{"array_raw": n}`: the element bytes of the value-type array held by handle `n`.
+    unsafe fn array_raw(&self, req: &Value) -> Result<Value, String> {
+        let arr = (self.api.il2cpp_gchandle_get_target)(req["array_raw"].as_u64().ok_or("array_raw")? as u32);
+        if arr.is_null() {
+            return Err("array_raw: null".into());
+        }
+        let n = (self.api.il2cpp_array_length)(arr) as usize;
+        let elem = (self.api.il2cpp_class_get_element_class)((self.api.il2cpp_object_get_class)(arr));
+        let es = (self.api.il2cpp_class_value_size)(elem, std::ptr::null_mut()) as usize;
+        Ok(json!({"n": n, "raw": hex(std::slice::from_raw_parts((arr as *const u8).add(ARRAY_DATA), n * es))}))
     }
 
     /// `{"field": "name", "handle": n}` (or `"on": class`): an instance field of an object. Value types come back
@@ -269,6 +290,15 @@ impl Ctx {
     pub unsafe fn call(&self, req: &Value) -> Value {
         if req.get("static_field").is_some() {
             return match self.static_field(req) {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
+        if req.get("array_raw").is_some() {
+            return match self.array_raw(req) {
                 Ok(mut v) => {
                     v["ok"] = json!(true);
                     v

@@ -11,9 +11,10 @@ use std::collections::HashMap;
 
 use crate::os::hex;
 use crate::placemaker::quads::grid_generation::grid_constants::{HEX_TO_PLANE, PLANE_TO_HEX};
-use crate::placemaker::quads::grid_generation::{CustomGridLibrary, CustomGridPatch, HexPatch, HexPatchState};
-use crate::unity::mathematics::{f2, f3, hash3, i3, mul_i3x3, Float2, Float3, Int2, Int3, Int3x3, Random};
+use crate::placemaker::quads::grid_generation::{CustomGridLibrary, CustomGridPatch, HexCluster, HexPatch, HexPatchState};
+use crate::unity::mathematics::{f2, f3, hash3, i3, mul_i3x3, normalize2, Float2, Float3, Int2, Int3, Int3x2, Int3x3, Random};
 use crate::unity::mathf;
+use crate::unity::vector::{v2, Vector2, Vector3};
 
 /// `GridGenerator.bitRadius`.
 pub const BIT_RADIUS: f32 = 10.510949;
@@ -29,9 +30,9 @@ pub fn diagonal() -> f32 {
     f32::from_bits(0x3F35_04F3)
 }
 
-/// `GridBit.State`: the steps `GridGenerator.IterateBit` takes a bit through.
+/// `GridBit.State`: the steps `GridGenerator.IterateBit` takes a bit through (ordered like the game's byte).
 #[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum GridBitState {
     #[default]
     Verts = 0,
@@ -42,7 +43,23 @@ pub enum GridBitState {
     Done = 5,
 }
 
+/// One `Mesh` the game fills for a bit (`IterateBit`'s Mesh step, on a `MeshFilter` from
+/// `WorldMeshes.GetMeshFilter`, drawn with `MaterialMaster.gridMaterial` on `LayerMaster`'s grid layer):
+/// what `Mesh.SetVertices` / `SetUVs(0)` / `SetUVs(1)` / `SetTriangles` receive.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct BitMesh {
+    /// Relative to the bit's position (`PlaneToWorld(v - bitPlanePos, 0)`).
+    pub vertices: Vec<Vector3>,
+    /// The grid hex position (× 12) of each corner, and the mean for the quad's centre.
+    pub uv0: Vec<Vector2>,
+    /// `(-1,-1) (-1,1) (1,1) (1,-1)` at the corners, `(0,0)` at the centre.
+    pub uv1: Vec<Vector2>,
+    pub triangles: Vec<i32>,
+}
+
 /// `Placemaker.GridBit` (a `MonoBehaviour` under `GridGenerator.bitContainer`): one meshed piece of the grid.
+/// `name`, `active`, `position` and `meshes` are its `GameObject`: name, `activeSelf`, `transform.position` and
+/// the meshes of its child `MeshFilter`s.
 #[derive(Clone, Debug, PartialEq)]
 pub struct GridBit {
     pub hex_pos: Int2,
@@ -52,10 +69,14 @@ pub struct GridBit {
     pub patch_done: bool,
     pub state: GridBitState,
     pub verts: Vec<Float2>,
+    pub name: String,
+    pub active: bool,
+    pub position: Vector3,
+    pub meshes: Vec<BitMesh>,
 }
 
 impl Default for GridBit {
-    /// `GridBit..ctor` 0xE285F0: `verts` with capacity 256.
+    /// `GridBit..ctor` 0xE285F0: `verts` with capacity 256 (a new `GameObject` is active).
     fn default() -> Self {
         GridBit {
             hex_pos: Int2::default(),
@@ -65,6 +86,10 @@ impl Default for GridBit {
             patch_done: false,
             state: GridBitState::Verts,
             verts: Vec::with_capacity(256),
+            name: String::new(),
+            active: true,
+            position: Vector3::ZERO,
+            meshes: Vec::new(),
         }
     }
 }
@@ -319,14 +344,90 @@ pub fn is_new_grid(h: Int3) -> bool {
     1.55 < c + b + a
 }
 
-/// `Placemaker.GridGenerator`'s state, as far as the rows ported so far use it (E3c: the patches). Patches are
-/// kept in `patches` and found by position through `patch_dict` (an index into `patches`: the game's dictionary
-/// holds the same objects as its list, and patches are never removed from the list, only reused).
-#[derive(Clone, Debug, Default)]
+/// `Placemaker.ModuleMath.baryVectors` as `ModuleMath..cctor` leaves them (read from the running game; the
+/// class is row E5): per sixth of the hexagon, the gradient of a barycentric weight in the plane.
+pub fn bary_vectors() -> [Float2; 6] {
+    let b = f32::from_bits;
+    [
+        f2(b(0xBD86_FE02), b(0x3DE9_D037)),
+        f2(b(0x3D86_FE00), b(0x3DE9_D039)),
+        f2(b(0x3E06_FE01), b(0x318E_5DCA)),
+        f2(b(0x3D86_FE02), b(0xBDE9_D037)),
+        f2(b(0xBD86_FE00), b(0xBDE9_D039)),
+        f2(b(0xBE06_FE01), b(0xB18E_5DCA)),
+    ]
+}
+
+/// `Placemaker.GridGenerator`'s state. Patches, clusters and bits are kept in their lists and found by position
+/// through the dictionaries (indexes into the lists: the game's dictionaries hold the same objects as its lists;
+/// only `SceneProcessIteration` removes from a list, and it rebuilds the index).
+/// `bit_container_position` stands for `bitContainer`'s transform; `master` (`WorldMaster`) is passed in
+/// where used: `Graph.genBounds` to `iterate_focus`, `WorldMaster.KeepGoing` as `keep_going`.
+#[derive(Clone, Debug)]
 pub struct GridGenerator {
     pub custom_grid_library: CustomGridLibrary,
+    pub bits: Vec<GridBit>,
+    pub bit_dict: HashMap<Int2, usize>,
     pub patches: Vec<HexPatch>,
     pub patch_dict: HashMap<Int2, usize>,
+    pub clusters: Vec<HexCluster>,
+    pub cluster_dict: HashMap<Int2, usize>,
+    pub bit_process_index: u16,
+    pub deltas: Vec<Float2>,
+    pub focus_updated: bool,
+    pub hex_origo: Int2,
+}
+
+impl Default for GridGenerator {
+    /// `GridGenerator..ctor` 0xE393C0: empty lists and dictionaries, `focusUpdated = true`.
+    fn default() -> Self {
+        GridGenerator {
+            custom_grid_library: CustomGridLibrary::default(),
+            bits: Vec::new(),
+            bit_dict: HashMap::new(),
+            patches: Vec::new(),
+            patch_dict: HashMap::new(),
+            clusters: Vec::new(),
+            cluster_dict: HashMap::new(),
+            bit_process_index: 0,
+            deltas: Vec::new(),
+            focus_updated: true,
+            hex_origo: Int2::default(),
+        }
+    }
+}
+
+/// The six neighbours of a bit, clockwise from `(72, -72)` (the clusters around it).
+fn cluster_dirs() -> impl Iterator<Item = Int2> {
+    std::iter::successors(Some(Int2 { x: 72, y: -72 }), |d| Some(hex::rotate_cw2i(*d))).take(6)
+}
+
+fn add2(a: Int2, b: Int2) -> Int2 {
+    Int2 { x: a.x.wrapping_add(b.x), y: a.y.wrapping_add(b.y) }
+}
+
+fn sub2(a: Int2, b: Int2) -> Int2 {
+    Int2 { x: a.x.wrapping_sub(b.x), y: a.y.wrapping_sub(b.y) }
+}
+
+/// One relaxation pass over a quad (`r` its corners): the offset that would make it a square of half-diagonal
+/// `diagonal` around its centre (`((r1 + r0) + r2) + r3) / 4`), added into `deltas[k]`.
+fn square_quad(r: [Float2; 4], k: [usize; 4], centre: Float2, deltas: &mut [Float2]) {
+    use crate::os::extra_math::{rotate2d_180, rotate2d_270, rotate2d_90};
+    let c = centre;
+    let d0 = f2(r[0].x - c.x, r[0].y - c.y);
+    let e1 = rotate2d_270(f2(r[1].x - c.x, r[1].y - c.y));
+    let e2 = rotate2d_180(f2(r[2].x - c.x, r[2].y - c.y));
+    let e3 = rotate2d_90(f2(r[3].x - c.x, r[3].y - c.y));
+    let s = f2(d0.x + e1.x + e2.x + e3.x, d0.y + e1.y + e2.y + e3.y);
+    let n = normalize2(s);
+    let n = f2(diagonal() * n.x, diagonal() * n.y);
+    let targets = [n, rotate2d_90(n), rotate2d_180(n), rotate2d_270(n)];
+    for i in 0..4 {
+        let t = targets[i];
+        let d = deltas[k[i]];
+        deltas[k[i]] = f2(((c.x + t.x) - r[i].x) + d.x, ((c.y + t.y) - r[i].y) + d.y);
+    }
 }
 
 impl GridGenerator {
@@ -370,6 +471,583 @@ impl GridGenerator {
     /// `Placemaker.GridGenerator.IteratePatch` 0xE30F50 on `patches[index]`.
     pub fn iterate_patch(&mut self, index: usize) {
         iterate_patch(&self.custom_grid_library, &mut self.patches[index]);
+    }
+
+    fn patch_at(&self, pos: Int2) -> usize {
+        *self.patch_dict.get(&pos).expect("patchDict[pos]: KeyNotFoundException")
+    }
+
+    fn cluster_at(&self, pos: Int2) -> usize {
+        *self.cluster_dict.get(&pos).expect("clusterDict[pos]: KeyNotFoundException")
+    }
+
+    /// `Placemaker.GridGenerator.MotivateCluster` 0xE34CD0: as `MotivatePatch`, for clusters (a reused one
+    /// loses its relaxed verts); a cluster's first motivation, while not done, motivates its three patches.
+    pub fn motivate_cluster(&mut self, cluster_pos: Int2, source_pos: Int2) -> usize {
+        let i = match self.cluster_dict.get(&cluster_pos) {
+            Some(&i) => i,
+            None => {
+                let mut found = None;
+                for (k, q) in self.clusters.iter_mut().enumerate() {
+                    if q.motivations.count == 0 {
+                        q.patch_count = 0;
+                        q.relaxation_steps = 0;
+                        q.relaxed_verts.clear();
+                        q.vert_indexes.clear();
+                        q.done = false;
+                        let old = q.hex_pos;
+                        self.cluster_dict.remove(&old);
+                        found = Some(k);
+                        break;
+                    }
+                }
+                let i = found.unwrap_or_else(|| {
+                    self.clusters.push(HexCluster::default());
+                    self.clusters.len() - 1
+                });
+                self.clusters[i].hex_pos = cluster_pos;
+                assert!(self.cluster_dict.insert(cluster_pos, i).is_none(), "MotivateCluster: Dictionary.Add of an existing key");
+                i
+            }
+        };
+        if self.clusters[i].motivations.add_motivation(source_pos) == 1 && !self.clusters[i].done {
+            self.clusters[i].patch_count = 0;
+            let pos = self.clusters[i].hex_pos;
+            let mut off = get_patch_offset(pos);
+            for _ in 0..3 {
+                self.motivate_patch(add2(pos, off), cluster_pos);
+                off = hex::rotate_cw2_2i(off);
+            }
+        }
+        i
+    }
+
+    /// `Placemaker.GridGenerator.UnmotivateCluster` 0xE39280.
+    pub fn unmotivate_cluster(&mut self, index: usize, source_pos: Int2) {
+        if self.clusters[index].motivations.remove_motivation(source_pos) == 0 && !self.clusters[index].done {
+            self.unmotivate_cluster_children(index);
+        }
+    }
+
+    /// `Placemaker.GridGenerator.UnmotivateClusterChildren` 0xE391C0: its three patches.
+    pub fn unmotivate_cluster_children(&mut self, index: usize) {
+        let pos = self.clusters[index].hex_pos;
+        let mut off = get_patch_offset(pos);
+        for _ in 0..3 {
+            self.unmotivate_patch(add2(pos, off), pos);
+            off = hex::rotate_cw2_2i(off);
+        }
+    }
+
+    /// `Placemaker.GridGenerator.MotivateBit` 0xE34790: one more reason for the bit at `bit_pos` to exist. A new
+    /// bit reuses the first unwanted one (its meshes go back to `WorldMeshes` when it was done; verts and steps
+    /// reset), else a new `GameObject` under `bitContainer`; it is placed at the position. The first
+    /// motivation motivates its patch (hidden until remeshed) and, unless done, its six clusters, stepping its
+    /// state back to Clusters when one of the first `clusterCount` is not done.
+    pub fn motivate_bit(&mut self, bit_pos: Int2) -> usize {
+        let i = match self.bit_dict.get(&bit_pos) {
+            Some(&i) => i,
+            None => {
+                let mut found = None;
+                for (k, b) in self.bits.iter_mut().enumerate() {
+                    if b.motivations == 0 {
+                        let old = b.hex_pos;
+                        self.bit_dict.remove(&old);
+                        if b.state == GridBitState::Done {
+                            // `WorldMaster.worldMeshes.ReturnMeshFilter` on each child, last first
+                            b.meshes.clear();
+                        }
+                        b.verts.clear();
+                        b.relaxation_steps = 0;
+                        b.cluster_count = 0;
+                        b.state = GridBitState::Verts;
+                        found = Some(k);
+                        break;
+                    }
+                }
+                let i = found.unwrap_or_else(|| {
+                    // `UnityFunctions.GetNewObject<GridBit>("Bit " + bits.Count, bitContainer)`: its
+                    // `GetNewGameObject` 0x3CCE80 makes a `new GameObject()`, so the name is lost
+                    self.bits.push(GridBit { name: "New Game Object".into(), ..Default::default() });
+                    self.bits.len() - 1
+                });
+                let p = hex::plane_to_world(hex_to_plane_i2(bit_pos), 0.0);
+                self.bits[i].position = Vector3 { x: p.x, y: p.y, z: p.z };
+                self.bits[i].hex_pos = bit_pos;
+                assert!(self.bit_dict.insert(bit_pos, i).is_none(), "MotivateBit: Dictionary.Add of an existing key");
+                i
+            }
+        };
+        let old = self.bits[i].motivations;
+        self.bits[i].motivations = old.wrapping_add(1);
+        if old == 0 {
+            self.motivate_patch(bit_pos, bit_pos);
+            self.bits[i].active = false;
+            self.bits[i].patch_done = false;
+            if self.bits[i].state != GridBitState::Done {
+                for (k, dir) in cluster_dirs().enumerate() {
+                    let c = self.motivate_cluster(add2(bit_pos, dir), bit_pos);
+                    let k = k as u8;
+                    if !self.clusters[c].done && k < self.bits[i].cluster_count {
+                        self.bits[i].cluster_count = k;
+                        if GridBitState::Clusters < self.bits[i].state {
+                            self.bits[i].state = GridBitState::Clusters;
+                        }
+                    }
+                }
+            }
+        }
+        i
+    }
+
+    /// `Placemaker.GridGenerator.UnmotivateBit` 0xE39150: the last motivation hides it and lets go of its
+    /// clusters (unless meshed) and its patch.
+    pub fn unmotivate_bit(&mut self, index: usize) {
+        let b = &mut self.bits[index];
+        b.motivations = b.motivations.wrapping_sub(1);
+        if b.motivations == 0 {
+            b.active = false;
+            if b.state < GridBitState::Mesh {
+                self.unmotivate_bit_children(index);
+            }
+            let pos = self.bits[index].hex_pos;
+            self.unmotivate_patch(pos, pos);
+        }
+    }
+
+    /// `Placemaker.GridGenerator.UnmotivateBitChildren` 0xE39040: its six clusters.
+    pub fn unmotivate_bit_children(&mut self, index: usize) {
+        let pos = self.bits[index].hex_pos;
+        for dir in cluster_dirs() {
+            let c = self.cluster_at(add2(pos, dir));
+            if self.clusters[c].motivations.remove_motivation(pos) == 0 && !self.clusters[c].done {
+                self.unmotivate_cluster_children(c);
+            }
+        }
+    }
+
+    fn grow_deltas(&mut self, n: usize) {
+        while self.deltas.len() < n {
+            self.deltas.push(Float2::default());
+        }
+    }
+
+    /// `Placemaker.GridGenerator.IterateCluster` 0xE2F950: first finishes the cluster's three patches (one
+    /// `IteratePatch` per call, "Cluster.Patch"), then gathers their corners once (shared corners on the three
+    /// lines through the cluster's centre are merged; "Cluster.Gather"), then relaxes them while `keep_going`
+    /// allows, up to 255 steps; the call after that lets go of the patches and marks it done.
+    pub fn iterate_cluster(&mut self, index: usize, keep_going: &mut dyn FnMut() -> bool) {
+        let pos = self.clusters[index].hex_pos;
+        if self.clusters[index].patch_count < 3 {
+            let mut off = get_patch_offset(pos);
+            for _ in 0..self.clusters[index].patch_count {
+                off = hex::rotate_cw2_2i(off);
+            }
+            let p = self.patch_at(add2(pos, off));
+            if !self.patches[p].done() {
+                self.iterate_patch(p);
+            } else {
+                self.clusters[index].patch_count += 1;
+            }
+            return;
+        }
+        if self.clusters[index].vert_indexes.is_empty() {
+            self.gather_cluster(index);
+            return;
+        }
+        if self.clusters[index].relaxation_steps == 0xFF {
+            self.unmotivate_cluster_children(index);
+            self.clusters[index].done = true;
+            return;
+        }
+        let mut off = get_patch_offset(pos);
+        let mut ps = [0usize; 3];
+        for p in ps.iter_mut() {
+            *p = self.patch_at(add2(pos, off));
+            off = hex::rotate_cw2_2i(off);
+        }
+        let n = self.clusters[index].relaxed_verts.len();
+        self.grow_deltas(n);
+        let o = self.clusters[index].patch_vert_offsets;
+        let offsets = [o.x, o.y, o.z];
+        loop {
+            loop {
+                if !keep_going() || self.clusters[index].relaxation_steps == 0xFF {
+                    return;
+                }
+                self.clusters[index].relaxation_steps += 1;
+                for (pi, &p) in ps.iter().enumerate() {
+                    let quads = &self.patches[p].quads;
+                    let c = &self.clusters[index];
+                    let mut i = 0;
+                    while i < quads.len() {
+                        let k: [usize; 4] = std::array::from_fn(|j| {
+                            let at = offsets[pi].wrapping_add(quads[i + j] as i32);
+                            c.vert_indexes[list_index(at)] as i32 as usize
+                        });
+                        let r: [Float2; 4] = std::array::from_fn(|j| c.relaxed_verts[k[j]]);
+                        let centre = f2(
+                            (r[1].x + r[0].x + r[2].x + r[3].x) * 0.25,
+                            (r[1].y + r[0].y + r[2].y + r[3].y) * 0.25,
+                        );
+                        square_quad(r, k, centre, &mut self.deltas);
+                        i += 4;
+                    }
+                }
+                if n >= 1 {
+                    break;
+                }
+            }
+            let c = &mut self.clusters[index];
+            for j in 0..n {
+                let (v, d) = (c.relaxed_verts[j], self.deltas[j]);
+                c.relaxed_verts[j] = f2(v.x + d.x * 0.4, v.y + d.y * 0.4);
+                self.deltas[j] = Float2::default();
+            }
+        }
+    }
+
+    /// `IterateCluster`'s "Cluster.Gather": the three patches' corners into `vertIndexes` (where each patch's
+    /// start is `patchVertOffsets`) and the distinct ones, relative to the cluster, into `relaxedVerts`.
+    fn gather_cluster(&mut self, index: usize) {
+        let pos = self.clusters[index].hex_pos;
+        let c3 = hex::get_hex3(pos);
+        let mut distinct: Vec<Int2> = Vec::with_capacity(768);
+        let mut off = get_patch_offset(pos);
+        let mut starts = [0i32; 3];
+        let mut total = 0i32;
+        for (p, start) in starts.iter_mut().enumerate() {
+            let pi = self.patch_at(add2(pos, off));
+            off = hex::rotate_cw2_2i(off);
+            *start = total;
+            let verts = &self.patches[pi].verts;
+            for &v in verts {
+                let on_line = !(v.x != c3.x && v.y != c3.y && c3.z.wrapping_neg() != v.x.wrapping_add(v.y));
+                let found = if p == 0 || !on_line { None } else { distinct.iter().position(|&u| u == v) };
+                let k = found.unwrap_or_else(|| {
+                    distinct.push(v);
+                    distinct.len() - 1
+                });
+                self.clusters[index].vert_indexes.push(k as i16);
+            }
+            total = total.wrapping_add(verts.len() as i32);
+        }
+        let c = &mut self.clusters[index];
+        c.patch_vert_offsets = i3(starts[0], starts[1], starts[2]);
+        for u in distinct {
+            c.relaxed_verts.push(hex_to_plane_i2(sub2(u, pos)));
+        }
+    }
+
+    /// `Placemaker.GridGenerator.IterateBit` 0xE2D6A0: first finishes the bit's patch (one step per call), then
+    /// one `GridBit.State` step: Verts (the patch's corners in the plane, relative to it), Relax (while
+    /// `keep_going` allows, up to 255 steps), Clusters (one `IterateCluster` per call on each of the six until
+    /// done), Compose (each corner blended with the two neighbouring clusters' relaxed corners by barycentric
+    /// weights; then lets go of the clusters), Mesh (the bit's `Mesh`es; shown).
+    pub fn iterate_bit(&mut self, index: usize, keep_going: &mut dyn FnMut() -> bool) {
+        let pos = self.bits[index].hex_pos;
+        if !self.bits[index].patch_done {
+            let p = self.patch_at(pos);
+            if !self.patches[p].done() {
+                self.iterate_patch(p);
+                if !self.patches[p].done() {
+                    return;
+                }
+            }
+            self.bits[index].patch_done = true;
+            if self.bits[index].state == GridBitState::Done {
+                self.bits[index].active = true;
+            }
+        }
+        match self.bits[index].state {
+            GridBitState::Verts => {
+                let p = self.patch_at(pos);
+                let patch = &self.patches[p];
+                for &v in &patch.verts {
+                    self.bits[index].verts.push(hex_to_plane_i2(sub2(v, patch.hex_pos)));
+                }
+                self.bits[index].state = GridBitState::Relax;
+            }
+            GridBitState::Relax => {
+                if self.bits[index].relaxation_steps == 0xFF {
+                    self.bits[index].state = GridBitState::Clusters;
+                    return;
+                }
+                let p = self.patch_at(pos);
+                let n = self.bits[index].verts.len();
+                self.grow_deltas(n);
+                loop {
+                    if !keep_going() || self.bits[index].relaxation_steps == 0xFF {
+                        return;
+                    }
+                    self.bits[index].relaxation_steps += 1;
+                    let quads = &self.patches[p].quads;
+                    let b = &self.bits[index];
+                    let mut i = 0;
+                    while i < quads.len() {
+                        let k: [usize; 4] = std::array::from_fn(|j| quads[i + j] as usize);
+                        let r: [Float2; 4] = std::array::from_fn(|j| b.verts[k[j]]);
+                        let centre = f2(
+                            (r[1].x + r[0].x + r[2].x + r[3].x) * 0.25,
+                            (r[1].y + r[0].y + r[2].y + r[3].y) * 0.25,
+                        );
+                        square_quad(r, k, centre, &mut self.deltas);
+                        i += 4;
+                    }
+                    let b = &mut self.bits[index];
+                    for j in 0..n {
+                        let (v, d) = (b.verts[j], self.deltas[j]);
+                        b.verts[j] = f2(d.x * 0.4 + v.x, d.y * 0.4 + v.y);
+                        self.deltas[j] = Float2::default();
+                    }
+                }
+            }
+            GridBitState::Clusters => {
+                if 5 < self.bits[index].cluster_count {
+                    self.bits[index].state = GridBitState::Compose;
+                    return;
+                }
+                let dir = cluster_dirs().nth(self.bits[index].cluster_count as usize).unwrap();
+                let c = self.cluster_at(add2(pos, dir));
+                if !self.clusters[c].done {
+                    self.iterate_cluster(c, keep_going);
+                } else {
+                    self.bits[index].cluster_count += 1;
+                }
+            }
+            GridBitState::Compose => self.compose_bit(index),
+            GridBitState::Mesh => self.mesh_bit(index),
+            GridBitState::Done => {}
+        }
+    }
+
+    /// `IterateBit`'s Compose step: each corner, by the sixth of the hexagon it lies in (from its angle to
+    /// `HexToPlane((1, -1))`), is blended with the matching relaxed corners of the two clusters on that sixth's
+    /// edges, by the barycentric weights of `ModuleMath.baryVectors`; the result is absolute in the plane.
+    fn compose_bit(&mut self, index: usize) {
+        let pos = self.bits[index].hex_pos;
+        let p = self.patch_at(pos);
+        let to = hex_to_plane_i2(Int2 { x: 1, y: -1 });
+        let bit_plane = hex_to_plane_i2(pos);
+        let bary = bary_vectors();
+        let n = self.bits[index].verts.len();
+        for i in 0..n {
+            let patch = &self.patches[p];
+            let from = hex_to_plane_i2(sub2(patch.verts[i], patch.hex_pos));
+            let angle = Vector2::signed_angle(v2(from.x, from.y), v2(to.x, to.y));
+            let angle = (((angle + 360.0) as f64) % 360.0) as f32;
+            let s = mathf::floor_to_int(angle / 60.0);
+            let next = (s + 1) % 6;
+            let mut dir_a = Int2 { x: 72, y: -72 };
+            for _ in 0..s.max(0) {
+                dir_a = hex::rotate_cw2i(dir_a);
+            }
+            let dir_b = hex::rotate_cw2i(dir_a);
+            let ca = &self.clusters[self.cluster_at(add2(pos, dir_a))];
+            let cb = &self.clusters[self.cluster_at(add2(pos, dir_b))];
+            let pick = |o: Int3, r: i32| match r {
+                0 => o.z,
+                1 => o.y,
+                2 => o.x,
+                _ => 0,
+            };
+            let off_a = pick(ca.patch_vert_offsets, s % 3);
+            let off_b = pick(cb.patch_vert_offsets, next % 3);
+            let pa = hex_to_plane_i2(dir_a);
+            let pb = hex_to_plane_i2(dir_b);
+            let w = self.bits[index].verts[i];
+            let ra = ca.relaxed_verts[ca.vert_indexes[list_index(off_a.wrapping_add(i as i32))] as i32 as usize];
+            let ra = f2(pa.x + ra.x, pa.y + ra.y);
+            let rb = cb.relaxed_verts[cb.vert_indexes[list_index(off_b.wrapping_add(i as i32))] as i32 as usize];
+            let rb = f2(pb.x + rb.x, pb.y + rb.y);
+            let (b0, b1, b2) = (bary[list_index(s % 6)], bary[list_index((s + 2) % 6)], bary[list_index((s + 4) % 6)]);
+            let f0 = b0.x * (from.x - pa.x) + b0.y * (from.y - pa.y);
+            let f1 = b1.x * (from.x - pb.x) + b1.y * (from.y - pb.y);
+            let f2_ = b2.y * from.y + b2.x * from.x;
+            self.bits[index].verts[i] = f2(
+                bit_plane.x + ((f0 * w.x + f1 * ra.x) + f2_ * rb.x),
+                bit_plane.y + ((f0 * w.y + f1 * ra.y) + f2_ * rb.y),
+            );
+        }
+        self.unmotivate_bit_children(index);
+        self.bits[index].state = GridBitState::Mesh;
+    }
+
+    /// `IterateBit`'s Mesh step: per quad of the patch, its four corners and its centre (5 vertices, 4
+    /// triangles round the centre), a new `Mesh` every 35 quads.
+    fn mesh_bit(&mut self, index: usize) {
+        let pos = self.bits[index].hex_pos;
+        let p = self.patch_at(pos);
+        let bit_plane = hex_to_plane_i2(pos);
+        let patch = &self.patches[p];
+        let b = &self.bits[index];
+        let mut meshes = Vec::new();
+        let mut m = BitMesh::default();
+        let world = |v: Float2| {
+            let w = hex::plane_to_world(f2(v.x - bit_plane.x, v.y - bit_plane.y), 0.0);
+            Vector3 { x: w.x, y: w.y, z: w.z }
+        };
+        let mut base = 0i32;
+        let mut i = 0;
+        while i < patch.quads.len() {
+            let q: [usize; 4] = std::array::from_fn(|j| patch.quads[i + j] as usize);
+            let r: [Float2; 4] = std::array::from_fn(|j| b.verts[q[j]]);
+            let h: [Float2; 4] = std::array::from_fn(|j| f2(patch.verts[q[j]].x as f32, patch.verts[q[j]].y as f32));
+            let centre = f2((r[0].x + r[1].x + r[2].x + r[3].x) * 0.25, (r[0].y + r[1].y + r[2].y + r[3].y) * 0.25);
+            let hc = f2((h[0].x + h[1].x + h[2].x + h[3].x) * 0.25, (h[0].y + h[1].y + h[2].y + h[3].y) * 0.25);
+            for v in [r[0], r[1], r[2], r[3], centre] {
+                m.vertices.push(world(v));
+            }
+            for v in [h[0], h[1], h[2], h[3], hc] {
+                m.uv0.push(v2(v.x, v.y));
+            }
+            for v in [v2(-1.0, -1.0), v2(-1.0, 1.0), v2(1.0, 1.0), v2(1.0, -1.0), v2(0.0, 0.0)] {
+                m.uv1.push(v);
+            }
+            for t in [0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4] {
+                m.triangles.push(base + t);
+            }
+            base += 5;
+            if base >= 171 {
+                meshes.push(std::mem::take(&mut m));
+                base = 0;
+            }
+            i += 4;
+        }
+        if base > 0 {
+            meshes.push(m);
+        }
+        let b = &mut self.bits[index];
+        b.meshes.extend(meshes);
+        b.state = GridBitState::Done;
+        b.active = true;
+    }
+
+    /// `Placemaker.GridGenerator.IterateBits` 0xE2F8B0: one step of the bit at `bitProcessIndex` while it
+    /// needs one, else on to the next; false once past the last.
+    pub fn iterate_bits(&mut self, keep_going: &mut dyn FnMut() -> bool) -> bool {
+        let i = self.bit_process_index as usize;
+        if self.bits.len() <= i {
+            return false;
+        }
+        let b = &self.bits[i];
+        if (b.state != GridBitState::Done || !b.patch_done) && b.motivations != 0 {
+            self.iterate_bit(i, keep_going);
+        } else {
+            self.bit_process_index = self.bit_process_index.wrapping_add(1);
+        }
+        true
+    }
+
+    /// `Placemaker.GridGenerator.IterateGenerateCenter` 0xE30E90: works on the bit at `hexOrigo`; true while
+    /// it is not done.
+    pub fn iterate_generate_center(&mut self, keep_going: &mut dyn FnMut() -> bool) -> bool {
+        let b = self.motivate_bit(self.hex_origo);
+        if self.bits[b].state != GridBitState::Done {
+            self.iterate_bit(b, keep_going);
+            return self.bits[b].state != GridBitState::Done;
+        }
+        false
+    }
+
+    /// `Placemaker.GridGenerator.IterateFocus` 0xE30990: when the focus moved, recentres on the patch at the
+    /// centre of `gen_bounds` (`WorldMaster.graph.genBounds`), wants every bit near the bounds (grown by
+    /// `bitExtent`; found ring by ring, one ring past the last one used) and lets go of the bits wanted before.
+    pub fn iterate_focus(&mut self, gen_bounds: Int3x2) -> bool {
+        use crate::os::extra_math::{center, contains};
+        if !self.focus_updated {
+            return false;
+        }
+        self.focus_updated = false;
+        let c = center(gen_bounds);
+        self.hex_origo = hex::get_hex2(hex_to_patch_hex_f(f3(c.x as f32, c.y as f32, c.z as f32)));
+        let wanted: Vec<usize> = (0..self.bits.len()).rev().filter(|&i| self.bits[i].motivations != 0).collect();
+        let e = BIT_EXTENT;
+        let grown = Int3x2 {
+            c0: i3(gen_bounds.c0.x.wrapping_sub(e), gen_bounds.c0.y.wrapping_sub(e), gen_bounds.c0.z.wrapping_sub(e)),
+            c1: i3(gen_bounds.c1.x.wrapping_add(e), gen_bounds.c1.y.wrapping_add(e), gen_bounds.c1.z.wrapping_add(e)),
+        };
+        let mut it = hex::HexOnionIterator::default();
+        let mut last = 1u32;
+        loop {
+            let d = it.dual_pos2();
+            let p = Int2 {
+                x: self.hex_origo.x.wrapping_add(d.x.wrapping_mul(72)),
+                y: self.hex_origo.y.wrapping_add(d.y.wrapping_mul(72)),
+            };
+            if contains(grown, hex::get_hex3(p)) {
+                last = it.layer_index.wrapping_add(1);
+                self.motivate_bit(p);
+            }
+            it.increment();
+            if !(it.layer_index <= last) {
+                break;
+            }
+        }
+        for &i in wanted.iter().rev() {
+            let b = &mut self.bits[i];
+            b.motivations = b.motivations.wrapping_sub(1);
+            if b.motivations == 0 {
+                b.active = false;
+                if b.state < GridBitState::Mesh {
+                    self.unmotivate_bit_children(i);
+                }
+                let pos = self.bits[i].hex_pos;
+                let p = self.patch_at(pos);
+                self.patches[p].motivations.remove_motivation(pos);
+            }
+        }
+        self.bit_process_index = 0;
+        true
+    }
+
+    /// `Placemaker.GridGenerator.OnEnable` 0xE37450: rebuilds the dictionaries from the (serialized) lists; a
+    /// bit left part-way between relaxing and done starts over ("Wrongly relaxed grid bit: " warning).
+    pub fn on_enable(&mut self) {
+        self.patch_dict = self.patches.iter().enumerate().map(|(i, p)| (p.hex_pos, i)).collect();
+        self.bit_dict.clear();
+        for (i, b) in self.bits.iter_mut().enumerate() {
+            if GridBitState::Relax < b.state && b.relaxation_steps != 0xFF {
+                // STANDIN: Debug.LogWarning("Wrongly relaxed grid bit: " + relaxationSteps + ... + 255) not shown
+                b.verts.clear();
+                b.relaxation_steps = 0;
+                b.cluster_count = 0;
+                b.state = GridBitState::Verts;
+            }
+            assert!(self.bit_dict.insert(b.hex_pos, i).is_none(), "OnEnable: Dictionary.Add of an existing key");
+        }
+        self.cluster_dict = self.clusters.iter().enumerate().map(|(i, c)| (c.hex_pos, i)).collect();
+    }
+
+    /// `Placemaker.GridGenerator.SceneProcessIteration` 0xE38830 (the scene-baking path): starts over with the
+    /// bit at the origin, steps it up to its Mesh state, forgets the clusters and drops unwanted patches.
+    pub fn scene_process_iteration(&mut self) {
+        self.bits.clear();
+        self.bit_dict.clear();
+        self.patches.clear();
+        self.patch_dict.clear();
+        self.clusters.clear();
+        self.cluster_dict.clear();
+        let b = self.motivate_bit(Int2::default());
+        self.bits[b].verts.clear();
+        self.bits[b].relaxation_steps = 0;
+        self.bits[b].cluster_count = 0;
+        self.bits[b].state = GridBitState::Verts;
+        // `GridGenerator.<>c.<SceneProcessIteration>b__46_0` 0x1F1440: always true
+        while self.bits[b].state < GridBitState::Mesh {
+            self.iterate_bit(b, &mut || true);
+        }
+        self.bits[b].cluster_count = 0;
+        self.clusters.clear();
+        self.cluster_dict.clear();
+        for i in (0..self.patches.len()).rev() {
+            if self.patches[i].motivations.count == 0 {
+                let pos = self.patches[i].hex_pos;
+                self.patch_dict.remove(&pos);
+                self.patches.remove(i);
+            }
+        }
+        self.patch_dict = self.patches.iter().enumerate().map(|(i, p)| (p.hex_pos, i)).collect();
     }
 }
 
