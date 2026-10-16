@@ -6,6 +6,7 @@ pub mod audio;
 pub mod install;
 pub mod mesh;
 pub mod objects;
+pub mod scene;
 pub mod serialized;
 pub mod texture;
 pub mod vorbis;

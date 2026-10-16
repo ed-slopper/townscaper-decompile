@@ -103,3 +103,18 @@ table). Vorbis data = packets each prefixed by a u16 length.
 - `ts_data::vorbis::decode` (lewton) gives exactly the bank's sample count for all 90 clips.
 - `birdsappear` (0.36 s, stereo 48 kHz, full-size packets) decodes to -97.6 dBFS RMS, the level of 16-bit
   dither: the clip is effectively silent in the build (same decoder and quality give normal levels elsewhere).
+
+## Scenes (F8f, proven 2026-10-15)
+
+`ts_data::scene::roots(&assets, "level1")` builds a file's GameObject tree (roots = transforms without a
+father, children in stored order) with each component named (Unity class, or the MonoBehaviour's script).
+Proven: every GameObject of each scene file appears exactly once, no cycles, every component named.
+`cargo run -p ts_data --example dump_scene -- level1` prints a tree (the game's data: don't commit output).
+
+| File | Roots | GameObjects | What (top level) |
+|---|---:|---:|---|
+| level0 | 3 | 34 | Boot: `PlatformManager`, `Rewired Input Manager`, `BootMaster` (canvas with `Dim`, `Loading`) |
+| level1 | 2 | 115 | The world: `WorldMaster` (inactive at load) with one child per system: `SaveSystem`, `MaterialMaster`, `Texture Png Master`, `AoBaker`, `Grid` (`GridGenerator`), `Graph`, `Maker`, `WorldMeshes`, `WaveFunctionCollapse`, `HoverHightlight`, `ClickEffect`, `ModuleBuilder`, `TextSaveSystem`, ... |
+| level2 | 2 | 1,065 | The UI: `UiMaster` (inactive at load) with `OrbitalCamera`, `ActionInputManager`, `InputModeManager`, the canvases, menu music |
+
+Inferred: the child order under `WorldMaster` is the order its systems are set up (E8 to confirm from code).
