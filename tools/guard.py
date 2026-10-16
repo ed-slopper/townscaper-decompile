@@ -92,7 +92,8 @@ def check_index() -> dict[tuple[str, str], set[str]]:
     return by_rva
 
 
-DOC_REF = re.compile(r"`((?:Placemaker|Os)(?:\.\w+)+)\.([\w.<>`]+)`\s+(0x[0-9A-Fa-f]+)")
+# `Ns.Type.Method` 0x..., optionally with a parameter list: `Ns.Type.Method(int, float)` 0x...
+DOC_REF = re.compile(r"`((?:Placemaker|Os)(?:\.\w+)+)\.([\w.<>]+)(?:\([^`]*\))?`\s+(0x[0-9A-Fa-f]+)")
 
 
 def check_doc_refs(files: list[str], index: dict[tuple[str, str], set[str]]) -> int:
