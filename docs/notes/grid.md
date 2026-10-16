@@ -78,3 +78,30 @@ named "New Game Object": `UnityFunctions.GetNewGameObject` 0x3CCE80 drops the `"
 whose hex lies in the bounds grown by `bitExtent` (84), walking an onion one ring past the last ring used, then
 releases the bits wanted before. `IterateGenerateCenter` motivates the centre bit on every call (its count is
 the number of calls). `Measure` 0xE333E0 has no callers.
+
+## Queries and meshes (proven, E3e)
+
+- `GetQuad(float2)` 0xE2AD80: the plane point's hex, rounded (`math.round`, ties to even), picks the nearest
+  cluster; the three bits round it are tried nearest first (`(x² + y²) + z²`, three compare-swaps), each only
+  when `Done` and wanted. In a bit, a binary search of exactly 5 halvings (no `lo ≤ hi` test) over the sorted
+  quads for `GetVertCost(hex) - 0.5`, then a scan alternating after / before that point. Each side stops when its
+  quad's first corner leaves `y - 3.5 .. y + 4.5`; a quad counts when its first corner is within √6 and the
+  point is on the inner side of all four edges (edge 0 sums the y term first, the others x first).
+- `GetQuad(int2, int2, int2)` 0xE2A740: the quad of the patch's finished bit with edge `c0 → c1`, its
+  `quadIndex` left 0.
+- `GetClostestVertPosition` 0xE2A2A0: the quad's corner picked by `!(a2 > a0)` / `!(a3 > a1)` of the four edge
+  distances.
+- `GetAdjecentQuad` 0xE29AB0 (no callers) and `AppendQuadList` 0xE289A0 (`DrawPlane`): the neighbour across edge
+  `v0–v3` (or `v1–v2`), searched from `(n + (quadIndex - 20) * 4) % n` (Ghidra drops the `* 4`), returned
+  rotated so the shared edge is its `v1–v2` (or `v3–v0`). The strip walk stops at a quad whose edge `p1 → p0`
+  faces along the camera direction's perpendicular. The cached patch carries over between the two walks; the
+  return is true when any quad was added; `hoverIndex` counts the quads put in front.
+- `GetVertOrIterate` 0xE2BC70: the vert's quads from the up to three bits sharing it (`HexToPatchHexes` mask),
+  each added with `Vert.AddQuad` and its corner angle (`Vector2.Angle(prev - a, next - a)`) summed, stopping past
+  350°. An unfinished bit is iterated `while (keepGoing())` (not until done; an always-true `keepGoing` never
+  returns); `quadCount` -1 / -2 / -3 for no bit / no `keepGoing` / still unfinished.
+- `PopulateBorderMesh` 0xE37920 (`BorderDrawer`): quads near the vert that cross `Graph.border` and touch the
+  vert: 4 world vertices, triangles `0 1 2 2 3 0`, UVs into `AoBaker.marchingSquaresTex` by the inside pattern
+  weighted with `AoBaker.powers` (`u = tx/2 + 2·Σ·tx`), +1 at the vert's corner.
+- `SetQuadMesh` 0xE38BB0 has no callers and assumes a 4-vertex-per-quad, 300-vertex mesh layout the Mesh step no
+  longer builds (left unported); `OnDrawGizmos` is editor-only.

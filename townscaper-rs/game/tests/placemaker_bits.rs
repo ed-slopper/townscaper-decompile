@@ -409,3 +409,172 @@ fn generate_center_matches_the_game() {
     game.bits[0].motivations = ours.bits[0].motivations;
     same(&game, &ours_snapshot(&ours, true), "IterateGenerateCenter finished");
 }
+
+// ---- E3e: queries on a finished neighbourhood ----
+
+use ts_game::placemaker::quads::{Quad, Vert};
+use ts_game::unity::mathematics::Int4;
+
+fn qbytes(q: &Quad) -> Vec<u8> {
+    bits_of(std::slice::from_ref(q))
+}
+fn vbytes(v: &Vert) -> Vec<u8> {
+    bits_of(std::slice::from_ref(v))
+}
+fn quad_of(b: &[u8]) -> Quad {
+    assert_eq!(b.len(), 68);
+    let mut q = Quad::default();
+    unsafe { std::ptr::copy_nonoverlapping(b.as_ptr(), &mut q as *mut Quad as *mut u8, 68) };
+    q
+}
+
+/// Both sides grow the scene's focus to the end (IterateFocus + IterateBits).
+fn finished_world(g: &mut Game) -> GridGenerator {
+    let mut ours = GridGenerator { custom_grid_library: our_library(), ..Default::default() };
+    let master = g.obj(g.gen, "master");
+    let graph = g.obj(master, "graph");
+    let b = i32s(&g.raw(graph, "genBounds"));
+    let bounds = Int3x2 { c0: i3(b[0], b[1], b[2]), c1: i3(b[3], b[4], b[5]) };
+    ours.iterate_focus(bounds);
+    g.gen_call("IterateFocus", vec![], false);
+    while ours.iterate_bits(&mut || true) {}
+    let kg = g.keep_going;
+    while ret::bytes(&g.gen_call("IterateBits", vec![json!({"handle": kg})], false))[0] != 0 {}
+    same(&snapshot(g, false), &ours_snapshot(&ours, false), "finished world");
+    ours
+}
+
+struct Rng(u32);
+impl Rng {
+    fn next(&mut self) -> u32 {
+        self.0 ^= self.0 << 13;
+        self.0 ^= self.0 >> 17;
+        self.0 ^= self.0 << 5;
+        self.0
+    }
+    fn f(&mut self, lo: f32, hi: f32) -> f32 {
+        lo + (self.next() as f32 / u32::MAX as f32) * (hi - lo)
+    }
+}
+
+fn delegate(g: &mut Game, class: &str, getter: &str) -> u64 {
+    let ty = |g: &mut Game, n: &str| {
+        let r = g.req(json!({"call": "System.Type.GetType", "args": [arg::string(n)], "param_types": ["System.String"], "main": true, "keep": true}), n);
+        handle(&r, n)
+    };
+    let func = ty(g, "System.Func`1[[System.Boolean]]");
+    let t = ty(g, class);
+    let mi = handle(&g.req(json!({"call": "GetMethod", "class": "System.Type", "handle": t, "args": [arg::string(getter)], "param_types": ["System.String"], "main": true, "keep": true}), "GetMethod"), "mi");
+    handle(&g.req(json!({"call": "System.Delegate.CreateDelegate", "args": [{"handle": func}, {"handle": mi}], "param_types": ["System.Type", "System.Reflection.MethodInfo"], "main": true, "keep": true}), "CreateDelegate"), "delegate")
+}
+
+#[test]
+fn grid_queries_match_the_game() {
+    let Some(mut h) = harness() else { return };
+    let mut g = setup(&mut h);
+    let mut ours = finished_world(&mut g);
+    // the plane area the finished bits cover
+    let ps: Vec<Vector3> = ours.bits.iter().filter(|b| b.state == GridBitState::Done).map(|b| b.position).collect();
+    let (x0, x1) = (ps.iter().map(|p| p.x).fold(f32::MAX, f32::min) - 12.0, ps.iter().map(|p| p.x).fold(f32::MIN, f32::max) + 12.0);
+    let (z0, z1) = (ps.iter().map(|p| p.z).fold(f32::MAX, f32::min) - 12.0, ps.iter().map(|p| p.z).fold(f32::MIN, f32::max) + 12.0);
+    let mut r = Rng(61);
+    let mut found = Vec::new();
+    let (mut hits, mut misses) = (0, 0);
+    for k in 0..400 {
+        let p = f2(r.f(x0, x1), r.f(z0, z1));
+        let q = ours.get_quad(p);
+        let game = ret::bytes(&g.gen_call("GetQuad", vec![arg::raw(&bits_of(&[p.x, p.y]))], false));
+        assert_eq!(game, qbytes(&q), "GetQuad({p:?}) #{k}\ngame {:?}\nours {q:?}", quad_of(&game));
+        if q.is_valid() {
+            hits += 1;
+            found.push(q)
+        } else {
+            misses += 1
+        }
+        let v = ours.get_clostest_vert_position(p);
+        let game = ret::bytes(&g.gen_call("GetClostestVertPosition", vec![arg::raw(&bits_of(&[p.x, p.y]))], false));
+        assert_eq!(game, vbytes(&v), "GetClostestVertPosition({p:?})");
+    }
+    eprintln!("GetQuad: {hits} hits, {misses} misses");
+    assert!(hits > 100 && misses > 10, "both answers should occur");
+    let ql = list("Placemaker.Quads.Quad, Assembly-CSharp");
+    let mut strip_quads = 0;
+    for (k, q) in found.iter().enumerate().take(120) {
+        // GetQuad by an edge, from each corner
+        let vs = [q.v0, q.v1, q.v2, q.v3];
+        let i = k % 4;
+        let (c0, c1) = (vs[i], vs[(i + 1) % 4]);
+        let ours_q = ours.get_quad_by_edge(c0, c0, c1);
+        let game = ret::bytes(&g.gen_call("GetQuad", vec![arg::raw(&i2b(c0)), arg::raw(&i2b(c0)), arg::raw(&i2b(c1))], false));
+        assert_eq!(game, qbytes(&ours_q), "GetQuad({c0:?}, {c0:?}, {c1:?})");
+        // the neighbour across v0-v3
+        let adj = ours.get_adjecent_quad(q);
+        let game = ret::bytes(&g.gen_call("GetAdjecentQuad", vec![arg::raw(&qbytes(q))], false));
+        assert_eq!(game, qbytes(&adj), "GetAdjecentQuad({q:?})");
+        // a strip from it
+        let l = handle(&g.req(json!({"new": ql.clone(), "args": [], "main": true}), "new List<Quad>"), "list");
+        g.call(l, Some(&ql), "Add", vec![arg::raw(&qbytes(q))], &[], false);
+        let a = r.f(0.0, 6.283);
+        let dir = v2(a.cos(), a.sin());
+        let steps = 1 + (r.next() % 12) as i32;
+        let hover = (r.next() % 3) as i32;
+        let mut nodes = vec![*q];
+        let mut our_hover = hover;
+        let our_ret = ours.append_quad_list(&mut nodes, dir, &mut our_hover, steps);
+        let rr = g.gen_call("AppendQuadList", vec![json!({"handle": l}), arg::raw(&bits_of(&[dir.x, dir.y])), arg::raw(&hover.to_le_bytes()), arg::i32(steps)], false);
+        assert_eq!(ret::bytes(&rr)[0] != 0, our_ret, "AppendQuadList return");
+        assert_eq!(i32::from_le_bytes(ret::hex_field(&rr["args_after"][2])[..4].try_into().unwrap()), our_hover, "AppendQuadList hoverIndex");
+        let game = g.to_array(l, &ql);
+        assert_eq!(game, bits_of(&nodes), "AppendQuadList({q:?}, {dir:?}, {steps}): {} vs {} quads", game.len() / 68, nodes.len());
+        strip_quads += nodes.len() - 1;
+    }
+    eprintln!("AppendQuadList added {strip_quads} quads over 120 strips");
+    assert!(strip_quads > 120, "the strips should grow");
+    // GetVertOrIterate on the found quads' corners (finished bits: no keepGoing needed), and their border meshes
+    let master = g.obj(g.gen, "master");
+    let ao = g.obj(master, "aoBaker");
+    let graph = g.obj(master, "graph");
+    let pw = i32s(&g.raw(ao, "powers"));
+    let powers = Int4 { x: pw[0], y: pw[1], z: pw[2], w: pw[3] };
+    let tex = g.obj(ao, "marchingSquaresTex");
+    let ts = f32s(&ret::bytes(&g.call(tex, Some("UnityEngine.Texture"), "get_texelSize", vec![], &[], false)));
+    let texel = v2(ts[0], ts[1]);
+    // a border round the middle of the grid, so that quads cross it
+    let c3 = ts_game::os::hex::get_hex3(ours.bits[0].hex_pos);
+    let border = Int3x2 { c0: i3(c3.x - 40, c3.y - 40, c3.z - 40), c1: i3(c3.x + 40, c3.y + 40, c3.z + 40) };
+    g.req(json!({"field": "border", "handle": graph, "set_raw": hexs(&bits_of(&[border.c0.x, border.c0.y, border.c0.z, border.c1.x, border.c1.y, border.c1.z])), "main": true}), "set border");
+    let mut border_quads = 0;
+    for (k, q) in found.iter().enumerate().take(150) {
+        let corner = [q.v0, q.v1, q.v2, q.v3][k % 4];
+        let v = ours.get_vert_or_iterate(corner, None);
+        let game = ret::bytes(&g.gen_call("GetVertOrIterate", vec![arg::raw(&i2b(corner)), json!({"null": true})], false));
+        assert_eq!(game, vbytes(&v), "GetVertOrIterate({corner:?})");
+        let ours_mesh = ours.populate_border_mesh(&v, texel, powers, border);
+        let mesh = handle(&g.req(json!({"new": "UnityEngine.Mesh", "args": [], "main": true}), "new Mesh"), "mesh");
+        g.gen_call("PopulateBorderMesh", vec![arg::raw(&game), json!({"handle": mesh})], false);
+        let vs = f32s(&g.array(mesh, "UnityEngine.Mesh.get_vertices"));
+        let uv = f32s(&g.uvs(mesh, 0));
+        let tris = i32s(&ret::bytes(&g.call(mesh, Some("UnityEngine.Mesh"), "GetIndicesImpl", vec![arg::i32(0), arg::bool(true)], &["System.Int32", "System.Boolean"], false)));
+        assert_eq!(bits_of(&vs), bits_of(&ours_mesh.vertices), "PopulateBorderMesh({corner:?}) vertices");
+        assert_eq!(bits_of(&uv), bits_of(&ours_mesh.uv0), "PopulateBorderMesh({corner:?}) uv\ngame {uv:?}\nours {:?}", ours_mesh.uv0);
+        assert_eq!(tris, ours_mesh.triangles, "PopulateBorderMesh({corner:?}) triangles");
+        border_quads += ours_mesh.triangles.len() / 6;
+    }
+    eprintln!("border quads drawn: {border_quads}");
+    assert!(border_quads > 0, "some border should be drawn");
+    // no bit there (-1); unfinished bits with no keepGoing (-2), or one that says no (-3)
+    let far = Int2 { x: 72 * 400, y: -72 * 400 };
+    let v = ours.get_vert_or_iterate(far, None);
+    assert_eq!(v.quad_count, -1);
+    assert_eq!(ret::bytes(&g.gen_call("GetVertOrIterate", vec![arg::raw(&i2b(far)), json!({"null": true})], false)), vbytes(&v), "GetVertOrIterate far");
+    let fresh = gg::get_starting_hex(200);
+    ours.motivate_bit(fresh);
+    g.gen_call("MotivateBit", vec![arg::raw(&i2b(fresh))], false);
+    let v = ours.get_vert_or_iterate(fresh, None);
+    assert_eq!(v.quad_count, -2);
+    assert_eq!(ret::bytes(&g.gen_call("GetVertOrIterate", vec![arg::raw(&i2b(fresh)), json!({"null": true})], false)), vbytes(&v), "GetVertOrIterate -2");
+    let never = delegate(&mut g, "UnityEngine.Application, UnityEngine.CoreModule", "get_isEditor");
+    let v = ours.get_vert_or_iterate(fresh, Some(&mut || false));
+    assert_eq!(v.quad_count, -3);
+    assert_eq!(ret::bytes(&g.gen_call("GetVertOrIterate", vec![arg::raw(&i2b(fresh)), json!({"handle": never})], false)), vbytes(&v), "GetVertOrIterate -3");
+}

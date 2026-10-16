@@ -12,7 +12,8 @@ use std::collections::HashMap;
 use crate::os::hex;
 use crate::placemaker::quads::grid_generation::grid_constants::{HEX_TO_PLANE, PLANE_TO_HEX};
 use crate::placemaker::quads::grid_generation::{CustomGridLibrary, CustomGridPatch, HexCluster, HexPatch, HexPatchState};
-use crate::unity::mathematics::{f2, f3, hash3, i3, mul_i3x3, normalize2, Float2, Float3, Int2, Int3, Int3x2, Int3x3, Random};
+use crate::placemaker::quads::{Quad, Vert};
+use crate::unity::mathematics::{f2, f3, hash3, i3, mul_i3x3, normalize2, Float2, Float3, Int2, Int3, Int3x2, Int3x3, Int4, Random};
 use crate::unity::mathf;
 use crate::unity::vector::{v2, Vector2, Vector3};
 
@@ -1382,4 +1383,479 @@ fn patch_sort(patch: &mut HexPatch) {
     patch.quads.clear();
     patch.quads.extend_from_slice(&sorted);
     patch.state = HexPatchState::Done;
+}
+
+/// The mesh `GridGenerator.PopulateBorderMesh` fills (`Mesh.Clear`, then `SetVertices` / `SetUVs(0)` /
+/// `SetTriangles`): the quads round a vert that cross `Graph.border`, in world plane coordinates, with UVs into
+/// `AoBaker.marchingSquaresTex`.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct BorderMesh {
+    pub vertices: Vec<Vector3>,
+    pub uv0: Vec<Vector2>,
+    pub triangles: Vec<i32>,
+}
+
+/// `(n + (quadIndex - 20) * 4) % n`: where `GetAdjecentQuad` / `AppendQuadList` start looking in a patch's quads.
+fn adjacent_start(n: i32, quad_index: u8) -> i32 {
+    n.wrapping_add((quad_index as i32 - 20).wrapping_mul(4)) % n
+}
+
+impl GridGenerator {
+    /// The quad `quads[i..i + 4]` of a patch, corners in `order`, with the bit's relaxed positions.
+    fn quad_of(&self, p: usize, b: usize, i: usize, order: [usize; 4]) -> Quad {
+        let patch = &self.patches[p];
+        let bit = &self.bits[b];
+        let q: [u8; 4] = std::array::from_fn(|k| patch.quads[i + order[k]]);
+        Quad {
+            quad_index: (i / 4) as u8,
+            pad: [0; 3],
+            v0: patch.verts[q[0] as usize],
+            v1: patch.verts[q[1] as usize],
+            v2: patch.verts[q[2] as usize],
+            v3: patch.verts[q[3] as usize],
+            p0: bit.verts[q[0] as usize],
+            p1: bit.verts[q[1] as usize],
+            p2: bit.verts[q[2] as usize],
+            p3: bit.verts[q[3] as usize],
+        }
+    }
+
+    /// `Placemaker.GridGenerator.GetQuad(int2, int2, int2)` 0xE2A740: the quad of the finished bit around
+    /// `hex_within_patch` that has the edge `corner0 → corner1`, starting at `corner0`; a default (invalid) quad
+    /// when there is none. Its `quadIndex` is 0 (the game leaves it unset).
+    pub fn get_quad_by_edge(&self, hex_within_patch: Int2, corner0: Int2, corner1: Int2) -> Quad {
+        let h3 = hex::get_hex3(hex_within_patch);
+        let pp = hex::get_hex2(hex_to_patch_hex_f(f3(h3.x as f32, h3.y as f32, h3.z as f32)));
+        let Some(&p) = self.patch_dict.get(&pp) else { return Quad::default() };
+        if !self.patches[p].done() {
+            return Quad::default();
+        }
+        let Some(&b) = self.bit_dict.get(&pp) else { return Quad::default() };
+        if self.bits[b].state != GridBitState::Done {
+            return Quad::default();
+        }
+        let patch = &self.patches[p];
+        let mut i = 0;
+        while i < patch.quads.len() {
+            for r in 0..4 {
+                let order = [r % 4, (r + 1) % 4, (r + 2) % 4, (r + 3) % 4];
+                let w0 = patch.verts[patch.quads[i + order[0]] as usize];
+                let w1 = patch.verts[patch.quads[i + order[1]] as usize];
+                if w0 == corner0 && w1 == corner1 {
+                    return Quad { quad_index: 0, ..self.quad_of(p, b, i, order) };
+                }
+            }
+            i += 4;
+        }
+        Quad::default()
+    }
+
+    /// `Placemaker.GridGenerator.GetQuad(float2)` 0xE2AD80: the quad under a plane position. The three bits
+    /// round the nearest cluster, nearest first, each when finished and wanted: a binary search (5 halvings) in
+    /// its cost-sorted quads for the position's cost - 0.5, then quads alternately after and before that point
+    /// (each side stops when its first corner leaves `y - 3.5 .. y + 4.5`), the first within √6 of the point
+    /// whose four edges all have it on their inner side.
+    pub fn get_quad(&self, plane_pos: Float2) -> Quad {
+        use crate::os::extra_math::rotate2d_90;
+        let h = plane_to_hex(plane_pos);
+        let round = |v: f32| (v as f64).round_ties_even() as f32;
+        let r = i3(mathf_cvtt(round(h.x)), mathf_cvtt(round(h.y)), mathf_cvtt(round(h.z)));
+        let cc = hex::get_hex2(get_closest_cluster_pos(r));
+        let off = get_patch_offset(cc);
+        let mut c = [
+            hex::get_hex3(add2(cc, off)),
+            hex::get_hex3(add2(cc, hex::rotate_cw2_2i(off))),
+            hex::get_hex3(add2(cc, hex::rotate_ccw2_2i(off))),
+        ];
+        let dist = |c: Int3| {
+            let (dx, dy, dz) = (h.x - c.x as f32, h.y - c.y as f32, h.z - c.z as f32);
+            dx * dx + dy * dy + dz * dz
+        };
+        let mut d = [dist(c[0]), dist(c[1]), dist(c[2])];
+        if d[0] > d[2] {
+            c.swap(0, 2);
+            d.swap(0, 2);
+        }
+        if d[0] > d[1] {
+            c.swap(0, 1);
+            d.swap(0, 1);
+        }
+        if d[2] > d[1] {
+            c.swap(1, 2);
+            d.swap(1, 2);
+        }
+        let (lo, hi) = (plane_pos.y - 3.5, plane_pos.y + 4.5);
+        let cost = get_vert_cost(hex::get_hex2_f(h)) - 0.5;
+        for _ in 0..3 {
+            let cand = c[0];
+            c.rotate_left(1);
+            let d = i3(cand.x.wrapping_sub(r.x), cand.y.wrapping_sub(r.y), cand.z.wrapping_sub(r.z));
+            if !(d.x.wrapping_abs() < 85 && d.y.wrapping_abs() < 85 && d.z.wrapping_abs() < 85) {
+                continue;
+            }
+            let Some(&b) = self.bit_dict.get(&hex::get_hex2(cand)) else { continue };
+            let bit = &self.bits[b];
+            if bit.state != GridBitState::Done || bit.motivations == 0 {
+                continue;
+            }
+            let Some(&p) = self.patch_dict.get(&bit.hex_pos) else { continue };
+            let patch = &self.patches[p];
+            let n = patch.quads.len() as i32;
+            let vcost = |i: i32| {
+                let v = patch.verts[patch.quads[list_index(i)] as usize];
+                get_vert_cost(f2(v.x as f32, v.y as f32))
+            };
+            let (mut lo_i, mut hi_i, mut mid, mut found) = (0i32, n / 4 - 1, 0i32, 0f32);
+            for _ in 0..5 {
+                mid = (hi_i + lo_i) / 2;
+                found = vcost(mid * 4);
+                if cost == found {
+                    break;
+                }
+                if cost < found {
+                    hi_i = mid - 1;
+                } else {
+                    lo_i = mid + 1;
+                }
+            }
+            let start = if cost <= found { mid } else { mid + 1 } * 4;
+            let (mut up, mut down) = (start, start - 4);
+            let (mut up_ok, mut down_ok) = (up < n, down >= 0);
+            let mut going_up = true;
+            while down_ok || up_ok {
+                let this_up = going_up;
+                going_up = !going_up;
+                let i;
+                if this_up {
+                    if !up_ok {
+                        continue;
+                    }
+                    i = up;
+                    up += 4;
+                    up_ok = up < n;
+                } else {
+                    if !down_ok {
+                        continue;
+                    }
+                    i = down;
+                    down -= 4;
+                    down_ok = down >= 0;
+                }
+                let k = list_index(i);
+                let q: [u8; 4] = std::array::from_fn(|j| patch.quads[k + j]);
+                let pt: [Float2; 4] = std::array::from_fn(|j| bit.verts[q[j] as usize]);
+                if this_up {
+                    if pt[0].y > hi {
+                        up_ok = false;
+                        continue;
+                    }
+                } else if lo > pt[0].y {
+                    down_ok = false;
+                    continue;
+                }
+                let (dx, dy) = (pt[0].x - plane_pos.x, pt[0].y - plane_pos.y);
+                if dx * dx + dy * dy > 6.0 {
+                    continue;
+                }
+                let e0 = rotate2d_90(f2(pt[1].x - pt[0].x, pt[1].y - pt[0].y));
+                if 0.0 > (plane_pos.y - pt[0].y) * e0.y + (plane_pos.x - pt[0].x) * e0.x {
+                    continue;
+                }
+                let inside = |a: Float2, b: Float2| {
+                    let e = rotate2d_90(f2(b.x - a.x, b.y - a.y));
+                    !(0.0 > e.x * (plane_pos.x - a.x) + e.y * (plane_pos.y - a.y))
+                };
+                if !inside(pt[1], pt[2]) || !inside(pt[2], pt[3]) || !inside(pt[3], pt[0]) {
+                    continue;
+                }
+                return Quad {
+                    quad_index: (i / 4) as u8,
+                    pad: [0; 3],
+                    v0: patch.verts[q[0] as usize],
+                    v1: patch.verts[q[1] as usize],
+                    v2: patch.verts[q[2] as usize],
+                    v3: patch.verts[q[3] as usize],
+                    p0: pt[0],
+                    p1: pt[1],
+                    p2: pt[2],
+                    p3: pt[3],
+                };
+            }
+        }
+        Quad::default()
+    }
+
+    /// `Placemaker.GridGenerator.GetClostestVertPosition` 0xE2A2A0: the corner of the quad under the position
+    /// on the position's side of both diagonals (by the four edges' distances); only `hexPos` and `planePos`
+    /// set, `quadCount = -1` when there is no quad.
+    pub fn get_clostest_vert_position(&self, plane_pos: Float2) -> Vert {
+        use crate::os::extra_math::rotate2d_90;
+        let q = self.get_quad(plane_pos);
+        let mut v = Vert::default();
+        if !q.is_valid() {
+            v.quad_count = -1;
+            return v;
+        }
+        let p = plane_pos;
+        let n0 = rotate2d_90(f2(q.p1.x - q.p0.x, q.p1.y - q.p0.y));
+        let a0 = n0.y * (p.y - q.p0.y) + n0.x * (p.x - q.p0.x);
+        let n1 = rotate2d_90(f2(q.p2.x - q.p1.x, q.p2.y - q.p1.y));
+        let a1 = n1.y * (p.y - q.p1.y) + n1.x * (p.x - q.p1.x);
+        let n2 = rotate2d_90(f2(q.p3.x - q.p2.x, q.p3.y - q.p2.y));
+        let a2 = n2.x * (p.x - q.p2.x) + n2.y * (p.y - q.p2.y);
+        let n3 = rotate2d_90(f2(q.p0.x - q.p3.x, q.p0.y - q.p3.y));
+        let a3 = n3.x * (p.x - q.p3.x) + n3.y * (p.y - q.p3.y);
+        let (h, pp) = if !(a2 > a0) {
+            if !(a3 > a1) { (q.v3, q.p3) } else { (q.v2, q.p2) }
+        } else if !(a3 > a1) {
+            (q.v0, q.p0)
+        } else {
+            (q.v1, q.p1)
+        };
+        v.hex_pos = h;
+        v.plane_pos = pp;
+        v
+    }
+
+    /// The neighbour of `quad` across its edge `v0–v3` (`e = 0`) or `v1–v2` (`e = 1`), as `GetAdjecentQuad` /
+    /// `AppendQuadList` find it; `cache` is the patch / bit last used (the game keeps it between steps).
+    fn neighbour(&self, quad: &Quad, e: usize, cache: &mut (Int2, Option<(usize, usize)>)) -> Option<Option<Quad>> {
+        let (a, b, c, d) = if e == 0 { (quad.v0, quad.v3, quad.v1, quad.v2) } else { (quad.v1, quad.v2, quad.v0, quad.v3) };
+        let pos = Int2 {
+            x: (a.x.wrapping_add(b.x).wrapping_mul(5).wrapping_sub(c.x.wrapping_add(d.x))) / 8,
+            y: (a.y.wrapping_add(b.y).wrapping_mul(5).wrapping_sub(c.y.wrapping_add(d.y))) / 8,
+        };
+        let h3 = hex::get_hex3(pos);
+        let pp = hex::get_hex2(hex_to_patch_hex_f(f3(h3.x as f32, h3.y as f32, h3.z as f32)));
+        if pp != cache.0 {
+            cache.0 = pp;
+            let p = *self.patch_dict.get(&pp)?;
+            let bi = *self.bit_dict.get(&pp)?;
+            if self.bits[bi].state != GridBitState::Done {
+                return None;
+            }
+            cache.1 = Some((p, bi));
+        }
+        let (p, bi) = cache.1?;
+        let patch = &self.patches[p];
+        let n = patch.quads.len() as i32;
+        let start = adjacent_start(n, quad.quad_index);
+        let (want0, want1) = if e == 0 { (quad.v0, quad.v3) } else { (quad.v2, quad.v1) };
+        let mut k = 0;
+        while k < n {
+            let i = list_index((k + start) % n);
+            for r in 0..4 {
+                let w = |j: usize| patch.verts[patch.quads[i + (r + j) % 4] as usize];
+                if w(0) == want0 && w(1) == want1 {
+                    let order = if e == 0 {
+                        [(r + 3) % 4, r, (r + 1) % 4, (r + 2) % 4]
+                    } else {
+                        [(r + 1) % 4, (r + 2) % 4, (r + 3) % 4, r]
+                    };
+                    return Some(Some(self.quad_of(p, bi, i, order)));
+                }
+            }
+            k += 4;
+        }
+        Some(None)
+    }
+
+    /// `Placemaker.GridGenerator.GetAdjecentQuad` 0xE29AB0: the finished quad across `quad`'s edge `v0–v3`,
+    /// starting one corner before that edge; a default quad when there is none. No callers in the game
+    /// (`AppendQuadList` does the same inline).
+    pub fn get_adjecent_quad(&self, quad: &Quad) -> Quad {
+        let mut cache = (Int2 { x: i32::MIN, y: i32::MIN }, None);
+        match self.neighbour(quad, 0, &mut cache) {
+            Some(Some(q)) => q,
+            _ => Quad::default(),
+        }
+    }
+
+    /// `Placemaker.GridGenerator.AppendQuadList` 0xE289A0 (`DrawPlane.IterateUpdate`): grows the strip of
+    /// quads `nodes` up to `steps` quads at each end, across edges `v0–v3` from the last node, then (list
+    /// reversed) across `v1–v2` from the first, `hover_index` counting the quads put before it; a step stops
+    /// the end when the new quad's first edge faces along `plane_camera_dir`'s perpendicular. True when a quad
+    /// was added.
+    pub fn append_quad_list(&self, nodes: &mut Vec<Quad>, plane_camera_dir: Vector2, hover_index: &mut i32, steps: i32) -> bool {
+        use crate::os::extra_math::rotate2d_90;
+        let perp = rotate2d_90(f2(plane_camera_dir.x, plane_camera_dir.y));
+        let mut added = false;
+        let mut cache = (Int2 { x: -1, y: -1 }, None);
+        for e in 0..2 {
+            let mut cur = *nodes.last().expect("AppendQuadList: nodes[Count - 1] of an empty list");
+            for _ in 0..steps.max(0) {
+                if !cur.is_valid() {
+                    break;
+                }
+                let Some(found) = self.neighbour(&cur, e, &mut cache) else { break };
+                let Some(q) = found else { continue };
+                let d = f2(q.p0.x - q.p1.x, q.p0.y - q.p1.y);
+                if perp.y * d.y + perp.x * d.x > 0.0 {
+                    cur = Quad::default();
+                } else {
+                    nodes.push(q);
+                    added = true;
+                    if e == 1 {
+                        *hover_index += 1;
+                    }
+                    cur = q;
+                }
+            }
+            nodes.reverse();
+        }
+        added
+    }
+
+    /// `Placemaker.GridGenerator.GetVertOrIterate` 0xE2BC70: the `Vert` at a grid position with the quads
+    /// round it, from the up to three bits whose patches share it (`HexToPatchHexes`). An unfinished bit is
+    /// iterated while `keep_going` allows (no `keep_going`: `quadCount = -2`); a missing bit gives
+    /// `quadCount = -1`, one still unfinished `-3`. Stops once the quads' angles close the circle (> 350).
+    pub fn get_vert_or_iterate(&mut self, hex_pos: Int2, mut keep_going: Option<&mut dyn FnMut() -> bool>) -> Vert {
+        let (m, mask) = hex_to_patch_hexes(hex::get_hex3(hex_pos));
+        let mut vert = Vert { hex_pos, ..Default::default() };
+        let mut bits = [None; 3];
+        for (i, slot) in bits.iter_mut().enumerate() {
+            if mask & (1 << i) == 0 {
+                continue;
+            }
+            let Some(&b) = self.bit_dict.get(&hex::get_hex2(m.c[i])) else {
+                vert.quad_count = -1;
+                return vert;
+            };
+            if self.bits[b].state != GridBitState::Done || !self.bits[b].patch_done {
+                let Some(k) = keep_going.as_mut() else {
+                    vert.quad_count = -2;
+                    return vert;
+                };
+                while k() {
+                    self.iterate_bit(b, &mut **k);
+                }
+                if self.bits[b].state != GridBitState::Done || !self.bits[b].patch_done {
+                    vert.quad_count = -3;
+                    return vert;
+                }
+            }
+            *slot = Some(b);
+        }
+        for i in 0..3 {
+            if mask & (1 << i) == 0 {
+                continue;
+            }
+            let b = bits[i].unwrap();
+            let p = self.patch_at(self.bits[b].hex_pos);
+            let n = self.patches[p].quads.len();
+            let mut c = 0;
+            while c < n {
+                for r in 0..4 {
+                    let patch = &self.patches[p];
+                    let q = patch.quads[c + r];
+                    if patch.verts[q as usize] != hex_pos {
+                        continue;
+                    }
+                    let quad = self.quad_of(p, b, c, [0, 1, 2, 3]);
+                    if vert.quad_count == 0 {
+                        vert.plane_pos = quad.get_plane_pos(r as i32);
+                    }
+                    let patch = &self.patches[p];
+                    let b1 = patch.quads[c + (r + 1) % 4];
+                    let b3 = patch.quads[c + (r + 3) % 4];
+                    let bit = &self.bits[b];
+                    let (a, n1, n3) = (bit.verts[q as usize], bit.verts[b1 as usize], bit.verts[b3 as usize]);
+                    vert.add_quad(quad);
+                    let angle = vert.angle;
+                    vert.angle = Vector2::angle(v2(n3.x - a.x, n3.y - a.y), v2(n1.x - a.x, n1.y - a.y)) + angle;
+                    if 350.0 < vert.angle {
+                        return vert;
+                    }
+                    break;
+                }
+                c += 4;
+            }
+        }
+        vert
+    }
+
+    /// `Placemaker.GridGenerator.PopulateBorderMesh` 0xE37920 (`BorderDrawer.Draw`): for the three bits round
+    /// the vert's nearest cluster (within 13.51 of it), each quad near the vert (first corner within 5) that
+    /// crosses the edge of `border` (`WorldMaster.graph.border`) and has the vert as a corner: its 4 corners,
+    /// 2 triangles, and UVs picking the marching-squares cell of its inside / outside pattern
+    /// (`AoBaker.powers`, `marchingSquaresTex.texelSize`), shifted by 1 at the corner(s) on the vert.
+    pub fn populate_border_mesh(&self, vert: &Vert, texel_size: Vector2, powers: Int4, border: Int3x2) -> BorderMesh {
+        use crate::os::extra_math::{contains, pow2};
+        let h3 = hex::get_hex3(vert.hex_pos);
+        let cc = hex::get_hex2(get_closest_cluster_pos(h3));
+        let mut off = get_patch_offset(cc);
+        let vp = hex_to_plane_i3(h3);
+        let (far, near) = (pow2(13.510949), pow2(5.0));
+        let (tx, ty) = (texel_size.x, texel_size.y);
+        let mut out = BorderMesh::default();
+        let mut base = 0i32;
+        for _ in 0..3 {
+            let pos = add2(cc, off);
+            off = hex::rotate_cw2_2i(off);
+            let bp = hex_to_plane_i2(pos);
+            let (dx, dy) = (bp.x - vp.x, bp.y - vp.y);
+            if !(dx * dx + dy * dy <= far) {
+                continue;
+            }
+            let Some(&b) = self.bit_dict.get(&pos) else { continue };
+            if self.bits[b].state != GridBitState::Done {
+                continue;
+            }
+            let Some(&p) = self.patch_dict.get(&pos) else { continue };
+            let patch = &self.patches[p];
+            let bit = &self.bits[b];
+            let mut k = 0;
+            while k < patch.quads.len() {
+                let q: [usize; 4] = std::array::from_fn(|j| patch.quads[k + j] as usize);
+                k += 4;
+                let p0 = bit.verts[q[0]];
+                let (dx, dy) = (p0.x - vp.x, p0.y - vp.y);
+                if !(dx * dx + dy * dy <= near) {
+                    continue;
+                }
+                let h: [Int3; 4] = std::array::from_fn(|j| hex::get_hex3(patch.verts[q[j]]));
+                let inside: [bool; 4] = std::array::from_fn(|j| contains(border, h[j]));
+                if inside.iter().all(|&x| x == inside[0]) {
+                    continue;
+                }
+                let on: [bool; 4] = std::array::from_fn(|j| vert.contains_vert(hex::get_hex2(h[j])));
+                if !(on[3] || on[2] || on[1] || on[0]) {
+                    continue;
+                }
+                for j in 0..4 {
+                    let w = hex::plane_to_world(bit.verts[q[j]], 0.0);
+                    out.vertices.push(Vector3 { x: w.x, y: w.y, z: w.z });
+                }
+                let wgt = |i: bool| -> i32 { if i { 0 } else { 4 } };
+                let sum = wgt(inside[0])
+                    .wrapping_mul(powers.x)
+                    .wrapping_add(powers.y.wrapping_mul(wgt(inside[1])))
+                    .wrapping_add(powers.z.wrapping_mul(wgt(inside[2])))
+                    .wrapping_add(powers.w.wrapping_mul(wgt(inside[3])));
+                let s = sum as f32 * tx;
+                let u0 = tx * 0.5 + (s + s);
+                let v0 = ty * 0.5 + 0.0;
+                let u0b = u0 + tx * 0.0;
+                let v0b = v0 + ty * 0.0 + 0.0;
+                let u1 = u0 + tx;
+                let v1 = v0 + ty + 0.0;
+                let f = |b: bool| b as i32 as f32;
+                out.uv0.push(v2(u0b + f(on[0]), v0b));
+                out.uv0.push(v2(u1 + f(on[1]), v0b));
+                out.uv0.push(v2(u1 + f(on[2]), v1));
+                out.uv0.push(v2(u0b + f(on[3]), v1));
+                for t in [0, 1, 2, 2, 3, 0] {
+                    out.triangles.push(base + t);
+                }
+                base += 4;
+            }
+        }
+        out
+    }
+}
+
+/// `(int)` of a float (`cvttss2si`; out of range: `int.MinValue`).
+fn mathf_cvtt(v: f32) -> i32 {
+    crate::unity::conv::f32_to_i32(v)
 }
