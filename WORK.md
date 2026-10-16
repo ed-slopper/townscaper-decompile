@@ -28,7 +28,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | | Split of E1 |
+| E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | ed-slopper/wren (2026-10-16) | Split of E1 |
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
 | E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1a, E1b | | |
 | E3 | The irregular grid: `GridGenerator` (45 methods: hex patch → random merge of triangles into quads → subdivision → relaxation), `Placemaker.Quads` (`Quad`, `Vert`), `Placemaker.Quads.GridGeneration` (`HexPatch`, `HexCluster`, `CustomGridPatch`/`Importer`/`Library`, `MotivationCounter`, `GridConstants`), `GridBit` | unowned | E2 | | [est] The heart of the look; seed and RNG order must match (`UnityEngine.Random` vs `System.Random`: find which). Split before claiming |
