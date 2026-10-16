@@ -1,4 +1,5 @@
-// Print the instructions of every function whose name contains one of the arguments (console only).
+// Print the instructions of every function named by an argument (exact name, or "~part" for a substring).
+// Console only.
 //@category Townscaper
 
 import ghidra.app.script.GhidraScript;
@@ -10,7 +11,7 @@ public class DisassembleName extends GhidraScript {
 	protected void run() throws Exception {
 		for (Function f : currentProgram.getFunctionManager().getFunctions(true)) {
 			for (String want : getScriptArgs()) {
-				if (!f.getName(true).equals(want)) {
+				if (!(want.startsWith("~") ? f.getName(true).contains(want.substring(1)) : f.getName(true).equals(want))) {
 					continue;
 				}
 				println("==== " + f.getEntryPoint() + "  " + f.getName(true));

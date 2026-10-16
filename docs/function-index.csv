@@ -103,45 +103,45 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,,UndoRedoFeedback,OnStart,public void OnStart(UiMaster master),dumped,
 0x1FC200,0x101FC200,,UndoRedoFeedback,.ctor,public void .ctor(),dumped,
 0x3CCD10,0x103CCD10,,UndoRedoFeedback,OnSetup,public void OnSetup(UiMaster master),dumped,
-0x3DC080,0x103DC080,Os.Hex,HexMath,GetHex2,public static float2 GetHex2(float3 hexPos),dumped,
-0x3DC0B0,0x103DC0B0,Os.Hex,HexMath,GetHex2,public static int2 GetHex2(int3 hexPos),dumped,
-0x3DC0C0,0x103DC0C0,Os.Hex,HexMath,GetHex3,public static int3 GetHex3(int2 hex2),dumped,
-0x3DC0E0,0x103DC0E0,Os.Hex,HexMath,GetHex3,public static float3 GetHex3(float2 hex2),dumped,
-0x3DC110,0x103DC110,Os.Hex,HexMath,HexClamp,"public static float3 HexClamp(float3 hexPos, float3 min, float3 max)",dumped,
-0x3DC350,0x103DC350,Os.Hex,HexMath,HexRoundX,public static int3 HexRoundX(float3 hexPos),dumped,
-0x3DC3B0,0x103DC3B0,Os.Hex,HexMath,HexRound,public static int3 HexRound(float3 hexPos),dumped,
-0x3DC4B0,0x103DC4B0,Os.Hex,HexMath,HexToPlane,public static float2 HexToPlane(float3 hexPos),dumped,
-0x3DC550,0x103DC550,Os.Hex,HexMath,HexToPlane,public static float2 HexToPlane(float2 hexPos),dumped,
-0x3DC650,0x103DC650,Os.Hex,HexMath,PlaneToHex,public static float3 PlaneToHex(float2 planePos),dumped,
-0x3DC700,0x103DC700,Os.Hex,HexMath,PlaneToWorld,"public static float3 PlaneToWorld(float2 planePos, float y = 0)",dumped,
-0x3DC730,0x103DC730,Os.Hex,HexMath,RotateCCW2,public static int2 RotateCCW2(int2 hexPos),dumped,
-0x3DC740,0x103DC740,Os.Hex,HexMath,RotateCCW,public static int2 RotateCCW(int2 hexPos),dumped,
-0x3DC750,0x103DC750,Os.Hex,HexMath,RotateCCW,public static int3 RotateCCW(int3 hexPos),dumped,
-0x3DC770,0x103DC770,Os.Hex,HexMath,RotateCCW,public static float3 RotateCCW(float3 hexPos),dumped,
-0x3DC7B0,0x103DC7B0,Os.Hex,HexMath,RotateCW2,public static int2 RotateCW2(int2 hexPos),dumped,
-0x3DC7C0,0x103DC7C0,Os.Hex,HexMath,RotateCW,public static int2 RotateCW(int2 hexPos),dumped,
-0x3DC7D0,0x103DC7D0,Os.Hex,HexMath,RotateCW,public static int3 RotateCW(int3 hexPos),dumped,
-0x3DC7F0,0x103DC7F0,Os.Hex,HexMath,RotateCW,public static float3 RotateCW(float3 hexPos),dumped,
-0x3DC830,0x103DC830,Os.Hex,HexMath,WorldToPlane,public static float2 WorldToPlane(float3 worldPos),dumped,
-0x3DC860,0x103DC860,Os.Hex,HexMath,.cctor,private static void .cctor(),dumped,
-0x1E4050,0x101E4050,Os.Hex,HexOnionIterator,get_vertIndexInSide,public uint get_vertIndexInSide(),dumped,
-0x1E7930,0x101E7930,Os.Hex,HexOnionIterator,get_layerIndex,public uint get_layerIndex(),dumped,
-0x1E7950,0x101E7950,Os.Hex,HexOnionIterator,get_vertCountInSide,public uint get_vertCountInSide(),dumped,
-0x2178B0,0x102178B0,Os.Hex,HexOnionIterator,get_vertIndex,public uint get_vertIndex(),dumped,
-0x2178C0,0x102178C0,Os.Hex,HexOnionIterator,get_sideIndex,public uint get_sideIndex(),dumped,
-0x24D4F0,0x1024D4F0,Os.Hex,HexOnionIterator,get_hexPos2,public int2 get_hexPos2(),dumped,
-0x3DD6F0,0x103DD6F0,Os.Hex,HexOnionIterator,Decrement,public int3 Decrement(),dumped,
-0x3DD8A0,0x103DD8A0,Os.Hex,HexOnionIterator,GetAndIncrement,public int3 GetAndIncrement(),dumped,
-0x3DD8E0,0x103DD8E0,Os.Hex,HexOnionIterator,GetAt,public static HexOnionIterator GetAt(uint vertIndex),dumped,
-0x3DD910,0x103DD910,Os.Hex,HexOnionIterator,GetWidthDelta,public static HexOnionIterator GetWidthDelta(int3 delta),dumped,
-0x3DD960,0x103DD960,Os.Hex,HexOnionIterator,Increment,public int3 Increment(),dumped,
-0x3DDB60,0x103DDB60,Os.Hex,HexOnionIterator,get_dualPos2,public int2 get_dualPos2(),dumped,
-0x3DDB80,0x103DDB80,Os.Hex,HexOnionIterator,get_hexPos3,public int3 get_hexPos3(),dumped,
-0x3DDBA0,0x103DDBA0,Os.Hex,HexOnionIterator,set_vertIndex,public void set_vertIndex(uint value),dumped,
-0x1F53D0,0x101F53D0,Os.Hex,HexOnionIteratorGizmo,.ctor,public void .ctor(),dumped,
-0x3DD360,0x103DD360,Os.Hex,HexOnionIteratorGizmo,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x1F53D0,0x101F53D0,Os.Hex,HexOnionVisualizer,.ctor,public void .ctor(),dumped,
-0x3DDDF0,0x103DDDF0,Os.Hex,HexOnionVisualizer,OnDrawGizmos,private void OnDrawGizmos(),dumped,
+0x3DC080,0x103DC080,Os.Hex,HexMath,GetHex2,public static float2 GetHex2(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC0B0,0x103DC0B0,Os.Hex,HexMath,GetHex2,public static int2 GetHex2(int3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC0C0,0x103DC0C0,Os.Hex,HexMath,GetHex3,public static int3 GetHex3(int2 hex2),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC0E0,0x103DC0E0,Os.Hex,HexMath,GetHex3,public static float3 GetHex3(float2 hex2),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC110,0x103DC110,Os.Hex,HexMath,HexClamp,"public static float3 HexClamp(float3 hexPos, float3 min, float3 max)",checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC350,0x103DC350,Os.Hex,HexMath,HexRoundX,public static int3 HexRoundX(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC3B0,0x103DC3B0,Os.Hex,HexMath,HexRound,public static int3 HexRound(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC4B0,0x103DC4B0,Os.Hex,HexMath,HexToPlane,public static float2 HexToPlane(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC550,0x103DC550,Os.Hex,HexMath,HexToPlane,public static float2 HexToPlane(float2 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC650,0x103DC650,Os.Hex,HexMath,PlaneToHex,public static float3 PlaneToHex(float2 planePos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC700,0x103DC700,Os.Hex,HexMath,PlaneToWorld,"public static float3 PlaneToWorld(float2 planePos, float y = 0)",checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC730,0x103DC730,Os.Hex,HexMath,RotateCCW2,public static int2 RotateCCW2(int2 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC740,0x103DC740,Os.Hex,HexMath,RotateCCW,public static int2 RotateCCW(int2 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC750,0x103DC750,Os.Hex,HexMath,RotateCCW,public static int3 RotateCCW(int3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC770,0x103DC770,Os.Hex,HexMath,RotateCCW,public static float3 RotateCCW(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC7B0,0x103DC7B0,Os.Hex,HexMath,RotateCW2,public static int2 RotateCW2(int2 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC7C0,0x103DC7C0,Os.Hex,HexMath,RotateCW,public static int2 RotateCW(int2 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC7D0,0x103DC7D0,Os.Hex,HexMath,RotateCW,public static int3 RotateCW(int3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC7F0,0x103DC7F0,Os.Hex,HexMath,RotateCW,public static float3 RotateCW(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC830,0x103DC830,Os.Hex,HexMath,WorldToPlane,public static float2 WorldToPlane(float3 worldPos),checked,ts_game::os::hex; tests/os_hex.rs
+0x3DC860,0x103DC860,Os.Hex,HexMath,.cctor,private static void .cctor(),checked,ts_game::os::hex; tests/os_hex.rs
+0x1E4050,0x101E4050,Os.Hex,HexOnionIterator,get_vertIndexInSide,public uint get_vertIndexInSide(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x1E7930,0x101E7930,Os.Hex,HexOnionIterator,get_layerIndex,public uint get_layerIndex(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x1E7950,0x101E7950,Os.Hex,HexOnionIterator,get_vertCountInSide,public uint get_vertCountInSide(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x2178B0,0x102178B0,Os.Hex,HexOnionIterator,get_vertIndex,public uint get_vertIndex(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x2178C0,0x102178C0,Os.Hex,HexOnionIterator,get_sideIndex,public uint get_sideIndex(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x24D4F0,0x1024D4F0,Os.Hex,HexOnionIterator,get_hexPos2,public int2 get_hexPos2(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DD6F0,0x103DD6F0,Os.Hex,HexOnionIterator,Decrement,public int3 Decrement(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DD8A0,0x103DD8A0,Os.Hex,HexOnionIterator,GetAndIncrement,public int3 GetAndIncrement(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DD8E0,0x103DD8E0,Os.Hex,HexOnionIterator,GetAt,public static HexOnionIterator GetAt(uint vertIndex),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DD910,0x103DD910,Os.Hex,HexOnionIterator,GetWidthDelta,public static HexOnionIterator GetWidthDelta(int3 delta),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DD960,0x103DD960,Os.Hex,HexOnionIterator,Increment,public int3 Increment(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DDB60,0x103DDB60,Os.Hex,HexOnionIterator,get_dualPos2,public int2 get_dualPos2(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DDB80,0x103DDB80,Os.Hex,HexOnionIterator,get_hexPos3,public int3 get_hexPos3(),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x3DDBA0,0x103DDBA0,Os.Hex,HexOnionIterator,set_vertIndex,public void set_vertIndex(uint value),checked,ts_game::os::hex::HexOnionIterator (getters are the pub fields); tests/os_hex.rs; set_vertIndex backwards is a STANDIN panic (the game loops Increment ~2^32 times)
+0x1F53D0,0x101F53D0,Os.Hex,HexOnionIteratorGizmo,.ctor,public void .ctor(),read,editor-only OnDrawGizmos debug view; not ported (no gizmos in a build)
+0x3DD360,0x103DD360,Os.Hex,HexOnionIteratorGizmo,OnDrawGizmos,private void OnDrawGizmos(),read,editor-only OnDrawGizmos debug view; not ported (no gizmos in a build)
+0x1F53D0,0x101F53D0,Os.Hex,HexOnionVisualizer,.ctor,public void .ctor(),read,editor-only OnDrawGizmos debug view; not ported (no gizmos in a build)
+0x3DDDF0,0x103DDDF0,Os.Hex,HexOnionVisualizer,OnDrawGizmos,private void OnDrawGizmos(),read,editor-only OnDrawGizmos debug view; not ported (no gizmos in a build)
 0x7C1B90,0x107C1B90,Os.Utils,Bitwise,GetByte,"public static byte GetByte(bool bit0 = False, bool bit1 = False, bool bit2 = False, bool bit3 = False, bool bit4 = False, bool bit5 = False, bool bit6 = False, bool bit7 = False)",checked,tests/os_utils.rs
 0x7C1C10,0x107C1C10,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(int b, int index)",checked,tests/os_utils.rs
 0x7C1C30,0x107C1C30,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(byte b, int index)",checked,tests/os_utils.rs

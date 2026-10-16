@@ -29,6 +29,8 @@
 //! `{"batch": [request, ...], "main": true}` runs the requests one after another in the same main-thread job
 //! (no game frame in between: e.g. `Random` draws, which the game itself also makes every frame); the reply's
 //! `results` has one reply per request.
+//! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
+//! the field's value as `{"type", "raw"}` (value types by value, references as the 4-byte pointer).
 
 use std::collections::VecDeque;
 use std::io::{BufRead, BufReader, Write};
@@ -178,8 +180,44 @@ impl Ctx {
         Ok(json!({"eax": eax, "bufs_after": bufs.iter().map(|b| hex(b)).collect::<Vec<_>>()}))
     }
 
+    /// `{"static_field": "Os.Hex.HexMath.hexAxisX"}`: the class is initialised (its static constructor runs),
+    /// then the field's bytes (a value type's data, or the 4-byte object pointer).
+    unsafe fn static_field(&self, req: &Value) -> Result<Value, String> {
+        let full = req["static_field"].as_str().ok_or("static_field")?;
+        let (class_name, field) = full.rsplit_once('.').ok_or("static_field is Namespace.Class.field")?;
+        let class = match req["class"].as_str() {
+            Some(k) => self.resolve_class(k)?,
+            None => self.find_class(class_name)?,
+        };
+        (self.api.il2cpp_runtime_class_init)(class);
+        let f = (self.api.il2cpp_class_get_field_from_name)(class, c(field).as_ptr());
+        if f.is_null() {
+            return Err(format!("no field {field}"));
+        }
+        let t = (self.api.il2cpp_field_get_type)(f);
+        let k = (self.api.il2cpp_class_from_type)(t);
+        let size = if (self.api.il2cpp_class_is_valuetype)(k) != 0 {
+            (self.api.il2cpp_class_value_size)(k, std::ptr::null_mut()) as usize
+        } else {
+            4
+        };
+        let mut buf = vec![0u8; size.max(4)];
+        (self.api.il2cpp_field_static_get_value)(f, buf.as_mut_ptr() as Ptr);
+        buf.truncate(size);
+        Ok(json!({"type": self.type_name(t), "raw": hex(&buf)}))
+    }
+
     /// Run one call request (on whatever thread this is).
     pub unsafe fn call(&self, req: &Value) -> Value {
+        if req.get("static_field").is_some() {
+            return match self.static_field(req) {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
         if let Some(list) = req.get("batch").and_then(Value::as_array) {
             let results: Vec<Value> = list.iter().map(|r| self.call(r)).collect();
             return json!({"ok": true, "results": results});

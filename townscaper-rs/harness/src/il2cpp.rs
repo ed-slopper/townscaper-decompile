@@ -68,6 +68,10 @@ api! {
     il2cpp_object_new: fn(Ptr) -> Ptr;
     il2cpp_gchandle_new: fn(Ptr, u8) -> u32;
     il2cpp_gchandle_get_target: fn(u32) -> Ptr;
+    il2cpp_class_get_field_from_name: fn(Ptr, *const c_char) -> Ptr;
+    il2cpp_field_static_get_value: fn(Ptr, Ptr) -> ();
+    il2cpp_field_get_type: fn(Ptr) -> Ptr;
+    il2cpp_runtime_class_init: fn(Ptr) -> ();
 }
 
 /// A C string from il2cpp (borrowed).
