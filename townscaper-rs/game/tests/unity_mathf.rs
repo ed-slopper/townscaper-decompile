@@ -146,6 +146,12 @@ fn float_functions_match_the_game() {
 fn perlin_noise_matches_the_game() {
     let Some(mut h) = harness() else { return };
     let mut checked = 0;
+    for t in tuples(2, 3000, 24) {
+        let g = ret::f32(&call(&mut h, "PerlinNoise", vec![arg::f32(t[0]), arg::f32(t[1])], &[F, F]));
+        let o = mathf::perlin_noise(t[0], t[1]);
+        assert!(same(o, g), "PerlinNoise({}, {}): ours {o:?} game {g:?}", t[0], t[1]);
+        checked += 1;
+    }
     // Perlin noise where the game calls it: small coordinates, many fractions.
     let mut r = Rng(16);
     for _ in 0..3000 {

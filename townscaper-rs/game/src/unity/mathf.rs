@@ -198,20 +198,26 @@ const PERM: [u8; 256] = [
     195, 78, 66, 215, 61, 156, 180,
 ];
 
-fn p(i: i32) -> i32 {
-    PERM[(i & 255) as usize] as i32
+fn p(i: u32) -> u32 {
+    PERM[(i & 255) as usize] as u32
 }
 
+/// The fade `6t⁵ − 15t⁴ + 10t³` in the engine's order: `((6t − 15)·t + 10) · ((t·t)·t)`.
 fn fade(t: f32) -> f32 {
-    t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+    ((t * 6.0 - 15.0) * t + 10.0) * (t * t * t)
 }
 
-fn nlerp(t: f32, a: f32, b: f32) -> f32 {
-    a + t * (b - a)
+/// `minss(1, f)`: 1 when `1 < f`, else `f` (NaN stays NaN).
+fn min1(f: f32) -> f32 {
+    if 1.0 < f {
+        1.0
+    } else {
+        f
+    }
 }
 
-/// Gradient of the reference improved noise with z = 0.
-fn grad(hash: i32, x: f32, y: f32) -> f32 {
+/// The gradient of the reference improved noise at z = 0.
+fn grad(hash: u32, x: f32, y: f32) -> f32 {
     let h = hash & 15;
     let u = if h < 8 { x } else { y };
     let v = if h < 4 {
@@ -224,24 +230,26 @@ fn grad(hash: i32, x: f32, y: f32) -> f32 {
     (if h & 1 == 0 { u } else { -u }) + (if h & 2 == 0 { v } else { -v })
 }
 
-/// `UnityEngine.Mathf.PerlinNoise` 0xA3BF60 (native): 2D improved Perlin noise (the 3D reference at z = 0),
-/// mapped from about [-0.69, 0.793] to [0, 1].
-pub fn perlin_noise(x: f32, y: f32) -> f32 {
-    let xi = floor_to_int(x);
-    let yi = floor_to_int(y);
-    let (x, y) = (x - xi as f32, y - yi as f32);
-    let (u, v) = (fade(x), fade(y));
-    let (xi, yi) = (xi & 255, yi & 255);
+/// `PerlinNoise::Noise` (UnityPlayer.dll 0x105DE770, native, all SSE single precision): 2D improved Perlin
+/// noise of `|x|`, `|y|` (mirrored around 0) with Ken Perlin's permutation (the engine's `int[512]` table is the
+/// same 256 twice); integer part by truncating convert; fade input clamped to 1; lerps `(b − a)·t + a`.
+fn perlin_raw(x: f32, y: f32) -> f32 {
+    let (ax, ay) = (x.abs(), y.abs());
+    let (xi, yi) = (super::conv::f32_to_i32(ax), super::conv::f32_to_i32(ay));
+    let (fx, fy) = (ax - xi as f32, ay - yi as f32);
+    let (xi, yi) = (xi as u32 & 255, yi as u32 & 255);
     let a = p(xi) + yi;
-    let aa = p(a);
-    let ab = p(a + 1);
     let b = p(xi + 1) + yi;
-    let ba = p(b);
-    let bb = p(b + 1);
-    let n = nlerp(
-        v,
-        nlerp(u, grad(p(aa), x, y), grad(p(ba), x - 1.0, y)),
-        nlerp(u, grad(p(ab), x, y - 1.0), grad(p(bb), x - 1.0, y - 1.0)),
-    );
-    (n + 0.69) / (0.793 + 0.69)
+    let u = fade(min1(fx));
+    let v = fade(min1(fy));
+    let lerp = |t: f32, a: f32, b: f32| (b - a) * t + a;
+    let lower = lerp(u, grad(p(p(a)), fx, fy), grad(p(p(b)), fx - 1.0, fy));
+    let upper = lerp(u, grad(p(p(a + 1)), fx, fy - 1.0), grad(p(p(b + 1)), fx - 1.0, fy - 1.0));
+    lerp(v, lower, upper)
+}
+
+/// `UnityEngine.Mathf.PerlinNoise` 0xA3BF60 → `Mathf_CUSTOM_PerlinNoise` (UnityPlayer.dll 0x107A1A30, native):
+/// `(Noise(x, y) + 0.69f) / 1.483f` on the x87 unit (53-bit precision on Windows), rounded to `float` once.
+pub fn perlin_noise(x: f32, y: f32) -> f32 {
+    ((perlin_raw(x, y) as f64 + 0.69f32 as f64) / 1.483f32 as f64) as f32
 }

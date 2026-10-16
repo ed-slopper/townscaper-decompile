@@ -98,7 +98,7 @@ DOC_REF = re.compile(r"`((?:Placemaker|Os)(?:\.\w+)+)\.([\w.<>`]+)`\s+(0x[0-9A-F
 def check_doc_refs(files: list[str], index: dict[tuple[str, str], set[str]]) -> int:
     n = 0
     for rel in files:
-        if not (rel.startswith("townscaper-rs/") and rel.endswith(".rs")):
+        if not (rel.startswith("townscaper-rs/") and rel.endswith(".rs")) or not (ROOT / rel).is_file():
             continue
         for lineno, line in enumerate((ROOT / rel).read_text(encoding="utf-8").splitlines(), start=1):
             if "//" not in line:
