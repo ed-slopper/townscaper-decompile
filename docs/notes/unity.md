@@ -67,3 +67,18 @@ every round (`game/tests/unity_random.rs`).
   loading screen): runs can't repeat the original's draws, only the generator's behaviour. The harness compares
   inside one main-thread `batch` so no game frame draws in between; `InitState` and the state accessors are
   stripped from the managed side, so the test calls the engine's icalls through the harness's `native` call.
+
+## Unity.Mathematics (F11d, proven)
+
+`unity::mathematics`: the out-of-line members the game calls (most of the package is inlined into the game's
+code as plain arithmetic and is ported with each game function). Equal to the game on 1,500 rounds of
+`math.length`/`normalize(float2)`, `abs`/`max(int3)`, `mul(int3x3, int3)`, `mul(int4x4, int4)`,
+`mul(int4x4, int4x4)`, `float4x4(int4x4)`, `math.inverse(float4x4)` (the shuffle-based cofactor inverse),
+`int3.GetHashCode`, and 1,000 seeds × 6 steps of `Unity.Mathematics.Random` (`game/tests/unity_mathematics.rs`).
+
+- `sqrt` is `(float)Math.Sqrt((double)x)`; `normalize(x)` = `x * (1 / sqrt(dot(x, x)))`.
+- `Random` is xorshift32: the constructor stores the seed's first step; `NextState` returns the old state;
+  `NextFloat` = `asfloat(0x3F800000 | (s >> 9)) − 1` (Ghidra renders the bit cast as a convert);
+  `NextFloat(min, max)` = `f·(max − min) + min`; `NextInt(min, max)` = `min + (range·s >> 32)`.
+  `PropPlacer` uses `NextFloat(min, max)` and `StorageUtils` `NextInt(min, max)`: those draws are reproducible.
+- `int3.GetHashCode` = `x·0x4C7F6DD1 + y·0x4822A3E9 + z·0xAAC3C25D + 0xD21D0945` (wrapping).
