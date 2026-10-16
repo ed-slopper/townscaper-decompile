@@ -14,18 +14,20 @@ Columns:
 Where things stand (2026-10-15): the build is identified and the decompile pipeline runs from the player's own
 install (`tools/decompile.sh`: Il2CppDumper + Cpp2IL into `work/`). The game's own code is indexed: 448 types,
 2,269 methods with bodies in `docs/function-index.csv`, all `dumped`, none read, ported or checked. Ghidra has the
-whole build with PDB names, C# names and field names (F3). There is no Unity project yet (F6) and no checking harness (F9).
+whole build with PDB names, C# names and field names (F3). The target is now a Rust rewrite on Bevy (`townscaper-rs/`); its workspace is being set up
+(F6). There is no asset reader (F8) and no checking harness (F9) yet.
 
 ## P0 Foundations
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
+| F6 | `townscaper-rs/` Cargo workspace (AGENTS.md section 15): app `townscaper` on Bevy 0.20 (window, clear colour, a STANDIN camera), `ts_game` and `ts_data` without Bevy, module skeleton `ts_game::{os, placemaker, unity}`; `ts_data` finds the player's install (`TOWNSCAPER_DIR`) and checks it is the reference build (Unity version, metadata v27, `GameAssembly.dll` md5); builds with MSVC, `cargo test` passes | any | | ed-slopper/wren (2026-10-15) | |
 | F5 | `ghidra/scripts/ExportDecomp.java` (start from `DecompileRva.java`): write every game method's pseudo-C to `work/decomp/<Namespace>/<Type>/<Method>_<rva>.c` (only `owner = game` rows of `function-index.csv`), so agents without the Ghidra MCP can read bodies | any | F3 | | Output stays in `work/` |
-| F6 | `unity/`: an empty Unity 2020.3.18f1 project with the packages the game ships (Unity.Mathematics, TextMeshPro, uGUI; versions from `ScriptingAssemblies.json` and the DLLs' assembly versions), `Assets/Scripts/Placemaker`, `Assets/Scripts/Os`, assembly layout as the original (`Assembly-CSharp-firstpass` for `Plugins/`), and it opens and compiles | any | | | Needs Unity 2020.3.18f1 on the PC (Hub) |
-| F7 | Decide what to do with the paid / closed middleware the game calls: Rewired (input, 170 types), I2 Localization (115), Crosstales FileBrowser (64), Thread Ninja, StandaloneFileBrowser, FuryStudios SDK: buy and install them locally (gitignored), write `STANDIN` facades with the same API, or replace with Unity's own | humans | | | Blocks the Ui and input rows; facades are the cheapest path [est] |
-| F8 | Assets from the player's own install into `unity/Assets/Game/` (gitignored): AssetRipper (pinned, fetched like the other tools) over `Townscaper_Data`, with scenes `level0..2`, prefabs, ScriptableObjects (module library, palettes, custom grids), meshes, textures, audio; script references re-pointed at our `Placemaker.*` types by GUID / name | any | F6 | | [est] Shaders come out as compiled DXBC: C3 |
-| F9 | Checking harness: run code inside the original game and compare with ours. Install MelonLoader or BepInEx 6 (IL2CPP) on the player's copy, a plugin that calls a game method with given inputs and writes the result, and an NUnit test in `unity/` that does the same on our port; exact compare | any | F6 | | [est] Split: F9a (loader + hello world in the original), F9b (call any static method by RVA/name and dump the result as JSON), F9c (compare runner) |
-| F10 | `tools/guard.py` + CI: fail if a game file or decompiler output is committed (extensions, `dump.cs`, `il2cpp.h`, size/magic checks), `function-index.csv` well-formed, every `/// … RVA 0x…` in `unity/` names a real row | any | F2 | | |
+| F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
+| F8 | `ts_data`: Unity 2020.3 `SerializedFile` reader for `Townscaper_Data` (`globalgamemanagers`, `level0..2`, `sharedassets*.assets`, `resources.assets`): header, object table, external refs, type tree if present (else layouts from the dump: MonoBehaviour fields from `dump.cs`, built-in classes from Unity 2020.3's layouts), `.resS` / `.resource` streamed data | unowned | F6 | | [est] Split before claiming: F8a header + object table, F8b GameObject/Transform/MonoBehaviour, F8c Mesh, F8d Texture2D, F8e AudioClip (FSB5 → Vorbis), F8f scenes |
+| F9 | Checking harness: run code inside the original game and compare with ours. MelonLoader or BepInEx 6 (IL2CPP) on the player's copy, a plugin that calls a game method with given inputs and writes the result as JSON, and Rust tests in `townscaper-rs/game/tests/` that feed the same inputs to our port; exact compare | any | F6 | | [est] Split: F9a (loader + hello world in the original), F9b (call a method by name, dump the result), F9c (Rust compare runner) |
+| F10 | `tools/guard.py` + CI: fail if a game file or decompiler output is committed (extensions, `dump.cs`, `il2cpp.h`, size/magic checks), `function-index.csv` well-formed, every `` `Ns.Type.Method` 0x… `` doc comment in `townscaper-rs/` names a real row; `cargo test -p ts_game -p ts_data` on push | any | F2, F6 | | |
+| F11 | `ts_game::unity`: the Unity and .NET semantics the game's results depend on, exact: `Mathf` (Unity's own `Approximately`, `Repeat`, `PingPong`, `SmoothDamp`, `RoundToInt` banker's rounding, ...), `Vector2/3/4`, `Quaternion` (Unity's `Euler`, `LookRotation`, `Slerp`), `Matrix4x4`, `UnityEngine.Random` (Xorshift128, `InitState`, `Range` int/float rules), `System.Random` if used, `Unity.Mathematics` (`float2/3`, `math.*`), `List<T>.Sort` (introsort: unstable, the game's order depends on it), `Dictionary`/`HashSet` iteration order where the game iterates them | unowned | F6 | | [est] Port only what the game calls: find the calls in `function-index.csv` / Cpp2IL `[Calls]`. Split before claiming |
 
 ## P1 Core engine
 
@@ -33,16 +35,16 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1 | `Os.Utils`: `ExtraMath` (56 methods), `Intersections`, `Bitwise`, `ByteFloat`/`ByteFloat2`/`ByteFloat3`/`SbyteFloat3`, `NumberStrings`, list/dict pool extensions, `UnityFunctions`, `ScopedProfiler` | unowned | F3, F6 | | Leaf code, good first port; everything else calls it |
-| E2 | `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1 | | |
+| E1 | `ts_game::os::utils` = `Os.Utils`: `ExtraMath` (56 methods), `Intersections`, `Bitwise`, `ByteFloat`/`ByteFloat2`/`ByteFloat3`/`SbyteFloat3`, `NumberStrings`, list/dict pool extensions, `UnityFunctions`, `ScopedProfiler` | unowned | F6, F11 | | Leaf code, good first port; everything else calls it |
+| E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1 | | |
 | E3 | The irregular grid: `GridGenerator` (45 methods: hex patch → random merge of triangles into quads → subdivision → relaxation), `Placemaker.Quads` (`Quad`, `Vert`), `Placemaker.Quads.GridGeneration` (`HexPatch`, `HexCluster`, `CustomGridPatch`/`Importer`/`Library`, `MotivationCounter`, `GridConstants`), `GridBit` | unowned | E2 | | [est] The heart of the look; seed and RNG order must match (`UnityEngine.Random` vs `System.Random`: find which). Split before claiming |
 | E4 | The graph: `Placemaker.Graphs` (`Graph` 42 methods incl. `AddVoxel` 0xE829E0, `Iterate` 0xE89CF0, `Save` 0xE8F920; `Corner`, `Square`, `Qube`, `Flow`/`FlowData`/`FlowTarget`, `Action`, `ModuleContainer`, `OrientedModuleSides`, `SideCounts`, `ShadowMesh`, `VoxelMesh`), `Voxel`, `VoxelType`, `MaterialType` | unowned | E3 | | [est] Split before claiming |
 | E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4 | | |
 | E5a | `Placemaker.Modules.Processing` (`ModuleImporter`, `ProtoModule`, `DecorProfile`, `MaterialCluster`, ...): the editor-time import of module meshes; port only what the shipped game runs | unowned | E5 | | Mostly editor code [est] |
 | E6 | `WaveFunctionCollapse` (18 methods incl. `IterateDecor` 0x3D88D0, `FillQubePossibilities` 0x3D6DD0, `RemovePossibleModule` 0x3DA190, the `Propagation` queue and its `CompareTo` 0x4FC880) | unowned | E5 | | Order of the propagation queue decides the result: port exactly |
 | E7 | Mesh building: `ModuleBuilder` (16, `Iterate` 0x32FF90), `WorldMeshes` (11), `BigMesh`/`BigMeshGroup`/`BigMeshMaster`/`BigMeshPart`/`BigMeshList`, `BitMeshQuadChange`, `MaterialMaster`, `Palette`/`PaletteHolder` | unowned | E6 | | |
-| E8 | Boot and the main loop: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7 | | Who ticks whom each frame; scene `level0..2` wiring from F8 |
-| E9 | Lighting and ground bakes: `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7 | | GPU passes: need the shaders (C3) to check |
+| E8 | Boot and the main loop as Bevy systems in the game's order: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7 | | Who ticks whom each frame (Unity's Awake/Start/Update/LateUpdate order, script execution order from `globalgamemanagers`); scene `level0..2` wiring from F8f |
+| E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7 | | GPU passes: need the shaders (C3) to check |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7 | | |
 
 ## P2 Gameplay systems
@@ -51,7 +53,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8 | | Placing and removing blocks, colours, the click feel |
 | G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8 | | |
-| G3 | Saving: `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
+| G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
 | G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
 | G4 | Undo / redo: find where it lives (`Graph` actions? `UndoRedoFeedback`, `UndoRedoButtons`), port it | unowned | E4 | | |
 | G5 | Life: `BirdFlock` (17), `Bird`, `BirdLanding`, `BirdSpot`, `ButterflyFlock`, `Butterfly`, `ButterflyLanding` | unowned | E8 | | |
@@ -69,18 +71,19 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| C1 | Scenes `level0`, `level1`, `level2`: what each holds, which components on which objects, serialized values; written up in `docs/notes/scenes.md` (names and values only) | unowned | F8 | | |
-| C2 | The module library: the `ModuleLibrary` asset's layout (modules, sides, profiles, decor) loaded by our `Placemaker.Modules` types from the player's asset | unowned | F8, E5 | | |
-| C3 | Shaders: the game's shaders (water, outlines, AO/shadow spreaders, marching squares, ground) recovered from their compiled form into readable `.shader` source in `unity/` | unowned | F8 | | [est] Biggest content row; DXBC → HLSL by hand. Split before claiming |
+| C1 | Scenes `level0`, `level1`, `level2`: what each holds, which components on which objects, serialized values (via F8f); written up in `docs/notes/scenes.md` (names and values only), and built by our app from the player's files | unowned | F8 | | |
+| C2 | The module library: the `ModuleLibrary` asset (modules, meshes, sides, profiles, decor) read by `ts_data` into `ts_game::placemaker::modules` types | unowned | F8, E5 | | |
+| C3 | Shaders: the game's shaders (water, outlines, AO/shadow spreaders, marching squares, ground, sky) read from their compiled form (DXBC in the player's assets) and rewritten as WGSL materials in the app | unowned | F8 | | [est] Biggest content row. Split before claiming |
 | C4 | Palettes, custom grids (`CustomGridLibrary`), credits and localisation tables (I2 `LanguageSourceData`) read from the player's assets | unowned | F8, F7 | | |
+| C5 | Sounds and music from the player's `.resource` files (FSB5 banks) played through Bevy audio | unowned | F8 | | |
 
 ## P4 Finishing
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| X1 | Our build runs end to end from the player's assets: boot, build a town, save, load, screenshot | unowned | E8, G1, G3, G7a | | |
+| X1 | Our build runs end to end from the player's files: boot, build a town, save, load, screenshot | unowned | E8, G1, G3, G7a | | |
 | X2 | Save compatibility: a save folder from the original loads in ours and back, byte for byte | unowned | G3, G3a, F9 | | |
-| X3 | Empty `grep -rn STANDIN unity` (except middleware facades decided in F7) | unowned | X1 | | |
+| X3 | Empty `grep -rn STANDIN townscaper-rs` (except the middleware replacements decided in F7) | unowned | X1 | | |
 | X4 | Every `owner = game` row of `function-index.csv` at `checked` or explained in its notes | unowned | F9 | | |
 
 ## P5 Later
@@ -104,3 +107,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 - 2026-10-15 ed-slopper/wren: board created (F1–F10, E1–E10, G1–G8, C1–C4, X1–X4, L1–L3).
 - 2026-10-15 ed-slopper/wren: F3 done; F4 closed as not needed (the PDB has the structs).
+- 2026-10-15 ed-slopper/wren: target changed to a Rust + Bevy rewrite (asked by ed-slopper): F6 is now the Cargo workspace, F7/F8/F9/F10 reworded for Rust, F11 (Unity semantics) and C5 (sounds) added, C1–C4 and X1–X4 reworded.

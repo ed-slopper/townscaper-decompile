@@ -11,10 +11,5 @@ work/
 __pycache__/
 *.pyc
 
-# The player's own assets, imported locally (F8)
-unity/Assets/Game/
-unity/Library/
-unity/Temp/
-unity/Logs/
-unity/obj/
-unity/UserSettings/
+# Rust
+townscaper-rs/target/

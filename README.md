@@ -1,7 +1,7 @@
 # townscaper-decompile
 
-Townscaper's game code (Oskar Stålberg / Raw Fury, Unity 2020.3.18f1, IL2CPP) recovered method by method from
-the shipped build and rewritten 1:1 as readable C# in a Unity project.
+Townscaper (Oskar Stålberg / Raw Fury, Unity 2020.3.18f1, IL2CPP) decompiled and rewritten 1:1 in **Rust** on
+**Bevy** (`townscaper-rs/`), method by method from the shipped build, running from the player's own game files.
 
 **This repo contains no game files and no decompiler output.** You need your own copy of Townscaper; the tools
 here decompile *your* install into `work/` (gitignored). What is committed: our tools, our notes, name and
@@ -20,4 +20,10 @@ python -I tools/index.py                                 # rebuilds docs/*.csv f
 bash tools/ghidra_import.sh "C:/GOG Games/Townscaper"   # Ghidra project with the PDB (slow)
 ```
 
-Needs Python 3.10+, .NET Framework 4.x (Il2CppDumper), and for Ghidra 12.x a JDK 21+.
+Build the rewrite (MSVC toolchain):
+
+```bash
+cd townscaper-rs && cargo +stable-x86_64-pc-windows-msvc run --release
+```
+
+Needs Rust (MSVC toolchain), Python 3.10+, .NET Framework 4.x (Il2CppDumper), and for Ghidra 12.x a JDK 21+.

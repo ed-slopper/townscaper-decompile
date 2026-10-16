@@ -2,12 +2,15 @@
 
 ## 1. The goal
 
-All of **Townscaper**'s own game code recovered from the shipped IL2CPP build and rewritten 1:1 as readable
-**C#** in a **Unity 2020.3.18f1** project (`unity/`), method by method, so that the project built with the
-player's own game assets behaves like the original. The game's code is the `Placemaker` and `Os` namespaces of
-`Assembly-CSharp` (448 types, 2,269 methods with bodies: [`docs/function-index.csv`](docs/function-index.csv)).
-The bundled middleware (Rewired, I2 Localization, Crosstales FileBrowser, Thread Ninja, StandaloneFileBrowser,
-the Fury SDK, Unity's own packages) is not ours to recover: see board row F7.
+All of **Townscaper** rewritten 1:1 in **Rust** (`townscaper-rs/`, **Bevy** as the window, GPU, audio and input
+host). Every method of the game's own code is re-created from the shipped IL2CPP build so it behaves the same,
+until the whole game runs from our code and the player's own game files (their own install, read by our code).
+
+The game's code is the `Placemaker` and `Os` namespaces of `Assembly-CSharp` (448 types, 2,269 methods with
+bodies: [`docs/function-index.csv`](docs/function-index.csv)). Under it sit Unity itself and bundled middleware
+(Rewired, I2 Localization, Crosstales FileBrowser, Thread Ninja, the Fury SDK). Those are not ported line by
+line: the parts the game relies on for its results (Unity's `Mathf`, `Random`, `Vector3`/`Quaternion`, mesh
+building, `List<T>.Sort` order, ...) get exact Rust equivalents (row F11); the rest is Bevy's job.
 
 The board is [`WORK.md`](WORK.md). The rules below let any number of AI agents, working for any number of
 people, pick work from it without clashing.
@@ -104,7 +107,7 @@ Anyone may change priorities, rows, areas or these rules when their human asks. 
 
 | Person | Branch | Area | Files |
 |---|---|---|---|
-| ed-slopper | `main` | Everything so far | `tools/**`, `ghidra/**`, `docs/**`, `unity/**` |
+| ed-slopper | `main` | Everything so far | `townscaper-rs/**`, `tools/**`, `ghidra/**`, `docs/**` |
 
 New people: add your own line (in a `board-` commit) before you claim a row, and take `unowned` or `any` rows.
 
@@ -116,18 +119,22 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   Ghidra pseudo-C, ISIL, disassembly), no Ghidra projects. All of that lives in `work/` (gitignored), made from
   each person's own copy by `tools/decompile.sh`. Names, signatures, addresses, field offsets and constants
   read out of the build are fine (`docs/*.csv`, `ghidra/symbols.txt`).
-- **Rewrite, don't paste.** C# in `unity/` is written by us from reading the original: same algorithm, same
-  order, same constants, same float maths (`float`, not `double`, where the original uses `float`; the same
-  `Unity.Mathematics` / `Mathf` calls), same bugs. Never paste Cpp2IL/Ghidra output into `unity/`.
-- **Write the original's address next to every recreated method**, in its doc comment:
-  `/// <summary>Placemaker.WaveFunctionCollapse.IterateDecor, RVA 0x3D88D0</summary>`. Keep the original's
-  type, member and field names and namespaces (they are in the metadata), so saves, scenes and serialized
-  fields line up.
+- **Port what the game does, 1:1.** Same algorithm, same order, same constants, same float maths (`f32` where
+  the original uses `float`, the same operation order, Unity's own `Mathf` / `Vector3` / `Random` semantics
+  through `ts_game::unity`, row F11), same bugs. Tuning by eye is not porting. Never paste Cpp2IL or Ghidra
+  output into the repo: read it, then write Rust.
+- **Write the original's address next to every recreated function**, in its doc comment, with the C# name:
+  ``/// `Placemaker.WaveFunctionCollapse.IterateDecor` 0x3D88D0``. A function that ports several originals
+  lists them all. Keep the original's names in snake_case (`iterate_decor`, `WaveFunctionCollapse`) and its
+  module layout (`ts_game::placemaker::wave_function_collapse`, `ts_game::os::hex`), so anyone can go from our
+  code to the original and back.
 - **Mark everything that is ours and not the game's** with `STANDIN:` and what it stands in for:
-  `// STANDIN: no-op, for Rewired's ReInput.players (middleware, F7)`. `grep -rn STANDIN unity` lists every one.
+  `// STANDIN: our orbit camera, for Placemaker.Ui.OrbitalCamera (G2)`. Bevy itself (window, GPU, audio
+  output, gamepads) is our host, not a stand-in; what we draw and how is the game's and must be ported.
+  `grep -rn STANDIN townscaper-rs` lists every stand-in left (row X3 empties it).
 - **Mark progress in `docs/function-index.csv`**, column `status`: `dumped` (nothing yet) → `read` (understood,
-  notes written) → `ported` (C# in `unity/`) → `checked` (proven equal to the original, section 15). The
-  `notes` column takes a short pointer (`notes/wfc.md`). `tools/index.py` keeps these when it rebuilds.
+  notes written) → `ported` (Rust in `townscaper-rs/`) → `checked` (proven equal to the original, section 15).
+  The `notes` column takes a short pointer (`notes/wfc.md`). `tools/index.py` keeps these when it rebuilds.
 - **Do not chase a gap outside your task.** Note it in the system's notes and add a row.
 
 ## 14. Decompiling
@@ -142,7 +149,7 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
     The shipped `GameAssembly.pdb` names every il2cpp function (`Placemaker_WaveFunctionCollapse__IterateDecor_m…`),
     `ghidra/scripts/ApplyIl2CppNames.java` adds the C# name, signature and string literals. Read bodies here.
   - `work/cpp2il-isil/**`: Cpp2IL's instruction-level dump, a second opinion when Ghidra's output is unclear.
-  - `work/il2cppdumper/il2cpp.h`: the C structs of every type, for Ghidra's data types (row F4).
+  - `work/il2cppdumper/il2cpp.h`: the C structs of every type (Ghidra already has them from the PDB, F4).
 - The **Ghidra MCP server** (<https://github.com/bethington/ghidra-mcp>) lets an agent read and rename in a running
   Ghidra. Before trusting an address, check the open program is `GameAssembly.dll` with the md5 above, **not**
   another project's program.
@@ -156,10 +163,21 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
 
 ## 15. Building and checking
 
-- `unity/` is a Unity **2020.3.18f1** project (the reference engine version; row F6). The player's own assets are
-  imported into `unity/Assets/Game/` locally by `tools/` (row F8); that folder is gitignored.
-- A method is **checked** only when it is shown equal to the original on the comparison harness (row F9):
-  the same inputs fed to the original (in the running game) and to ours, outputs compared exactly.
+- `townscaper-rs/` is a Cargo workspace:
+
+  | Crate | Path | What | Bevy? |
+  |---|---|---|---|
+  | `townscaper` | `townscaper-rs/` | The app: window, input, drawing, audio, the frame loop | yes |
+  | `ts_game` | `townscaper-rs/game` | The ported game code (`os::*`, `placemaker::*`) and the Unity semantics it needs (`unity::*`) | **no** |
+  | `ts_data` | `townscaper-rs/data` | Readers of the player's own files (`Townscaper_Data/*.assets`, `.resS`, `.resource`, saves) | **no** |
+
+  `ts_game` and `ts_data` never depend on Bevy, so every ported function can be called and tested on its own.
+- Build on Windows with the **MSVC** toolchain (the GNU one needs `dlltool`):
+  `cargo +stable-x86_64-pc-windows-msvc run --release` in `townscaper-rs/`. Tests: `cargo test -p ts_game -p ts_data`.
+  Tests that need the player's install read it from `TOWNSCAPER_DIR` and skip when it is not set.
+- A function is **checked** only when it is shown equal to the original on the comparison harness (row F9): the
+  same inputs fed to the original (in the running game) and to ours, outputs compared exactly. Run the build and
+  the tests that cover your system before marking a row done.
 
 ## 16. End of every session
 
