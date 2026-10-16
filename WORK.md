@@ -22,7 +22,6 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F8a | `ts_data::serialized`: the whole metadata of a SerializedFile (format 22, no type trees): types (class id, script type index, script id hash), object table (path id, offset, size, type), script refs, externals; every reference file loads and every object's bytes lie inside the file | unowned | F6 | ed-slopper/wren (2026-10-15) | Split of F8 |
 | F8b | Built-in objects needed to see the scenes: `GameObject` (components, layer, name, active), `Transform` (local rotation/position/scale, children, father), `MonoBehaviour` header (game object, enabled, script PPtr, name), `MonoScript` (class, namespace, assembly), with Unity 2020.3.18f1's field layouts; `PPtr` across files via externals | unowned | F8a | | Split of F8 |
 | F8c | `Mesh` (vertex channels and streams, index buffer, sub-meshes, bounds) | unowned | F8b | | Split of F8 |
 | F8d | `Texture2D` (format, mips, image data in `.resS`), decoded for the formats the game uses | unowned | F8b | | Split of F8 |
@@ -108,6 +107,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F4 | il2cpp's C structs in Ghidra: **nothing to do**, the PDB carries them with their fields (`__this->___decorUpdates_12`, `list->____size_2`), checked on 0x3D88D0. Il2CppDumper's `il2cpp.h` is only needed for builds without the PDB | P0 | ed-slopper/wren | 2026-10-15 | 7184754 |
 | F5 | `ghidra/scripts/ExportDecomp.java` + `tools/ghidra_export.sh`: the pseudo-C of every game method in `docs/function-index.csv` to `work/decomp/<Namespace>/<Type>/<Method>_<rva>.c` (gitignored), with the C# signature on top: 2,269 written, 0 failed, 448 share a body with an earlier row (identical-code folding), 5 min, 82 MB | P0 | ed-slopper/wren | 2026-10-15 | afc6bc1 |
 | F6 | `townscaper-rs/` Cargo workspace: app `townscaper` on Bevy 0.20 (window titled with the build check, STANDIN sky colour and fixed camera), `ts_game` (module skeleton `os::{utils, hex}`, `placemaker`, `unity`) and `ts_data` without Bevy; `ts_data::install` finds and identifies the install (Unity version, metadata v27, both md5s), `ts_data::serialized::Header` reads the SerializedFile header (formats 9–22). Tests: header unit tests + every `.assets`/`level*`/`globalgamemanagers` of the reference install parses with its exact file size. First app build 12 min (MSVC); the window opens (RTX 3060, no errors) | P0 | ed-slopper/wren | 2026-10-15 | d09981a |
+| F8a | `ts_data::serialized::SerializedFile`: the whole metadata of a format-22 SerializedFile without type trees (types, object table, script refs, externals, ref types, user info); all nine files of the reference install read to exactly their metadata end, 8,478 objects, none overlapping; layout in `docs/notes/files.md` | P0 | ed-slopper/wren | 2026-10-15 | F8aCOMMIT |
 
 ## Changes to the board
 
@@ -117,3 +117,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F6 done.
 - 2026-10-15 ed-slopper/wren: F5 done.
 - 2026-10-15 ed-slopper/wren: split F8 into F8a–F8g (no type trees in the build: we supply the layouts).
+- 2026-10-15 ed-slopper/wren: F8a done.
