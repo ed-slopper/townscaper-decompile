@@ -231,16 +231,16 @@ rva,va,namespace,type,method,signature,status,notes
 0x6CDDA0,0x106CDDA0,Os.Utils,ExtraMath,SetZ,"public static float3 SetZ(float3 vector, float z = 0)",checked,tests/os_extra_math.rs
 0x6CDDD0,0x106CDDD0,Os.Utils,ExtraMath,ToneOffsetToPitch,public static float ToneOffsetToPitch(float tone),checked,tests/os_extra_math.rs
 0x6CDE40,0x106CDE40,Os.Utils,ExtraMath,.cctor,private static void .cctor(),checked,tests/os_extra_math.rs
-0x3E6E40,0x103E6E40,Os.Utils,Intersections,BoxBox,"public static bool BoxBox(Vector3 min0, Vector3 max0, Vector3 min1, Vector3 max1)",dumped,
-0x3E6E90,0x103E6E90,Os.Utils,Intersections,OrientedBoxOrientedBoxInternal,"private static bool OrientedBoxOrientedBoxInternal(Matrix4x4 box0, Matrix4x4 box1, HashSet<Vector3> axisList)",dumped,
-0x3E80B0,0x103E80B0,Os.Utils,Intersections,OrientedBoxOrientedBox,"public static bool OrientedBoxOrientedBox(Matrix4x4 box0, Matrix4x4 box1)",dumped,
-0x3E8240,0x103E8240,Os.Utils,Intersections,OrientedBoxTriangle,"public static bool OrientedBoxTriangle(Matrix4x4 box0, Vector3 p0, Vector3 p1, Vector3 p2)",dumped,
-0x3E95C0,0x103E95C0,Os.Utils,Intersections,TriangleRay,"public static bool TriangleRay(Vector3 p1, Vector3 p2, Vector3 p3, Ray ray)",dumped,
-0x3E98B0,0x103E98B0,Os.Utils,Intersections,TriangleTriangleInternal,"private static bool TriangleTriangleInternal(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 v0, Vector3 v1, Vector3 v2, float minDistance)",dumped,
-0x3E9F60,0x103E9F60,Os.Utils,Intersections,TriangleTriangle,"public static bool TriangleTriangle(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 v0, Vector3 v1, Vector3 v2, float minDistance = 0)",dumped,
-0x3EA3B0,0x103EA3B0,Os.Utils,Intersections,.cctor,private static void .cctor(),dumped,
-0x334970,0x10334970,Os.Utils,NumberStrings,Get,public static string Get(int number),dumped,
-0x334A60,0x10334A60,Os.Utils,NumberStrings,.cctor,private static void .cctor(),dumped,
+0x3E6E40,0x103E6E40,Os.Utils,Intersections,BoxBox,"public static bool BoxBox(Vector3 min0, Vector3 max0, Vector3 min1, Vector3 max1)",checked,tests/os_intersections.rs
+0x3E6E90,0x103E6E90,Os.Utils,Intersections,OrientedBoxOrientedBoxInternal,"private static bool OrientedBoxOrientedBoxInternal(Matrix4x4 box0, Matrix4x4 box1, HashSet<Vector3> axisList)",checked,tests/os_intersections.rs
+0x3E80B0,0x103E80B0,Os.Utils,Intersections,OrientedBoxOrientedBox,"public static bool OrientedBoxOrientedBox(Matrix4x4 box0, Matrix4x4 box1)",checked,tests/os_intersections.rs
+0x3E8240,0x103E8240,Os.Utils,Intersections,OrientedBoxTriangle,"public static bool OrientedBoxTriangle(Matrix4x4 box0, Vector3 p0, Vector3 p1, Vector3 p2)",checked,tests/os_intersections.rs
+0x3E95C0,0x103E95C0,Os.Utils,Intersections,TriangleRay,"public static bool TriangleRay(Vector3 p1, Vector3 p2, Vector3 p3, Ray ray)",checked,tests/os_intersections.rs
+0x3E98B0,0x103E98B0,Os.Utils,Intersections,TriangleTriangleInternal,"private static bool TriangleTriangleInternal(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 v0, Vector3 v1, Vector3 v2, float minDistance)",checked,tests/os_intersections.rs
+0x3E9F60,0x103E9F60,Os.Utils,Intersections,TriangleTriangle,"public static bool TriangleTriangle(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 v0, Vector3 v1, Vector3 v2, float minDistance = 0)",checked,tests/os_intersections.rs
+0x3EA3B0,0x103EA3B0,Os.Utils,Intersections,.cctor,private static void .cctor(),checked,tests/os_intersections.rs
+0x334970,0x10334970,Os.Utils,NumberStrings,Get,public static string Get(int number),checked,tests/os_intersections.rs
+0x334A60,0x10334A60,Os.Utils,NumberStrings,.cctor,private static void .cctor(),checked,tests/os_intersections.rs
 0x1FC7D0,0x101FC7D0,Os.Utils,SbyteFloat3,op_Equality,"public static bool op_Equality(SbyteFloat3 a, SbyteFloat3 b)",checked,tests/os_utils.rs
 0x1FC8F0,0x101FC8F0,Os.Utils,SbyteFloat3,op_Inequality,"public static bool op_Inequality(SbyteFloat3 a, SbyteFloat3 b)",checked,tests/os_utils.rs
 0x96E980,0x1096E980,Os.Utils,SbyteFloat3,Equals,public override bool Equals(object obj),ported,"boxed Equals(object): same fields as op_Equality, no harness test"

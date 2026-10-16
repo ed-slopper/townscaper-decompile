@@ -28,7 +28,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | ed-slopper/wren (2026-10-16) | Split of E1 |
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
 | E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1a, E1b | | |
 | E3 | The irregular grid: `GridGenerator` (45 methods: hex patch → random merge of triangles into quads → subdivision → relaxation), `Placemaker.Quads` (`Quad`, `Vert`), `Placemaker.Quads.GridGeneration` (`HexPatch`, `HexCluster`, `CustomGridPatch`/`Importer`/`Library`, `MotivationCounter`, `GridConstants`), `GridBit` | unowned | E2 | | [est] The heart of the look; seed and RNG order must match (`UnityEngine.Random` vs `System.Random`: find which). Split before claiming |
@@ -121,6 +120,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F7 | Middleware decided by ed-slopper (2026-10-15: "accept the proposal on the board"): Rewired → Bevy input under a port of the game's `ActionInputManager` / `ControlBinding` layer; I2 Localization → a port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser → `rfd`; Fury SDK (platform, achievements) → no-op STANDINs. In `docs/notes/unity.md` | humans | ed-slopper | 2026-10-15 | c2f22b1 |
 | E1a | `ts_game::os::utils`: `Bitwise`, `ByteFloat`, `ByteFloat2`, `ByteFloat3`, `SbyteFloat3` (61 rows `checked` against the game in `tests/os_utils.rs`, the 4 boxed `Equals(object)` `ported`). Found by the harness: `SbyteFloat3 * int3x3` dots each column with the vector (the transpose of `math.mul`); `FloatToByte` clamps only the top (negatives wrap); SbyteFloat3's scale is 254 and its `normal` has no −1. `tools/mark.py` sets index statuses | P1 | ed-slopper/wren | 2026-10-15 | 0fb2e05 |
 | E1b | `ts_game::os::extra_math`: all of `ExtraMath` (42 rows `checked` against the game in `tests/os_extra_math.rs`, 1,200 rounds; `BinarySearchTransformX` `ported` on child x positions, its harness check waits for E11). Found: `Cross2` rounds once from x87 precision; huge trig arguments differ between the game's Intel libm and the CRT (outside the game's range; `unity.md`) | P1 | ed-slopper/wren | 2026-10-16 | d1f62c4 |
+| E1c | `ts_game::os::intersections`: `Intersections` (`BoxBox`, the oriented box/box and box/triangle separating-axis tests `PropPlacer` uses, Möller–Trumbore `TriangleRay`, plane-based `TriangleTriangle`) and `NumberStrings`; all 10 rows `checked` (1,500 random near-touching cases per test with both answers frequent, 300 numbers) | P1 | ed-slopper/wren | 2026-10-16 | E1cCOMMIT |
 
 ## Changes to the board
 
@@ -153,3 +153,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: split E1 into E1a–E1d; E2 Needs E1a, E1b.
 - 2026-10-15 ed-slopper/wren: E1a done.
 - 2026-10-16 ed-slopper/wren: E1b done.
+- 2026-10-16 ed-slopper/wren: E1c done.
