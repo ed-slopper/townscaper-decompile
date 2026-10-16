@@ -1,0 +1,22 @@
+[workspace]
+members = [".", "game", "data"]
+resolver = "2"
+
+[package]
+name = "townscaper"
+version = "0.1.0"
+edition = "2021"
+description = "Townscaper rewritten 1:1 in Rust on Bevy, running from the player's own game files"
+
+[dependencies]
+ts_game = { path = "game" }
+ts_data = { path = "data" }
+bevy = "0.20"
+
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 2
+[profile.release]
+opt-level = 3
+codegen-units = 16

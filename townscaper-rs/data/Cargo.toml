@@ -1,0 +1,8 @@
+[package]
+name = "ts_data"
+version = "0.1.0"
+edition = "2021"
+description = "Readers of the player's own Townscaper files; no Bevy"
+
+[dependencies]
+md-5 = "0.10"
