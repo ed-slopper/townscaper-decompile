@@ -1,0 +1,20 @@
+# Third-party tools (fetched by tools/fetch_tools.sh)
+tools/bin/
+
+# Everything produced from the player's own copy of the game stays local:
+# dumps, decompiled code, Ghidra projects, extracted assets. Never commit these.
+work/
+*.gpr
+*.rep/
+
+# Python
+__pycache__/
+*.pyc
+
+# The player's own assets, imported locally (F8)
+unity/Assets/Game/
+unity/Library/
+unity/Temp/
+unity/Logs/
+unity/obj/
+unity/UserSettings/

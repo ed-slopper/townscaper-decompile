@@ -1,0 +1,809 @@
+typedef,assembly,namespace,type,kind,base,fields,methods,owner
+7411,Assembly-CSharp-firstpass,,<Module>,class,,0,0,game
+7412,Assembly-CSharp-firstpass,Crosstales,ExtensionMethods.<>c__DisplayClass6_0,class,,1,2,Crosstales FileBrowser
+7413,Assembly-CSharp-firstpass,Crosstales,ExtensionMethods.<>c__DisplayClass7_0,class,,1,2,Crosstales FileBrowser
+7414,Assembly-CSharp-firstpass,Crosstales,ExtensionMethods.<>c__51<T>,class,,2,3,Crosstales FileBrowser
+7415,Assembly-CSharp-firstpass,Crosstales,ExtensionMethods,class,,1,107,Crosstales FileBrowser
+7416,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.OpenFilesStart,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7417,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.OpenFilesComplete,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7418,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.OpenFoldersStart,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7419,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.OpenFoldersComplete,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7420,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.SaveFileStart,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7421,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.SaveFileComplete,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7422,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser.<>c,class,,2,3,Crosstales FileBrowser
+7423,Assembly-CSharp-firstpass,Crosstales.FB,FileBrowser,class,Singleton<FileBrowser>,26,116,Crosstales FileBrowser
+7424,Assembly-CSharp-firstpass,Crosstales.FB,ExtensionFilter,struct,,2,2,Crosstales FileBrowser
+7425,Assembly-CSharp-firstpass,Crosstales.FB,OnOpenFilesCompleted,class,"UnityEvent<bool, string, string>",0,1,Crosstales FileBrowser
+7426,Assembly-CSharp-firstpass,Crosstales.FB,OnOpenFoldersCompleted,class,"UnityEvent<bool, string, string>",0,1,Crosstales FileBrowser
+7427,Assembly-CSharp-firstpass,Crosstales.FB,OnSaveFileCompleted,class,"UnityEvent<bool, string>",0,1,Crosstales FileBrowser
+7428,Assembly-CSharp-firstpass,Crosstales.FB,WrapperHolder,class,,1,3,Crosstales FileBrowser
+7429,Assembly-CSharp-firstpass,Crosstales.FB,WrapperExample,class,BaseCustomFileBrowser,5,24,Crosstales FileBrowser
+7430,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,BaseCustomFileBrowser,class,"MonoBehaviour, IFileBrowser",3,29,Crosstales FileBrowser
+7431,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,BaseFileBrowser,class,IFileBrowser,3,29,Crosstales FileBrowser
+7432,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FileBrowserGeneric,class,BaseFileBrowser,5,24,Crosstales FileBrowser
+7433,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FileBrowserWindows.<>c__DisplayClass54_0,class,,7,2,Crosstales FileBrowser
+7434,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FileBrowserWindows.<>c__DisplayClass55_0,class,,2,3,Crosstales FileBrowser
+7435,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FileBrowserWindows.<>c__DisplayClass56_0,class,,6,2,Crosstales FileBrowser
+7436,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FileBrowserWindows,class,BaseFileBrowser,21,32,Crosstales FileBrowser
+7437,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.BrowseCallbackProc,class,MulticastDelegate,0,4,Crosstales FileBrowser
+7438,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.OpenFileName,struct,,23,0,Crosstales FileBrowser
+7439,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.BROWSEINFO,struct,,8,0,Crosstales FileBrowser
+7440,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.IShellItem,interface,,0,5,Crosstales FileBrowser
+7441,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.FileOpenDialog,class,__Il2CppComObject,0,2,Crosstales FileBrowser
+7442,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.IFileOpenDialog,interface,,0,26,Crosstales FileBrowser
+7443,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,NativeMethods,class,,0,7,Crosstales FileBrowser
+7444,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,FOS,enum,,21,0,Crosstales FileBrowser
+7445,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,SIGDN,enum,,10,0,Crosstales FileBrowser
+7446,Assembly-CSharp-firstpass,Crosstales.FB.Wrapper,IFileBrowser,interface,,0,28,Crosstales FileBrowser
+7447,Assembly-CSharp-firstpass,Crosstales.FB.Util,Config,class,,4,1,Crosstales FileBrowser
+7448,Assembly-CSharp-firstpass,Crosstales.FB.Util,Constants,class,BaseConstants,22,2,Crosstales FileBrowser
+7449,Assembly-CSharp-firstpass,Crosstales.FB.Util,Helper,class,BaseHelper,0,1,Crosstales FileBrowser
+7450,Assembly-CSharp-firstpass,Crosstales.FB.Util,SetupProject,class,,0,3,Crosstales FileBrowser
+7451,Assembly-CSharp-firstpass,Crosstales.Common.Model.Enum,Platform,enum,,9,0,Crosstales FileBrowser
+7452,Assembly-CSharp-firstpass,Crosstales.Common.Model.Enum,SampleRate,enum,,6,0,Crosstales FileBrowser
+7453,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTProcess,class,IDisposable,17,40,Crosstales FileBrowser
+7454,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.STARTUPINFOEX,struct,,2,0,Crosstales FileBrowser
+7455,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.STARTUPINFO,struct,,18,0,Crosstales FileBrowser
+7456,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.PROCESS_INFORMATION,struct,,4,0,Crosstales FileBrowser
+7457,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods.SECURITY_ATTRIBUTES,struct,,3,0,Crosstales FileBrowser
+7458,Assembly-CSharp-firstpass,Crosstales.Common.Util,NativeMethods,class,,0,6,Crosstales FileBrowser
+7459,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTProcessStartInfo,class,,11,23,Crosstales FileBrowser
+7460,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTScreenshot,class,Singleton<CTScreenshot>,6,3,Crosstales FileBrowser
+7461,Assembly-CSharp-firstpass,Crosstales.Common.Util,PlatformController.<>c,class,,3,4,Crosstales FileBrowser
+7462,Assembly-CSharp-firstpass,Crosstales.Common.Util,PlatformController,class,MonoBehaviour,5,6,Crosstales FileBrowser
+7463,Assembly-CSharp-firstpass,Crosstales.Common.Util,RandomColor,class,MonoBehaviour,17,4,Crosstales FileBrowser
+7464,Assembly-CSharp-firstpass,Crosstales.Common.Util,RandomRotator,class,MonoBehaviour,12,3,Crosstales FileBrowser
+7465,Assembly-CSharp-firstpass,Crosstales.Common.Util,RandomScaler,class,MonoBehaviour,12,3,Crosstales FileBrowser
+7466,Assembly-CSharp-firstpass,Crosstales.Common.Util,BaseConstants,class,,62,4,Crosstales FileBrowser
+7467,Assembly-CSharp-firstpass,Crosstales.Common.Util,BaseHelper.<>c,class,,4,5,Crosstales FileBrowser
+7468,Assembly-CSharp-firstpass,Crosstales.Common.Util,BaseHelper,class,,7,63,Crosstales FileBrowser
+7469,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTHelper,class,MonoBehaviour,1,7,Crosstales FileBrowser
+7470,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTPlayerPrefs,class,,0,27,Crosstales FileBrowser
+7471,Assembly-CSharp-firstpass,Crosstales.Common.Util,CTWebClient,class,WebClient,2,8,Crosstales FileBrowser
+7472,Assembly-CSharp-firstpass,Crosstales.Common.Util,MemoryCacheStream,class,Stream,6,15,Crosstales FileBrowser
+7473,Assembly-CSharp-firstpass,Crosstales.Common.Util,Singleton<T>,class,MonoBehaviour,5,11,Crosstales FileBrowser
+7474,Assembly-CSharp-firstpass,Crosstales.Common.Util,SingletonHelper,class,,2,8,Crosstales FileBrowser
+7475,Assembly-CSharp-firstpass,Crosstales.Common.Util,XmlHelper,class,,0,6,Crosstales FileBrowser
+7476,Assembly-CSharp-firstpass,,<PrivateImplementationDetails>,class,,0,1,game
+7477,Assembly-CSharp,,<Module>,class,,0,0,game
+7478,Assembly-CSharp,,Beatbox,class,MonoBehaviour,3,3,game
+7479,Assembly-CSharp,,ExampleScript.<StartExamples>d__2,class,"IEnumerator<object>, IEnumerator, IDisposable",4,6,game
+7480,Assembly-CSharp,,ExampleScript.<Blocking>d__3,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+7481,Assembly-CSharp,,ExampleScript.<Cancellation>d__4,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+7482,Assembly-CSharp,,ExampleScript.<ErrorHandling>d__5,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+7483,Assembly-CSharp,,ExampleScript,class,MonoBehaviour,0,11,game
+7484,Assembly-CSharp,,CustomCameraProjection,class,MonoBehaviour,2,3,game
+7485,Assembly-CSharp,,FurySystemMessenger,class,PlatformSystemMessengerBase,0,8,game
+7486,Assembly-CSharp,,LocalizationService,class,ILocalisationService,1,5,game
+7487,Assembly-CSharp,,PlatformManager,class,MonoBehaviour,3,7,game
+7488,Assembly-CSharp,,ExampleDebugMenu.<>c__DisplayClass2_0,class,,1,2,game
+7489,Assembly-CSharp,,ExampleDebugMenu.<>c,class,,2,3,game
+7490,Assembly-CSharp,,ExampleDebugMenu,class,MonoBehaviour,2,4,game
+7491,Assembly-CSharp,,StoreAssetExporter,class,MonoBehaviour,2,1,game
+7492,Assembly-CSharp,,StoreAssetFrame.Format,enum,,4,0,game
+7493,Assembly-CSharp,,StoreAssetFrame.Folder,enum,,3,0,game
+7494,Assembly-CSharp,,StoreAssetFrame,class,MonoBehaviour,2,1,game
+7495,Assembly-CSharp,,BindingRow.<>c__DisplayClass7_0,class,,4,2,game
+7496,Assembly-CSharp,,BindingRow,class,MonoBehaviour,6,3,game
+7497,Assembly-CSharp,,CornerImage,class,MaskableGraphic,5,7,game
+7498,Assembly-CSharp,,DebugUI,class,"MonoBehaviour, UiMaster.IUiSetup",6,6,game
+7499,Assembly-CSharp,,UndoRedoFeedback,class,"UIBehaviour, UiMaster.IUiSetup",0,3,game
+7500,Assembly-CSharp,,TextFps.<FpsCounter>d__5,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+7501,Assembly-CSharp,,TextFps,class,MonoBehaviour,3,4,game
+7502,Assembly-CSharp,SFB,IStandaloneFileBrowser,interface,,0,6,StandaloneFileBrowser
+7503,Assembly-CSharp,SFB,ExtensionFilter,struct,,2,1,StandaloneFileBrowser
+7504,Assembly-CSharp,SFB,StandaloneFileBrowser,class,,1,12,StandaloneFileBrowser
+7505,Assembly-CSharp,SFB,WindowWrapper,class,IWin32Window,1,2,StandaloneFileBrowser
+7506,Assembly-CSharp,SFB,StandaloneFileBrowserWindows,class,IStandaloneFileBrowser,0,10,StandaloneFileBrowser
+7507,Assembly-CSharp,Rewired,IGamepadTemplate,interface,IControllerTemplate,0,29,Rewired (input)
+7508,Assembly-CSharp,Rewired,IRacingWheelTemplate,interface,IControllerTemplate,0,42,Rewired (input)
+7509,Assembly-CSharp,Rewired,IHOTASTemplate,interface,IControllerTemplate,0,88,Rewired (input)
+7510,Assembly-CSharp,Rewired,IFlightYokeTemplate,interface,IControllerTemplate,0,49,Rewired (input)
+7511,Assembly-CSharp,Rewired,IFlightPedalsTemplate,interface,IControllerTemplate,0,3,Rewired (input)
+7512,Assembly-CSharp,Rewired,ISixDofControllerTemplate,interface,IControllerTemplate,0,41,Rewired (input)
+7513,Assembly-CSharp,Rewired,GamepadTemplate,class,"ControllerTemplate, IGamepadTemplate, IControllerTemplate",40,31,Rewired (input)
+7514,Assembly-CSharp,Rewired,RacingWheelTemplate,class,"ControllerTemplate, IRacingWheelTemplate, IControllerTemplate",47,44,Rewired (input)
+7515,Assembly-CSharp,Rewired,HOTASTemplate,class,"ControllerTemplate, IHOTASTemplate, IControllerTemplate",169,90,Rewired (input)
+7516,Assembly-CSharp,Rewired,FlightYokeTemplate,class,"ControllerTemplate, IFlightYokeTemplate, IControllerTemplate",78,51,Rewired (input)
+7517,Assembly-CSharp,Rewired,FlightPedalsTemplate,class,"ControllerTemplate, IFlightPedalsTemplate, IControllerTemplate",4,5,Rewired (input)
+7518,Assembly-CSharp,Rewired,SixDofControllerTemplate,class,"ControllerTemplate, ISixDofControllerTemplate, IControllerTemplate",68,43,Rewired (input)
+7519,Assembly-CSharp,Rewired,InputManager,class,InputManager_Base,1,10,Rewired (input)
+7520,Assembly-CSharp,Rewired.Platforms.Switch,NintendoSwitchInputManager.UserData,class,IKeyedData<int>,17,48,Rewired (input)
+7521,Assembly-CSharp,Rewired.Platforms.Switch,NintendoSwitchInputManager.NpadSettings_Internal,class,IKeyedData<int>,4,16,Rewired (input)
+7522,Assembly-CSharp,Rewired.Platforms.Switch,NintendoSwitchInputManager.DebugPadSettings_Internal,class,IKeyedData<int>,3,12,Rewired (input)
+7523,Assembly-CSharp,Rewired.Platforms.Switch,NintendoSwitchInputManager,class,"MonoBehaviour, IExternalInputManager",1,3,Rewired (input)
+7524,Assembly-CSharp,Rewired.Utils,ExternalTools,class,IExternalTools,4,86,Rewired (input)
+7525,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.ControllerAssignmentSaveInfo.PlayerInfo,class,,4,4,Rewired (input)
+7526,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.ControllerAssignmentSaveInfo.JoystickInfo,class,,3,1,Rewired (input)
+7527,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.ControllerAssignmentSaveInfo,class,,1,5,Rewired (input)
+7528,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.JoystickAssignmentHistoryInfo,class,,2,1,Rewired (input)
+7529,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.<>c__DisplayClass78_0,class,,1,2,Rewired (input)
+7530,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.<>c__DisplayClass78_1,class,,1,2,Rewired (input)
+7531,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.<>c__DisplayClass78_2,class,,1,2,Rewired (input)
+7532,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs.<LoadJoystickAssignmentsDeferred>d__80,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,Rewired (input)
+7533,Assembly-CSharp,Rewired.Data,UserDataStore_PlayerPrefs,class,UserDataStore,20,85,Rewired (input)
+7534,Assembly-CSharp,Rewired.Internal,ControllerTemplateFactory,class,,2,4,Rewired (input)
+7535,Assembly-CSharp,Rewired.Integration.UnityUI,PlayerPointerEventData,class,PointerEventData,6,14,Rewired (input)
+7536,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredEventSystem,class,EventSystem,1,4,Rewired (input)
+7537,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredPointerInputModule.MouseState,class,,1,5,Rewired (input)
+7538,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredPointerInputModule.MouseButtonEventData,class,,2,3,Rewired (input)
+7539,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredPointerInputModule.ButtonState,class,,2,5,Rewired (input)
+7540,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredPointerInputModule.UnityInputSource,class,"IMouseInputSource, ITouchInputSource",3,16,Rewired (input)
+7541,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredPointerInputModule,class,BaseInputModule,12,31,Rewired (input)
+7542,Assembly-CSharp,Rewired.Integration.UnityUI,PointerEventType,enum,,3,0,Rewired (input)
+7543,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredStandaloneInputModule.PlayerSetting,class,,2,3,Rewired (input)
+7544,Assembly-CSharp,Rewired.Integration.UnityUI,RewiredStandaloneInputModule,class,RewiredPointerInputModule,35,91,Rewired (input)
+7545,Assembly-CSharp,Rewired.UI.ControlMapper,ButtonInfo,class,UIElementInfo,0,1,Rewired (input)
+7546,Assembly-CSharp,Rewired.UI.ControlMapper,CalibrationWindow.ButtonIdentifier,enum,,5,0,Rewired (input)
+7547,Assembly-CSharp,Rewired.UI.ControlMapper,CalibrationWindow.<>c__DisplayClass41_0,class,,3,2,Rewired (input)
+7548,Assembly-CSharp,Rewired.UI.ControlMapper,CalibrationWindow,class,Window,36,35,Rewired (input)
+7549,Assembly-CSharp,Rewired.UI.ControlMapper,CanvasScalerExt,class,CanvasScaler,0,2,Rewired (input)
+7550,Assembly-CSharp,Rewired.UI.ControlMapper,CanvasScalerFitter.BreakPoint,class,,3,1,Rewired (input)
+7551,Assembly-CSharp,Rewired.UI.ControlMapper,CanvasScalerFitter,class,MonoBehaviour,5,4,Rewired (input)
+7552,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIElement,class,,7,14,Rewired (input)
+7553,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIButton.<>c__DisplayClass7_0,class,,2,2,Rewired (input)
+7554,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIButton,class,ControlMapper.GUIElement,0,6,Rewired (input)
+7555,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIInputField.<>c__DisplayClass19_0,class,,2,2,Rewired (input)
+7556,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIInputField,class,ControlMapper.GUIElement,1,15,Rewired (input)
+7557,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIToggle.<>c__DisplayClass10_0,class,,2,2,Rewired (input)
+7558,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUIToggle,class,ControlMapper.GUIElement,0,9,Rewired (input)
+7559,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.GUILabel,class,,3,16,Rewired (input)
+7560,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.MappingSet.ActionListMode,enum,,3,0,Rewired (input)
+7561,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.MappingSet,class,,6,8,Rewired (input)
+7562,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputBehaviorSettings,class,,12,14,Rewired (input)
+7563,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.Prefabs,class,,14,16,Rewired (input)
+7564,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.References,class,,36,47,Rewired (input)
+7565,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputActionSet,class,,2,3,Rewired (input)
+7566,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputMapping,class,,8,22,Rewired (input)
+7567,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.AxisCalibrator,class,,5,5,Rewired (input)
+7570,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.LayoutElementSizeType,enum,,3,0,Rewired (input)
+7571,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.WindowType,enum,,12,0,Rewired (input)
+7572,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGrid,class,,2,24,Rewired (input)
+7573,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList.MapCategoryEntry,class,,3,12,Rewired (input)
+7574,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList.ActionEntry,class,,5,14,Rewired (input)
+7575,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList.FieldSet,class,,2,1,Rewired (input)
+7576,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList.ActionCategoryEntry,class,,2,3,Rewired (input)
+7577,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList.<GetActionSets>d__18,class,"IEnumerable<ControlMapper.InputActionSet>, IEnumerable, IEnumerator<ControlMapper.InputActionSet>, IEnumerator, IDisposable",9,8,Rewired (input)
+7578,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.InputGridEntryList,class,,1,27,Rewired (input)
+7579,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.WindowManager,class,,5,23,Rewired (input)
+7580,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass341_0,class,,3,3,Rewired (input)
+7581,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass342_0,class,,6,4,Rewired (input)
+7582,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass349_0,class,,4,5,Rewired (input)
+7583,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass350_0,class,,2,3,Rewired (input)
+7584,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass403_0,class,,2,3,Rewired (input)
+7585,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<ElementAssignmentConflicts>d__411,class,"IEnumerable<ElementAssignmentConflictInfo>, IEnumerable, IEnumerator<ElementAssignmentConflictInfo>, IEnumerator, IDisposable",14,11,Rewired (input)
+7586,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper.<>c__DisplayClass456_0,class,,1,2,Rewired (input)
+7587,Assembly-CSharp,Rewired.UI.ControlMapper,ControlMapper,class,MonoBehaviour,104,286,Rewired (input)
+7588,Assembly-CSharp,Rewired.UI.ControlMapper,CustomButton.<OnFinishSubmit>d__51,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,Rewired (input)
+7589,Assembly-CSharp,Rewired.UI.ControlMapper,CustomButton,class,"Button, ICustomSelectable, ICancelHandler, IEventSystemHandler",9,37,Rewired (input)
+7590,Assembly-CSharp,Rewired.UI.ControlMapper,CustomSlider,class,"Slider, ICustomSelectable, ICancelHandler, IEventSystemHandler",9,33,Rewired (input)
+7591,Assembly-CSharp,Rewired.UI.ControlMapper,CustomToggle,class,"Toggle, ICustomSelectable, ICancelHandler, IEventSystemHandler",9,33,Rewired (input)
+7592,Assembly-CSharp,Rewired.UI.ControlMapper,ICustomSelectable,interface,"ICancelHandler, IEventSystemHandler",0,16,Rewired (input)
+7593,Assembly-CSharp,Rewired.UI.ControlMapper,InputBehaviorWindow.InputBehaviorInfo,class,,4,7,Rewired (input)
+7594,Assembly-CSharp,Rewired.UI.ControlMapper,InputBehaviorWindow.ButtonIdentifier,enum,,4,0,Rewired (input)
+7595,Assembly-CSharp,Rewired.UI.ControlMapper,InputBehaviorWindow.PropertyType,enum,,3,0,Rewired (input)
+7596,Assembly-CSharp,Rewired.UI.ControlMapper,InputBehaviorWindow.<>c__DisplayClass26_0,class,,3,3,Rewired (input)
+7597,Assembly-CSharp,Rewired.UI.ControlMapper,InputBehaviorWindow,class,Window,13,17,Rewired (input)
+7598,Assembly-CSharp,Rewired.UI.ControlMapper,InputFieldInfo,class,UIElementInfo,5,11,Rewired (input)
+7599,Assembly-CSharp,Rewired.UI.ControlMapper,InputRow,class,MonoBehaviour,4,5,Rewired (input)
+7600,Assembly-CSharp,I2.Loc,LanguageData.CustomEntry,class,,2,3,I2 Localization
+7601,Assembly-CSharp,I2.Loc,LanguageData.ModifierKeys,class,,5,1,I2 Localization
+7602,Assembly-CSharp,Rewired.UI.ControlMapper,LanguageData,class,LanguageDataBase,60,69,Rewired (input)
+7603,Assembly-CSharp,Rewired.UI.ControlMapper,LanguageDataBase,class,ScriptableObject,0,69,Rewired (input)
+7604,Assembly-CSharp,Rewired.UI.ControlMapper,ScrollRectSelectableChild,class,"MonoBehaviour, ISelectHandler, IEventSystemHandler",4,6,Rewired (input)
+7605,Assembly-CSharp,Rewired.UI.ControlMapper,ScrollbarVisibilityHelper,class,MonoBehaviour,1,1,Rewired (input)
+7606,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.SelectableSettings_Base,class,,4,6,Rewired (input)
+7607,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.SelectableSettings,class,ThemeSettings.SelectableSettings_Base,1,3,Rewired (input)
+7608,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.SliderSettings,class,ThemeSettings.SelectableSettings_Base,3,6,Rewired (input)
+7609,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.ScrollbarSettings,class,ThemeSettings.SelectableSettings_Base,2,5,Rewired (input)
+7610,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.ImageSettings,class,,10,12,Rewired (input)
+7611,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.CustomColorBlock,struct,,8,17,Rewired (input)
+7612,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.CustomSpriteState,struct,,5,11,Rewired (input)
+7613,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.CustomAnimationTriggers,class,,6,14,Rewired (input)
+7614,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.TextSettings,class,,7,8,Rewired (input)
+7615,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings.FontStyleOverride,enum,,6,0,Rewired (input)
+7616,Assembly-CSharp,Rewired.UI.ControlMapper,ThemeSettings,class,ScriptableObject,19,8,Rewired (input)
+7617,Assembly-CSharp,Rewired.UI.ControlMapper,ThemedElement.ElementInfo,class,,2,3,Rewired (input)
+7618,Assembly-CSharp,Rewired.UI.ControlMapper,ThemedElement,class,MonoBehaviour,1,2,Rewired (input)
+7619,Assembly-CSharp,Rewired.UI.ControlMapper,ToggleInfo,class,InputFieldInfo,0,1,Rewired (input)
+7620,Assembly-CSharp,Rewired.UI.ControlMapper,UIControl,class,MonoBehaviour,4,7,Rewired (input)
+7621,Assembly-CSharp,Rewired.UI.ControlMapper,UIControlSet.<>c__DisplayClass6_0,class,,3,3,Rewired (input)
+7622,Assembly-CSharp,Rewired.UI.ControlMapper,UIControlSet,class,MonoBehaviour,2,5,Rewired (input)
+7623,Assembly-CSharp,Rewired.UI.ControlMapper,UIElementInfo,class,"MonoBehaviour, ISelectHandler, IEventSystemHandler",4,4,Rewired (input)
+7624,Assembly-CSharp,Rewired.UI.ControlMapper,UIGroup,class,MonoBehaviour,2,5,Rewired (input)
+7625,Assembly-CSharp,Rewired.UI.ControlMapper,UIImageHelper.State,class,,1,2,Rewired (input)
+7626,Assembly-CSharp,Rewired.UI.ControlMapper,UIImageHelper,class,MonoBehaviour,3,5,Rewired (input)
+7627,Assembly-CSharp,Rewired.UI.ControlMapper,UISelectionUtility,class,,1,2,Rewired (input)
+7628,Assembly-CSharp,Rewired.UI.ControlMapper,UISliderControl.<>c__DisplayClass10_0,class,,1,3,Rewired (input)
+7629,Assembly-CSharp,Rewired.UI.ControlMapper,UISliderControl,class,UIControl,4,6,Rewired (input)
+7630,Assembly-CSharp,Rewired.UI.ControlMapper,UITools,class,,0,8,Rewired (input)
+7631,Assembly-CSharp,Placemaker.Props,Window.Timer,class,,2,6,game
+7632,Assembly-CSharp,Placemaker.Props,Window.<OnEnableAsync>d__64,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+7633,Assembly-CSharp,Rewired.UI.ControlMapper,Window,class,MonoBehaviour,14,44,Rewired (input)
+7634,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.ControllerSelection,class,,4,10,Rewired (input)
+7635,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.DialogHelper.DialogType,enum,,7,0,Rewired (input)
+7636,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.DialogHelper,class,,11,28,Rewired (input)
+7637,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.QueueEntry.State,enum,,4,0,Rewired (input)
+7638,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.QueueEntry,class,,5,12,Rewired (input)
+7639,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.JoystickAssignmentChange,class,ControlRemappingDemo1.QueueEntry,3,7,Rewired (input)
+7640,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.ElementAssignmentChange,class,ControlRemappingDemo1.QueueEntry,2,6,Rewired (input)
+7641,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.FallbackJoystickIdentification,class,ControlRemappingDemo1.QueueEntry,2,5,Rewired (input)
+7642,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.Calibration,class,ControlRemappingDemo1.QueueEntry,6,9,Rewired (input)
+7643,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.WindowProperties,struct,,5,0,Rewired (input)
+7644,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.QueueActionType,enum,,6,0,Rewired (input)
+7645,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.ElementAssignmentChangeType,enum,,6,0,Rewired (input)
+7646,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1.UserResponse,enum,,5,0,Rewired (input)
+7647,Assembly-CSharp,Rewired.Demos,ControlRemappingDemo1,class,MonoBehaviour,23,61,Rewired (input)
+7648,Assembly-CSharp,Rewired.Demos,CustomControllersTiltDemo,class,MonoBehaviour,4,4,Rewired (input)
+7649,Assembly-CSharp,Rewired.Demos,CustomControllerDemo,class,MonoBehaviour,11,11,Rewired (input)
+7650,Assembly-CSharp,Rewired.Demos,CustomControllerDemo_Player,class,MonoBehaviour,6,4,Rewired (input)
+7651,Assembly-CSharp,Rewired.Demos,TouchButtonExample,class,"MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler",2,8,Rewired (input)
+7652,Assembly-CSharp,Rewired.Demos,TouchJoystickExample,class,"MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler, IDragHandler",9,12,Rewired (input)
+7653,Assembly-CSharp,Rewired.Demos,DualShock4SpecialFeaturesExample.Touch,class,,2,1,Rewired (input)
+7654,Assembly-CSharp,Rewired.Demos,DualShock4SpecialFeaturesExample.<>c__DisplayClass20_0,class,,1,2,Rewired (input)
+7655,Assembly-CSharp,Rewired.Demos,DualShock4SpecialFeaturesExample,class,MonoBehaviour,9,12,Rewired (input)
+7656,Assembly-CSharp,Rewired.Demos,EightPlayersExample_Player,class,MonoBehaviour,9,6,Rewired (input)
+7657,Assembly-CSharp,Rewired.Demos,FallbackJoystickIdentificationDemo,class,MonoBehaviour,7,9,Rewired (input)
+7658,Assembly-CSharp,Rewired.Demos,PlayerMouseSpriteExample,class,MonoBehaviour,14,6,Rewired (input)
+7659,Assembly-CSharp,Rewired.Demos,PlayerPointerEventHandlerExample,class,"MonoBehaviour, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler, IPointerClickHandler, IScrollHandler, IBeginDragHandler, IDragHandler, IEndDragHandler",3,13,Rewired (input)
+7660,Assembly-CSharp,Rewired.Demos,UIPointer,class,UIBehaviour,3,9,Rewired (input)
+7661,Assembly-CSharp,Rewired.Demos,PressAnyButtonToJoinExample_Assigner,class,MonoBehaviour,0,5,Rewired (input)
+7662,Assembly-CSharp,Rewired.Demos,PressAnyButtonToJoinExample_GamePlayer,class,MonoBehaviour,7,6,Rewired (input)
+7663,Assembly-CSharp,Rewired.Demos,PressStartToJoinExample_Assigner.PlayerMap,class,,2,1,Rewired (input)
+7664,Assembly-CSharp,Rewired.Demos,PressStartToJoinExample_Assigner,class,MonoBehaviour,4,6,Rewired (input)
+7665,Assembly-CSharp,Rewired.Demos,PressStartToJoinExample_GamePlayer,class,MonoBehaviour,7,6,Rewired (input)
+7666,Assembly-CSharp,Rewired.Demos,Bullet,class,MonoBehaviour,3,3,Rewired (input)
+7667,Assembly-CSharp,Rewired.Demos,SimpleCombinedKeyboardMouseRemapping.Row,class,,4,1,Rewired (input)
+7668,Assembly-CSharp,Rewired.Demos,SimpleCombinedKeyboardMouseRemapping.TargetMapping,struct,,2,0,Rewired (input)
+7669,Assembly-CSharp,Rewired.Demos,SimpleCombinedKeyboardMouseRemapping.<>c__DisplayClass17_0,class,,3,2,Rewired (input)
+7670,Assembly-CSharp,Rewired.Demos,SimpleCombinedKeyboardMouseRemapping.<StartListeningDelayed>d__22,class,"IEnumerator<object>, IEnumerator, IDisposable",7,6,Rewired (input)
+7671,Assembly-CSharp,Rewired.Demos,SimpleCombinedKeyboardMouseRemapping,class,MonoBehaviour,13,12,Rewired (input)
+7672,Assembly-CSharp,Rewired.Demos,SimpleControlRemapping.Row,class,,4,1,Rewired (input)
+7673,Assembly-CSharp,Rewired.Demos,SimpleControlRemapping.<>c__DisplayClass21_0,class,,3,2,Rewired (input)
+7674,Assembly-CSharp,Rewired.Demos,SimpleControlRemapping.<StartListeningDelayed>d__28,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,Rewired (input)
+7675,Assembly-CSharp,Rewired.Demos,SimpleControlRemapping,class,MonoBehaviour,13,17,Rewired (input)
+7676,Assembly-CSharp,Rewired.Demos,ControlMapperDemoMessage.<SelectDefaultDeferred>d__7,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,Rewired (input)
+7677,Assembly-CSharp,Rewired.Demos,ControlMapperDemoMessage,class,MonoBehaviour,2,7,Rewired (input)
+7678,Assembly-CSharp,Rewired.Demos.GamepadTemplateUI,ControllerUIEffect,class,MonoBehaviour,6,5,Rewired (input)
+7679,Assembly-CSharp,Rewired.Demos.GamepadTemplateUI,ControllerUIElement,class,MonoBehaviour,12,8,Rewired (input)
+7680,Assembly-CSharp,Rewired.Demos.GamepadTemplateUI,GamepadTemplateUI.Stick,class,,4,6,Rewired (input)
+7681,Assembly-CSharp,Rewired.Demos.GamepadTemplateUI,GamepadTemplateUI.UIElement,class,,2,1,Rewired (input)
+7682,Assembly-CSharp,Rewired.Demos.GamepadTemplateUI,GamepadTemplateUI,class,MonoBehaviour,31,14,Rewired (input)
+7683,Assembly-CSharp,Placemaker,AoBaker.<>c,class,,1,3,game
+7684,Assembly-CSharp,Placemaker,AoBaker,class,MonoBehaviour,29,9,game
+7685,Assembly-CSharp,Placemaker,AmbientSound,class,MonoBehaviour,1,3,game
+7686,Assembly-CSharp,Placemaker,AudioSnapshotManager,class,"MonoBehaviour, UiMaster.IUiSetup",4,6,game
+7687,Assembly-CSharp,Placemaker,AudioSourcePool,class,MonoBehaviour,2,3,game
+7688,Assembly-CSharp,Placemaker,BigMesh,class,MonoBehaviour,11,5,game
+7689,Assembly-CSharp,Placemaker,BigMeshGroup,class,MonoBehaviour,3,1,game
+7690,Assembly-CSharp,Placemaker,BigMeshMaster,class,MonoBehaviour,2,8,game
+7691,Assembly-CSharp,Placemaker,BigMeshPart,class,,3,1,game
+7692,Assembly-CSharp,Placemaker,BigMeshList,struct,,5,3,game
+7693,Assembly-CSharp,Placemaker,BitMeshQuadChange,struct,IComparable<BitMeshQuadChange>,3,1,game
+7694,Assembly-CSharp,Placemaker,BootGameCore.State,enum,,5,0,game
+7695,Assembly-CSharp,Placemaker,BootGameCore,class,MonoBehaviour,10,6,game
+7696,Assembly-CSharp,Placemaker,BootMaster.<FirstBootWrapper>d__12,class,"IEnumerator<bool>, IEnumerator, IDisposable",5,6,game
+7697,Assembly-CSharp,Placemaker,BootMaster.<GameBootRoutine>d__13,class,"IEnumerator<bool>, IEnumerator, IDisposable",6,6,game
+7698,Assembly-CSharp,Placemaker,BootMaster.<UserBootRoutine>d__14,class,"IEnumerator<bool>, IEnumerator, IDisposable",4,6,game
+7699,Assembly-CSharp,Placemaker,BootMaster.<SignedOutBootWrapper>d__16,class,"IEnumerator<bool>, IEnumerator, IDisposable",4,6,game
+7700,Assembly-CSharp,Placemaker,BootMaster,class,MonoBehaviour,10,10,game
+7701,Assembly-CSharp,Placemaker,BorderDrawer,class,MonoBehaviour,4,6,game
+7702,Assembly-CSharp,Placemaker,ClickEffect,class,MonoBehaviour,15,7,game
+7703,Assembly-CSharp,Placemaker,ClickParticleSound,class,MonoBehaviour,4,3,game
+7704,Assembly-CSharp,Placemaker,Voxel,class,"MonoBehaviour, IComparable<Voxel>",3,2,game
+7705,Assembly-CSharp,Placemaker,GridBit.State,enum,,7,0,game
+7706,Assembly-CSharp,Placemaker,GridBit,class,MonoBehaviour,7,2,game
+7707,Assembly-CSharp,Placemaker,GridGenerator.<>c,class,,2,3,game
+7708,Assembly-CSharp,Placemaker,GridGenerator,class,MonoBehaviour,18,45,game
+7709,Assembly-CSharp,Placemaker,HoverHightlight.<>c__DisplayClass6_0,struct,,7,0,game
+7710,Assembly-CSharp,Placemaker,HoverHightlight,class,MonoBehaviour,5,6,game
+7711,Assembly-CSharp,Placemaker,LayerMaster,class,,14,1,game
+7712,Assembly-CSharp,Placemaker,DrawPlane,class,MonoBehaviour,7,7,game
+7713,Assembly-CSharp,Placemaker,GroundClicker.DragMode,enum,,7,0,game
+7714,Assembly-CSharp,Placemaker,GroundClicker,class,"MonoBehaviour, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler, UiMaster.IUiSetup",17,23,game
+7715,Assembly-CSharp,Placemaker,HoverData.<>c__DisplayClass39_0,struct,,8,0,game
+7716,Assembly-CSharp,Placemaker,HoverData,class,MonoBehaviour,22,21,game
+7717,Assembly-CSharp,Placemaker,Maker.<>c,class,,2,3,game
+7718,Assembly-CSharp,Placemaker,Maker,class,MonoBehaviour,13,24,game
+7719,Assembly-CSharp,Placemaker,RapidButton,struct,,9,3,game
+7720,Assembly-CSharp,Placemaker,MaterialMaster.VoxelMaterial,class,,1,1,game
+7721,Assembly-CSharp,Placemaker,MaterialMaster,class,"MonoBehaviour, WorldMaster.IOnOnEnable",20,4,game
+7722,Assembly-CSharp,Placemaker,ModuleBuilder.<>c__DisplayClass8_0,struct,,3,0,game
+7723,Assembly-CSharp,Placemaker,ModuleBuilder.<>c__DisplayClass9_0,struct,,3,0,game
+7724,Assembly-CSharp,Placemaker,ModuleBuilder,class,MonoBehaviour,4,16,game
+7725,Assembly-CSharp,Placemaker,BaseModule,class,,4,1,game
+7726,Assembly-CSharp,Placemaker,DecorModule,class,BaseModule,0,1,game
+7727,Assembly-CSharp,Placemaker,MiscReferences,class,ScriptableObject,1,1,game
+7728,Assembly-CSharp,Placemaker,Module,class,BaseModule,2,1,game
+7729,Assembly-CSharp,Placemaker,ModuleMesh,class,,10,1,game
+7730,Assembly-CSharp,Placemaker,Palette,class,ScriptableObject,1,1,game
+7731,Assembly-CSharp,Placemaker,PaletteHolder.<>c,class,,2,3,game
+7732,Assembly-CSharp,Placemaker,PaletteHolder,class,MonoBehaviour,4,4,game
+7733,Assembly-CSharp,Placemaker,Prop,class,MonoBehaviour,2,1,game
+7734,Assembly-CSharp,Placemaker,PropPlacement,struct,,8,3,game
+7735,Assembly-CSharp,Placemaker,PropPlacer,class,MonoBehaviour,11,23,game
+7736,Assembly-CSharp,Placemaker,Sandbanker.State,enum,,7,0,game
+7737,Assembly-CSharp,Placemaker,Sandbanker,class,MonoBehaviour,11,9,game
+7738,Assembly-CSharp,Placemaker,SaveCamera,class,MonoBehaviour,5,3,game
+7739,Assembly-CSharp,Placemaker,FastCoroutineUpdater,class,MonoBehaviour,0,2,game
+7740,Assembly-CSharp,Placemaker,FastCoroutines.Item,struct,,3,0,game
+7741,Assembly-CSharp,Placemaker,FastCoroutines.<FastCoroutine>d__9,class,"IEnumerator<object>, IEnumerator, IDisposable",4,6,game
+7742,Assembly-CSharp,Placemaker,FastCoroutines,class,,3,7,game
+7743,Assembly-CSharp,Placemaker,MetaSave.State,enum,,13,0,game
+7744,Assembly-CSharp,Placemaker,MetaSave.<>c,class,,3,4,game
+7745,Assembly-CSharp,Placemaker,MetaSave,class,"MonoBehaviour, IComparable<MetaSave>",15,11,game
+7746,Assembly-CSharp,Placemaker,SaveData.C,struct,,3,1,game
+7747,Assembly-CSharp,Placemaker,SaveData.V,struct,,2,0,game
+7748,Assembly-CSharp,Placemaker,SaveData.Cam,struct,,3,0,game
+7749,Assembly-CSharp,Placemaker,SaveData.Sun,struct,,2,0,game
+7750,Assembly-CSharp,Placemaker,SaveData,class,,7,4,game
+7751,Assembly-CSharp,Placemaker,SaveDataScripableObject,class,ScriptableObject,1,1,game
+7752,Assembly-CSharp,Placemaker,SaveSystem.BootState,enum,,12,0,game
+7753,Assembly-CSharp,Placemaker,SaveSystem.State,enum,,9,0,game
+7754,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass51_0,struct,,1,0,game
+7755,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass54_0,class,,3,2,game
+7756,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,class,"IEnumerator<object>, IEnumerator, IDisposable",7,6,game
+7757,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass55_0,class,,3,3,game
+7758,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass55_1,class,,3,2,game
+7759,Assembly-CSharp,Placemaker,SaveSystem.<>c__DisplayClass65_0,class,,2,2,game
+7760,Assembly-CSharp,Placemaker,SaveSystem.<SaveAndQuit>d__72,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,game
+7761,Assembly-CSharp,Placemaker,SaveSystem.<>c,class,,3,4,game
+7762,Assembly-CSharp,Placemaker,SaveSystem,class,MonoBehaviour,38,40,game
+7763,Assembly-CSharp,Placemaker,SettingsData.Screenshot,struct,,3,0,game
+7764,Assembly-CSharp,Placemaker,SettingsData.ObjExport,struct,,1,0,game
+7765,Assembly-CSharp,Placemaker,SettingsData.Axis,struct,,2,0,game
+7766,Assembly-CSharp,Placemaker,SettingsData,class,,13,1,game
+7767,Assembly-CSharp,Placemaker,TextSaveAlphabet,class,,3,1,game
+7768,Assembly-CSharp,Placemaker,TextSaveSystem.ITextSaver,interface,,0,2,game
+7769,Assembly-CSharp,Placemaker,TextSaveSystem,class,MonoBehaviour,6,10,game
+7770,Assembly-CSharp,Placemaker,UniversalStopwatch,class,,2,3,game
+7771,Assembly-CSharp,Placemaker,ScreenshotCamera,class,MonoBehaviour,9,4,game
+7772,Assembly-CSharp,Placemaker,ShaderIds,class,,5,1,game
+7773,Assembly-CSharp,Placemaker,ShadowBaker.<>c,class,,2,3,game
+7774,Assembly-CSharp,Placemaker,ShadowBaker,class,MonoBehaviour,30,17,game
+7775,Assembly-CSharp,Placemaker,ShadowBakerCamera,class,MonoBehaviour,1,2,game
+7776,Assembly-CSharp,Placemaker,StorageUtils.<SaveSettings>d__16,class,"IEnumerator<object>, IEnumerator, IDisposable",6,7,game
+7777,Assembly-CSharp,Placemaker,StorageUtils.<LoadSettingsData>d__17,class,"IEnumerator<object>, IEnumerator, IDisposable",8,6,game
+7778,Assembly-CSharp,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,class,"IEnumerator<object>, IEnumerator, IDisposable",6,7,game
+7779,Assembly-CSharp,Placemaker,StorageUtils.<SaveCurrent>d__19,class,"IEnumerator<object>, IEnumerator, IDisposable",9,6,game
+7780,Assembly-CSharp,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,class,"IEnumerator<byte[]>, IEnumerator, IDisposable",6,6,game
+7781,Assembly-CSharp,Placemaker,StorageUtils.<FillSaveCard>d__22,class,"IEnumerator<object>, IEnumerator, IDisposable",6,6,game
+7782,Assembly-CSharp,Placemaker,StorageUtils.<SaveToPath>d__23,class,"IEnumerator<object>, IEnumerator, IDisposable",8,7,game
+7783,Assembly-CSharp,Placemaker,StorageUtils.<DeleteCard>d__24,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,game
+7784,Assembly-CSharp,Placemaker,StorageUtils.<MoveAllSaves>d__25,class,"IEnumerator<object>, IEnumerator, IDisposable",9,7,game
+7785,Assembly-CSharp,Placemaker,StorageUtils.<FilesListChanged>d__26,class,"IEnumerator<bool>, IEnumerator, IDisposable",5,6,game
+7786,Assembly-CSharp,Placemaker,StorageUtils.<RefreshFilesList>d__27,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,game
+7787,Assembly-CSharp,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,class,"IEnumerator<string>, IEnumerator, IDisposable",6,6,game
+7788,Assembly-CSharp,Placemaker,StorageUtils,class,MonoBehaviour,14,19,game
+7789,Assembly-CSharp,Placemaker,TexturePngMaster.PngTexture,class,,5,2,game
+7790,Assembly-CSharp,Placemaker,TexturePngMaster,class,"MonoBehaviour, WorldMaster.IOnOnEnable, IOnScenePostProcess",8,9,game
+7791,Assembly-CSharp,Placemaker,TimeManager,class,,2,9,game
+7792,Assembly-CSharp,Placemaker,SaveCardsHandler.LoadingAllSaveCardsState,enum,,6,0,game
+7793,Assembly-CSharp,Placemaker,SaveCardsHandler.LoadSingleSaveDataState,enum,,4,0,game
+7794,Assembly-CSharp,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,class,"IEnumerator<object>, IEnumerator, IDisposable",7,6,game
+7795,Assembly-CSharp,Placemaker,SaveCardsHandler.<DeleteCard>d__36,class,"IEnumerator<object>, IEnumerator, IDisposable",6,6,game
+7796,Assembly-CSharp,Placemaker,SaveCardsHandler,class,"MonoBehaviour, UiMaster.IUiSetup",13,23,game
+7797,Assembly-CSharp,Placemaker,UiAudio,class,MonoBehaviour,3,4,game
+7798,Assembly-CSharp,Placemaker,VoxelBobEffect,class,MonoBehaviour,5,8,game
+7799,Assembly-CSharp,Placemaker,VoxelBounceEffect,class,MonoBehaviour,11,11,game
+7800,Assembly-CSharp,Placemaker,WaterSound,class,MonoBehaviour,1,2,game
+7801,Assembly-CSharp,Placemaker,WaveFunctionCollapse.LastRemovedStruct,struct,,4,0,game
+7802,Assembly-CSharp,Placemaker,WaveFunctionCollapse.Propagation,struct,IComparable<WaveFunctionCollapse.Propagation>,4,1,game
+7803,Assembly-CSharp,Placemaker,WaveFunctionCollapse,class,MonoBehaviour,17,18,game
+7804,Assembly-CSharp,Placemaker,ByteQube,struct,,17,16,game
+7805,Assembly-CSharp,Placemaker,ModuleMath,class,,21,17,game
+7806,Assembly-CSharp,Placemaker,VoxelType,enum,,20,0,game
+7807,Assembly-CSharp,Placemaker,MaterialType,enum,,5,0,game
+7808,Assembly-CSharp,Placemaker,ToolType,enum,,5,0,game
+7809,Assembly-CSharp,Placemaker,Orientation,struct,,5,6,game
+7810,Assembly-CSharp,Placemaker,SideProfile,struct,,10,7,game
+7811,Assembly-CSharp,Placemaker,WorldMaster.YieldType,enum,,3,0,game
+7812,Assembly-CSharp,Placemaker,WorldMaster.State,enum,,45,0,game
+7813,Assembly-CSharp,Placemaker,WorldMaster.IOnOnEnable,interface,,0,1,game
+7814,Assembly-CSharp,Placemaker,WorldMaster.<>c,class,,3,4,game
+7815,Assembly-CSharp,Placemaker,WorldMaster,class,"MonoBehaviour, IOnScenePostProcess",59,23,game
+7816,Assembly-CSharp,Placemaker,WorldMeshes,class,MonoBehaviour,3,11,game
+7817,Assembly-CSharp,Placemaker.Quads,Quad,struct,,9,10,game
+7818,Assembly-CSharp,Placemaker.Quads,Vert,struct,,10,7,game
+7819,Assembly-CSharp,Placemaker.Quads.GridGeneration,CustomGridPatch,class,,4,1,game
+7820,Assembly-CSharp,Placemaker.Quads.GridGeneration,CustomGridImporter,class,MonoBehaviour,0,1,game
+7821,Assembly-CSharp,Placemaker.Quads.GridGeneration,CustomGridLibrary,class,ScriptableObject,5,2,game
+7822,Assembly-CSharp,Placemaker.Quads.GridGeneration,GridConstants,class,,6,0,game
+7823,Assembly-CSharp,Placemaker.Quads.GridGeneration,HexCluster,class,,8,1,game
+7824,Assembly-CSharp,Placemaker.Quads.GridGeneration,HexPatch.State,enum,,7,0,game
+7825,Assembly-CSharp,Placemaker.Quads.GridGeneration,HexPatch,class,,7,2,game
+7826,Assembly-CSharp,Placemaker.Quads.GridGeneration,MotivationCounter.<GetEnumerator>d__3,class,"IEnumerator<int2>, IEnumerator, IDisposable",3,6,game
+7827,Assembly-CSharp,Placemaker.Quads.GridGeneration,MotivationCounter,struct,"IEnumerable<int2>, IEnumerable",1,4,game
+7828,Assembly-CSharp,Placemaker.Props,PropModifierStruct,struct,,6,0,game
+7829,Assembly-CSharp,Placemaker.Props,IPropModifier,interface,,0,2,game
+7830,Assembly-CSharp,Placemaker.Props,IPropEnable,interface,,0,3,game
+7831,Assembly-CSharp,Placemaker.Props,PropAchievements.Achievement,enum,,10,0,game
+7832,Assembly-CSharp,Placemaker.Props,PropAchievements,class,MonoBehaviour,1,5,game
+7833,Assembly-CSharp,Placemaker.Props,PropCollider.Layer,enum,,9,0,game
+7834,Assembly-CSharp,Placemaker.Props,PropCollider,class,MonoBehaviour,3,4,game
+7835,Assembly-CSharp,Placemaker.Props,PropColoredMesh,class,MonoBehaviour,1,1,game
+7836,Assembly-CSharp,Placemaker.Props,PropRadiusIterator<T>,struct,"IEnumerator<T>, IEnumerator, IDisposable, IEnumerable<T>, IEnumerable",11,9,game
+7837,Assembly-CSharp,Placemaker.Props,PropMeshAnimator,class,MonoBehaviour,1,7,game
+7838,Assembly-CSharp,Placemaker.Props,PropMeshOutline,class,MonoBehaviour,0,1,game
+7839,Assembly-CSharp,Placemaker.Props,PropMeshReference.Item,class,,3,1,game
+7840,Assembly-CSharp,Placemaker.Props,PropMeshReference,class,"MonoBehaviour, IPropEnable",3,5,game
+7841,Assembly-CSharp,Placemaker.Props,PropNgonScaler,class,"MonoBehaviour, IPropModifier",0,3,game
+7842,Assembly-CSharp,Placemaker.Props,PropNode,class,"MonoBehaviour, IComparable<PropNode>, IComparer<PropNode>",14,19,game
+7843,Assembly-CSharp,Placemaker.Props,PropPropeller,class,"MonoBehaviour, IPropModifier",2,5,game
+7844,Assembly-CSharp,Placemaker.Props,PropReference,class,MonoBehaviour,2,4,game
+7845,Assembly-CSharp,Placemaker.Props,PropTransformer,class,"MonoBehaviour, IPropModifier",4,3,game
+7846,Assembly-CSharp,Placemaker.Props,PropWire,class,MonoBehaviour,2,2,game
+7847,Assembly-CSharp,Placemaker.Props,PropWireAnchor,class,MonoBehaviour,5,2,game
+7848,Assembly-CSharp,Placemaker.Props,PropWireFlagMesh,class,"MonoBehaviour, IPropModifier",1,4,game
+7849,Assembly-CSharp,Placemaker.Props,PropWireItalianMesh,class,"MonoBehaviour, IPropModifier",0,4,game
+7850,Assembly-CSharp,Placemaker.Props,ShiftingMesh,class,"MonoBehaviour, IComparable<Vector3>, IComparable<ShiftingMesh>",1,3,game
+7851,Assembly-CSharp,Placemaker.Props,WindVane,class,"MonoBehaviour, IPropModifier",2,3,game
+7852,Assembly-CSharp,Placemaker.Props,Window,class,"MonoBehaviour, IPropModifier",4,5,game
+7853,Assembly-CSharp,Placemaker.Modules,ModuleLibrary,class,ScriptableObject,10,4,game
+7854,Assembly-CSharp,Placemaker.Modules,CornerLookup,class,,2,1,game
+7855,Assembly-CSharp,Placemaker.Modules,OrientedModule,struct,,3,12,game
+7856,Assembly-CSharp,Placemaker.Modules,OutlineUv,class,,1,7,game
+7857,Assembly-CSharp,Placemaker.Modules.Processing,MappedMaterialSettings,class,ScriptableObject,1,1,game
+7858,Assembly-CSharp,Placemaker.Modules.Processing,ModuleImporter,class,MonoBehaviour,14,2,game
+7859,Assembly-CSharp,Placemaker.Modules.Processing,ProtoModule,class,,24,2,game
+7860,Assembly-CSharp,Placemaker.Modules.Processing,ProtoModuleMesh,class,,10,1,game
+7861,Assembly-CSharp,Placemaker.Modules.Processing,CornerTouch,struct,,5,0,game
+7862,Assembly-CSharp,Placemaker.Modules.Processing,MappedMaterial,struct,,16,0,game
+7863,Assembly-CSharp,Placemaker.Modules.Processing,DecorProfile,class,,1,1,game
+7864,Assembly-CSharp,Placemaker.Modules.Processing,DecorPoint,struct,,3,0,game
+7865,Assembly-CSharp,Placemaker.Modules.Processing,MaterialCluster,class,,3,1,game
+7866,Assembly-CSharp,Placemaker.Modules.Processing,CornerState,enum,,4,0,game
+7867,Assembly-CSharp,Placemaker.Life,Bird,class,"MonoBehaviour, IComparable<Bird>, IComparable<Vector3>",17,4,game
+7868,Assembly-CSharp,Placemaker.Life,BirdFlock.State,enum,,6,0,game
+7869,Assembly-CSharp,Placemaker.Life,BirdFlock,class,MonoBehaviour,37,17,game
+7870,Assembly-CSharp,Placemaker.Life,BirdLanding,class,"MonoBehaviour, IPropEnable, IComparable<BirdLanding>, IComparable<Vector3>",3,13,game
+7871,Assembly-CSharp,Placemaker.Life,BirdSpot,struct,,2,0,game
+7872,Assembly-CSharp,Placemaker.Life,Butterfly,class,MonoBehaviour,9,1,game
+7873,Assembly-CSharp,Placemaker.Life,ButterflyFlock.State,enum,,4,0,game
+7874,Assembly-CSharp,Placemaker.Life,ButterflyFlock,class,MonoBehaviour,10,7,game
+7875,Assembly-CSharp,Placemaker.Life,ButterflyLanding,class,"MonoBehaviour, IPropEnable",1,5,game
+7876,Assembly-CSharp,Placemaker.SceneProcessing,IOnScenePostProcess,interface,,0,1,game
+7877,Assembly-CSharp,Placemaker.SceneProcessing,TargetPlatformFlags,enum,,16,0,game
+7878,Assembly-CSharp,Placemaker.SceneProcessing,PlatformDependent,class,"MonoBehaviour, IOnScenePostProcess",1,2,game
+7879,Assembly-CSharp,Placemaker.Graphs,Flow.FlowCalcData,struct,,7,0,game
+7880,Assembly-CSharp,Placemaker.Graphs,Flow,class,MonoBehaviour,3,7,game
+7881,Assembly-CSharp,Placemaker.Graphs,FlowData,struct,,9,1,game
+7882,Assembly-CSharp,Placemaker.Graphs,FlowTarget,class,MonoBehaviour,0,1,game
+7883,Assembly-CSharp,Placemaker.Graphs,Action,struct,,5,3,game
+7884,Assembly-CSharp,Placemaker.Graphs,Corner,class,MonoBehaviour,8,3,game
+7885,Assembly-CSharp,Placemaker.Graphs,Graph.LoadState,enum,,6,0,game
+7886,Assembly-CSharp,Placemaker.Graphs,Graph.<>c,class,,3,4,game
+7887,Assembly-CSharp,Placemaker.Graphs,Graph,class,MonoBehaviour,46,42,game
+7888,Assembly-CSharp,Placemaker.Graphs,ModuleContainer,class,MonoBehaviour,3,1,game
+7889,Assembly-CSharp,Placemaker.Graphs,Qube.Relation,struct,,3,3,game
+7890,Assembly-CSharp,Placemaker.Graphs,Qube.Relation6,struct,,6,2,game
+7891,Assembly-CSharp,Placemaker.Graphs,Qube,class,MonoBehaviour,15,8,game
+7892,Assembly-CSharp,Placemaker.Graphs,OrientedModuleSides,struct,IComparable<OrientedModuleSides>,3,1,game
+7893,Assembly-CSharp,Placemaker.Graphs,SideCounts,struct,,2,0,game
+7894,Assembly-CSharp,Placemaker.Graphs,ShadowMesh,class,MonoBehaviour,5,1,game
+7895,Assembly-CSharp,Placemaker.Graphs,Square.Relation,struct,,3,3,game
+7896,Assembly-CSharp,Placemaker.Graphs,Square,class,MonoBehaviour,14,7,game
+7897,Assembly-CSharp,Placemaker.Graphs,VoxelMesh,class,,3,1,game
+7898,Assembly-CSharp,Placemaker.Ui,MenuMusic,class,"MonoBehaviour, UiMaster.IUiSetup",4,7,game
+7899,Assembly-CSharp,Placemaker.Ui,ControlBinding.ControllerTypeGroup,enum,,3,0,game
+7900,Assembly-CSharp,Placemaker.Ui,ControlBinding.TargetMapping,struct,,2,0,game
+7901,Assembly-CSharp,Placemaker.Ui,ControlBinding.RowVisibilityCategory,enum,,4,0,game
+7902,Assembly-CSharp,Placemaker.Ui,ControlBinding.<>c__DisplayClass44_0,class,,1,2,game
+7903,Assembly-CSharp,Placemaker.Ui,ControlBinding,class,"UIBehaviour, UiMaster.IUiSetup",20,26,game
+7904,Assembly-CSharp,Placemaker.Ui,ControlBindingKey.<>c__DisplayClass7_0,class,,2,2,game
+7905,Assembly-CSharp,Placemaker.Ui,ControlBindingKey,class,MonoBehaviour,6,3,game
+7906,Assembly-CSharp,Placemaker.Ui,KeyboardAndMouseControlRemap.<>c__DisplayClass29_0,class,,1,2,game
+7907,Assembly-CSharp,Placemaker.Ui,KeyboardAndMouseControlRemap,class,"UIBehaviour, UiMaster.IUiSetup, IOnScenePostProcess",17,22,game
+7908,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu.ControllerTypeGroup,enum,,3,0,game
+7909,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu.TargetMapping,struct,,2,0,game
+7910,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu.RowVisibilityCategory,enum,,4,0,game
+7911,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu.<>c__DisplayClass21_0,class,,2,3,game
+7912,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu.<>c__DisplayClass37_0,class,,1,2,game
+7913,Assembly-CSharp,Placemaker.Ui,KeyboardControlsMenu,class,"UIBehaviour, UiMaster.IUiSetup, IOnScenePostProcess",18,22,game
+7914,Assembly-CSharp,Placemaker.Ui,ActionInputManager,class,"MonoBehaviour, UiMaster.IUiSetup",1,5,game
+7915,Assembly-CSharp,Placemaker.Ui,GamepadScreenCursor.<>c__DisplayClass12_0,class,,4,4,game
+7916,Assembly-CSharp,Placemaker.Ui,GamepadScreenCursor.<>c,class,,2,3,game
+7917,Assembly-CSharp,Placemaker.Ui,GamepadScreenCursor,class,"MonoBehaviour, UiMaster.IUiSetup",12,6,game
+7918,Assembly-CSharp,Placemaker.Ui,MasterClicker,class,"MonoBehaviour, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler, IPointerClickHandler, IEndDragHandler, IDragHandler, IBeginDragHandler, UiMaster.IUiSetup",24,27,game
+7919,Assembly-CSharp,Placemaker.Ui,ObjExporter.MaterialToExport,class,,4,1,game
+7920,Assembly-CSharp,Placemaker.Ui,ObjExporter,class,MonoBehaviour,5,5,game
+7921,Assembly-CSharp,Placemaker.Ui,OrbitalCamera,class,"MonoBehaviour, UiMaster.IUiSetup",29,23,game
+7922,Assembly-CSharp,Placemaker.Ui,BaseButton.State,enum,,5,0,game
+7923,Assembly-CSharp,Placemaker.Ui,BaseButton.<>c,class,,4,5,game
+7924,Assembly-CSharp,Placemaker.Ui,BaseButton,class,"MonoBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler",10,14,game
+7925,Assembly-CSharp,Placemaker.Ui,BetterScrollRect.Mode,enum,,5,0,game
+7926,Assembly-CSharp,Placemaker.Ui,BetterScrollRect.Context,struct,,6,1,game
+7927,Assembly-CSharp,Placemaker.Ui,BetterScrollRect.<>c,class,,4,5,game
+7928,Assembly-CSharp,Placemaker.Ui,BetterScrollRect,class,"UIBehaviour, UiMaster.IUiSetup, IDragHandler, IEventSystemHandler, IBeginDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler",14,15,game
+7929,Assembly-CSharp,Placemaker.Ui,ButtonAudio.AudioData,struct,,3,0,game
+7930,Assembly-CSharp,Placemaker.Ui,ButtonAudio.SoundType,enum,,7,0,game
+7931,Assembly-CSharp,Placemaker.Ui,ButtonAudio.IButtonAudioModifier,interface,,0,1,game
+7932,Assembly-CSharp,Placemaker.Ui,ButtonAudio,class,,0,1,game
+7933,Assembly-CSharp,Placemaker.Ui,ButtonAudio_Clip,class,"MonoBehaviour, ButtonAudio.IButtonAudioModifier",2,2,game
+7934,Assembly-CSharp,Placemaker.Ui,ButtonAudio_Pitch.Mode,enum,,3,0,game
+7935,Assembly-CSharp,Placemaker.Ui,ButtonAudio_Pitch,class,"MonoBehaviour, ButtonAudio.IButtonAudioModifier",4,2,game
+7936,Assembly-CSharp,Placemaker.Ui,ButtonNavigator,class,UIBehaviour,0,1,game
+7937,Assembly-CSharp,Placemaker.Ui,CloseSymbol,class,"MonoBehaviour, UiMaster.IUiSetup",1,4,game
+7938,Assembly-CSharp,Placemaker.Ui,CommandFeedbacker,class,"UIBehaviour, UiMaster.IUiSetup",7,5,game
+7939,Assembly-CSharp,Placemaker.Ui,ControlLegend,class,"MonoBehaviour, UiMaster.IUiSetup",5,8,game
+7940,Assembly-CSharp,Placemaker.Ui,CreditsData,class,,3,1,game
+7941,Assembly-CSharp,Placemaker.Ui,CreditsMenu.AutoScroll,struct,,6,15,game
+7942,Assembly-CSharp,Placemaker.Ui,CreditsMenu,class,"MonoBehaviour, UiMaster.IUiSetup, IOnScenePostProcess",10,13,game
+7943,Assembly-CSharp,Placemaker.Ui,DialogSystem.<>c__DisplayClass15_0,class,,1,2,game
+7944,Assembly-CSharp,Placemaker.Ui,DialogSystem,class,"MonoBehaviour, UiMaster.IUiSetup",6,15,game
+7945,Assembly-CSharp,Placemaker.Ui,DialogWindow.OrderPriority,enum,,5,0,game
+7946,Assembly-CSharp,Placemaker.Ui,DialogWindow,class,"MonoBehaviour, GenericMenuNavigator.INavigableMenu, IComparable<DialogWindow>",13,12,game
+7947,Assembly-CSharp,Placemaker.Ui,Dim.State,enum,,4,0,game
+7948,Assembly-CSharp,Placemaker.Ui,Dim.<>c__DisplayClass11_0,class,,3,3,game
+7949,Assembly-CSharp,Placemaker.Ui,Dim.<>c,class,,2,3,game
+7950,Assembly-CSharp,Placemaker.Ui,Dim,class,"MonoBehaviour, UiMaster.IUiSetup",6,5,game
+7951,Assembly-CSharp,Placemaker.Ui,DisableableButton.<>c__DisplayClass7_0,class,,2,5,game
+7952,Assembly-CSharp,Placemaker.Ui,DisableableButton,class,"MonoBehaviour, UiMaster.IUiSetup",6,3,game
+7953,Assembly-CSharp,Placemaker.Ui,DistanceFieldMask,class,BaseMeshEffect,2,3,game
+7954,Assembly-CSharp,Placemaker.Ui,DistanceFieldSettings,class,BaseMeshEffect,4,12,game
+7955,Assembly-CSharp,Placemaker.Ui,EmptyGraphic,class,Graphic,0,2,game
+7956,Assembly-CSharp,Placemaker.Ui,FocusedSaveCard,class,MonoBehaviour,2,1,game
+7957,Assembly-CSharp,Placemaker.Ui,FullscreenButton,class,"UIBehaviour, UiMaster.IUiSetup",3,5,game
+7958,Assembly-CSharp,Placemaker.Ui,GameViewRect,class,UIBehaviour,2,10,game
+7959,Assembly-CSharp,Placemaker.Ui,GamepadControlsRow,class,"MonoBehaviour, UiMaster.IUiSetup",3,3,game
+7960,Assembly-CSharp,Placemaker.Ui,GamepadStepper.Mode,enum,,9,0,game
+7961,Assembly-CSharp,Placemaker.Ui,GamepadStepper,class,MonoBehaviour,10,5,game
+7962,Assembly-CSharp,Placemaker.Ui,GamepadXboxDialog,class,"MonoBehaviour, UiMaster.IUiSetup",3,4,game
+7963,Assembly-CSharp,Placemaker.Ui,GenericControlsMenu,class,"MonoBehaviour, UiMaster.IUiSetup, GenericMenuNavigator.INavigableMenu",3,8,game
+7964,Assembly-CSharp,Placemaker.Ui,GenericMenuNavigator.Mode,enum,,3,0,game
+7965,Assembly-CSharp,Placemaker.Ui,GenericMenuNavigator.INavigableMenu,interface,,0,2,game
+7966,Assembly-CSharp,Placemaker.Ui,GenericMenuNavigator,class,"MonoBehaviour, UiMaster.IUiSetup",9,9,game
+7967,Assembly-CSharp,Placemaker.Ui,GridButtons.<>c__DisplayClass8_0,class,,3,2,game
+7968,Assembly-CSharp,Placemaker.Ui,GridButtons,class,"UIBehaviour, UiMaster.IUiSetup, ButtonAudio.IButtonAudioModifier",7,8,game
+7969,Assembly-CSharp,Placemaker.Ui,InputModeManager.Mode,enum,,4,0,game
+7970,Assembly-CSharp,Placemaker.Ui,InputModeManager.<>c__DisplayClass8_0,struct,,1,0,game
+7971,Assembly-CSharp,Placemaker.Ui,InputModeManager,class,"MonoBehaviour, UiMaster.IUiSetup",5,7,game
+7972,Assembly-CSharp,Placemaker.Ui,LanguageButtons.S,struct,IComparable<LanguageButtons.S>,2,1,game
+7973,Assembly-CSharp,Placemaker.Ui,LanguageButtons.<>c__DisplayClass5_0,class,,4,4,game
+7974,Assembly-CSharp,Placemaker.Ui,LanguageButtons,class,"UIBehaviour, UiMaster.IUiSetup",4,7,game
+7975,Assembly-CSharp,Placemaker.Ui,LoadingUi.State,enum,,7,0,game
+7976,Assembly-CSharp,Placemaker.Ui,LoadingUi,class,"MonoBehaviour, UiMaster.IUiSetup, IOnScenePostProcess",15,12,game
+7977,Assembly-CSharp,Placemaker.Ui,Localization,class,,1,1,game
+7978,Assembly-CSharp,Placemaker.Ui,LocalizeRTLFlipper,class,MonoBehaviour,0,5,game
+7979,Assembly-CSharp,Placemaker.Ui,MaxSavesCounter,class,UIBehaviour,4,2,game
+7980,Assembly-CSharp,Placemaker.Ui,NavigableButton.<>c,class,,4,5,game
+7981,Assembly-CSharp,Placemaker.Ui,NavigableButton,class,"MonoBehaviour, UiMaster.IUiSetup",5,6,game
+7982,Assembly-CSharp,Placemaker.Ui,PaletteMenu.IPaletteSetup,interface,,0,1,game
+7983,Assembly-CSharp,Placemaker.Ui,PaletteMenu.<>c__DisplayClass30_0,class,,4,5,game
+7984,Assembly-CSharp,Placemaker.Ui,PaletteMenu,class,"UIBehaviour, UiMaster.IUiSetup, IDragHandler, IEventSystemHandler, IEndDragHandler, IBeginDragHandler",23,21,game
+7985,Assembly-CSharp,Placemaker.Ui,PalettePicker,class,"MonoBehaviour, PaletteMenu.IPaletteSetup, ButtonAudio.IButtonAudioModifier",4,6,game
+7986,Assembly-CSharp,Placemaker.Ui,PinUiButton.<>c__DisplayClass7_0,class,,4,3,game
+7987,Assembly-CSharp,Placemaker.Ui,PinUiButton,class,"UIBehaviour, UiMaster.IUiSetup",6,4,game
+7988,Assembly-CSharp,Placemaker.Ui,PinnedUi.<>c__DisplayClass3_0,class,,1,2,game
+7989,Assembly-CSharp,Placemaker.Ui,PinnedUi,class,"UIBehaviour, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler",3,6,game
+7990,Assembly-CSharp,Placemaker.Ui,PinnedUiMobile,class,"UIBehaviour, UiMaster.IUiSetup",8,6,game
+7991,Assembly-CSharp,Placemaker.Ui,ProgressBarButton,class,"MonoBehaviour, UiMaster.IUiSetup",10,6,game
+7992,Assembly-CSharp,Placemaker.Ui,SaveCard.<>c__DisplayClass12_0,class,,2,4,game
+7993,Assembly-CSharp,Placemaker.Ui,SaveCard.<>c__DisplayClass12_1,class,,2,2,game
+7994,Assembly-CSharp,Placemaker.Ui,SaveCard,class,"MonoBehaviour, IComparable<SaveCard>",10,4,game
+7995,Assembly-CSharp,Placemaker.Ui,SaveMenu.StatusUIState,enum,,4,0,game
+7996,Assembly-CSharp,Placemaker.Ui,SaveMenu.MenuInitState,enum,,5,0,game
+7997,Assembly-CSharp,Placemaker.Ui,SaveMenu.OpenSaveMenuState,enum,,8,0,game
+7998,Assembly-CSharp,Placemaker.Ui,SaveMenu.<>c__DisplayClass51_0,class,,2,10,game
+7999,Assembly-CSharp,Placemaker.Ui,SaveMenu.<>c,class,,2,3,game
+8000,Assembly-CSharp,Placemaker.Ui,SaveMenu,class,"UIBehaviour, UiMaster.IUiSetup, IOnScenePostProcess",46,35,game
+8001,Assembly-CSharp,Placemaker.Ui,SavingIndicator,class,"MonoBehaviour, UiMaster.IUiSetup",4,4,game
+8002,Assembly-CSharp,Placemaker.Ui,ScaleUiButtons.<>c__DisplayClass9_0,class,,4,4,game
+8003,Assembly-CSharp,Placemaker.Ui,ScaleUiButtons.<>c__DisplayClass9_1,class,,1,2,game
+8004,Assembly-CSharp,Placemaker.Ui,ScaleUiButtons,class,"UIBehaviour, UiMaster.IUiSetup",8,7,game
+8005,Assembly-CSharp,Placemaker.Ui,ScreenshotButtons.<>c__DisplayClass20_0,class,,3,3,game
+8006,Assembly-CSharp,Placemaker.Ui,ScreenshotButtons.<>c__DisplayClass20_1,class,,4,4,game
+8007,Assembly-CSharp,Placemaker.Ui,ScreenshotButtons,class,"UIBehaviour, UiMaster.IUiSetup",19,9,game
+8008,Assembly-CSharp,Placemaker.Ui,ScreenshotFrame,class,"UIBehaviour, UiMaster.IUiSetup",10,6,game
+8009,Assembly-CSharp,Placemaker.Ui,ScreenshotSwitch.<>c__DisplayClass21_0,class,,4,2,game
+8010,Assembly-CSharp,Placemaker.Ui,ScreenshotSwitch,class,"UIBehaviour, UiMaster.IUiSetup",19,16,game
+8011,Assembly-CSharp,Placemaker.Ui,SettingsMenu,class,"MonoBehaviour, UiMaster.IUiSetup, GenericMenuNavigator.INavigableMenu",3,6,game
+8012,Assembly-CSharp,Placemaker.Ui,ShadingButtons.<>c__DisplayClass14_0,class,,4,2,game
+8013,Assembly-CSharp,Placemaker.Ui,ShadingButtons,class,"UIBehaviour, UiMaster.IUiSetup",13,17,game
+8014,Assembly-CSharp,Placemaker.Ui,SideMenu.<>c__DisplayClass17_0,class,,4,9,game
+8015,Assembly-CSharp,Placemaker.Ui,SideMenu.<>c__DisplayClass22_0,class,,2,2,game
+8016,Assembly-CSharp,Placemaker.Ui,SideMenu,class,"UIBehaviour, UiMaster.IUiSetup",16,13,game
+8017,Assembly-CSharp,Placemaker.Ui,SideMenuNavigator.<>c__DisplayClass11_0,class,,2,5,game
+8018,Assembly-CSharp,Placemaker.Ui,SideMenuNavigator,class,"UIBehaviour, UiMaster.IUiSetup",11,12,game
+8019,Assembly-CSharp,Placemaker.Ui,SimpleMessage,class,"UIBehaviour, UiMaster.IUiSetup",6,10,game
+8020,Assembly-CSharp,Placemaker.Ui,Slider.<>c__DisplayClass23_0,class,,2,2,game
+8021,Assembly-CSharp,Placemaker.Ui,Slider,class,"UIBehaviour, IPointerDownHandler, IEventSystemHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IDragHandler, IBeginDragHandler, IEndDragHandler, UiMaster.IUiSetup",11,14,game
+8022,Assembly-CSharp,Placemaker.Ui,SoundButton.<>c__DisplayClass8_0,class,,5,5,game
+8023,Assembly-CSharp,Placemaker.Ui,SoundButton,class,"UIBehaviour, UiMaster.IUiSetup",7,6,game
+8024,Assembly-CSharp,Placemaker.Ui,StandardButton.<>c__DisplayClass3_0,class,,2,3,game
+8025,Assembly-CSharp,Placemaker.Ui,StandardButton,class,"MonoBehaviour, UiMaster.IUiSetup",2,3,game
+8026,Assembly-CSharp,Placemaker.Ui,SunButton.<>c__DisplayClass23_0,class,,3,3,game
+8027,Assembly-CSharp,Placemaker.Ui,SunButton,class,"UIBehaviour, UiMaster.IUiSetup",22,12,game
+8028,Assembly-CSharp,Placemaker.Ui,SunButtonGamepad.<>c__DisplayClass7_0,class,,3,6,game
+8029,Assembly-CSharp,Placemaker.Ui,SunButtonGamepad,class,"UIBehaviour, UiMaster.IUiSetup",7,5,game
+8030,Assembly-CSharp,Placemaker.Ui,SunSlider,class,"UIBehaviour, UiMaster.IUiSetup, IPointerUpHandler, IEventSystemHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerDownHandler",8,13,game
+8031,Assembly-CSharp,Placemaker.Ui,TextSaveButtons,class,"UIBehaviour, UiMaster.IUiSetup",4,5,game
+8032,Assembly-CSharp,Placemaker.Ui,ToggleButton.Function,enum,,8,0,game
+8033,Assembly-CSharp,Placemaker.Ui,ToggleButton,class,"UIBehaviour, UiMaster.IUiSetup, ButtonAudio.IButtonAudioModifier",6,7,game
+8034,Assembly-CSharp,Placemaker.Ui,ToolsButton,class,"MonoBehaviour, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IDropHandler",11,10,game
+8035,Assembly-CSharp,Placemaker.Ui,Toucher.Tracker.Data,struct,,7,0,game
+8036,Assembly-CSharp,Placemaker.Ui,Toucher.Tracker,class,,7,1,game
+8037,Assembly-CSharp,Placemaker.Ui,Toucher.State,enum,,8,0,game
+8038,Assembly-CSharp,Placemaker.Ui,Toucher.<>c__DisplayClass15_0,class,,2,2,game
+8039,Assembly-CSharp,Placemaker.Ui,Toucher,class,"MonoBehaviour, UiMaster.IUiSetup",10,7,game
+8040,Assembly-CSharp,Placemaker.Ui,UiElementScaler,class,"UIBehaviour, UiMaster.IUiSetup",2,6,game
+8041,Assembly-CSharp,Placemaker.Ui,UiMaster.MenuState,enum,,17,0,game
+8042,Assembly-CSharp,Placemaker.Ui,UiMaster.IUiSetup,interface,,0,2,game
+8043,Assembly-CSharp,Placemaker.Ui,UiMaster.IUiDimensionsChange,interface,,0,1,game
+8044,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass71_0,class,,1,2,game
+8045,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass76_0,class,,1,3,game
+8046,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass80_0,class,,3,3,game
+8047,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass86_0.<<LoadString>g__Routine|0>d,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+8048,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass86_0,class,,2,2,game
+8049,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass87_0.<<StartFinishLoading>g__Routine|0>d,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+8050,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c__DisplayClass87_0,class,,2,2,game
+8051,Assembly-CSharp,Placemaker.Ui,UiMaster.<>c,class,,3,8,game
+8052,Assembly-CSharp,Placemaker.Ui,UiMaster.<<LoadMetaSave>g__LoadMetaSaveRoutine|82_0>d,class,"IEnumerator<object>, IEnumerator, IDisposable",4,6,game
+8053,Assembly-CSharp,Placemaker.Ui,UiMaster.<<StartNew>g__Routine|85_0>d,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,game
+8054,Assembly-CSharp,Placemaker.Ui,UiMaster,class,"UIBehaviour, IOnScenePostProcess",54,39,game
+8055,Assembly-CSharp,Placemaker.Ui,UiScaler,class,MonoBehaviour,1,6,game
+8056,Assembly-CSharp,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,class,,4,9,game
+8057,Assembly-CSharp,Placemaker.Ui,UndoRedoButtons,class,"UIBehaviour, UiMaster.IUiSetup",14,7,game
+8058,Assembly-CSharp,Placemaker.Ui,UpdateState.Axis,enum,,7,0,game
+8059,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c,class,,9,10,game
+8060,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass30_0,class,,3,3,game
+8061,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass32_0,class,,1,2,game
+8062,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass33_0,class,,1,3,game
+8063,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass34_0,class,,1,2,game
+8064,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass35_0,class,,1,2,game
+8065,Assembly-CSharp,Placemaker.Ui,UpdateState.<>c__DisplayClass37_0,class,,6,2,game
+8066,Assembly-CSharp,Placemaker.Ui,UpdateState,class,,8,25,game
+8067,Assembly-CSharp,Placemaker.Ui,Username,class,"MonoBehaviour, UiMaster.IUiSetup",2,5,game
+8068,Assembly-CSharp,Placemaker.Ui,WebLinkButton.Link,enum,,8,0,game
+8069,Assembly-CSharp,Placemaker.Ui,WebLinkButton.<>c__DisplayClass3_0,class,,2,2,game
+8070,Assembly-CSharp,Placemaker.Ui,WebLinkButton,class,"MonoBehaviour, UiMaster.IUiSetup",1,4,game
+8071,Assembly-CSharp,Placemaker.Ui,XBoxSignoutButton,class,"MonoBehaviour, UiMaster.IUiSetup",1,4,game
+8072,Assembly-CSharp,Placemaker.Audio,ManySound,class,MonoBehaviour,13,1,game
+8073,Assembly-CSharp,Placemaker.Audio,ManySoundsManager.SoundType,enum,,15,0,game
+8074,Assembly-CSharp,Placemaker.Audio,ManySoundsManager.SingleSound,struct,,2,0,game
+8075,Assembly-CSharp,Placemaker.Audio,ManySoundsManager,class,MonoBehaviour,4,4,game
+8076,Assembly-CSharp,I2.Loc,PersistentStorage.eFileType,enum,,5,0,I2 Localization
+8077,Assembly-CSharp,I2.Loc,PersistentStorage,class,,1,10,I2 Localization
+8078,Assembly-CSharp,I2.Loc,I2BasePersistentStorage,class,,0,12,I2 Localization
+8079,Assembly-CSharp,I2.Loc,I2CustomPersistentStorage,class,I2BasePersistentStorage,0,1,I2 Localization
+8080,Assembly-CSharp,I2.Loc,BaseSpecializationManager,class,,2,4,I2 Localization
+8081,Assembly-CSharp,I2.Loc,SpecializationManager,class,BaseSpecializationManager,1,7,I2 Localization
+8082,Assembly-CSharp,I2.Loc,EventCallback,class,,2,3,I2 Localization
+8083,Assembly-CSharp,I2.Loc,ePluralType,enum,,7,0,I2 Localization
+8084,Assembly-CSharp,I2.Loc,GoogleLanguages.LanguageCodeDef,struct,,4,0,I2 Localization
+8085,Assembly-CSharp,I2.Loc,GoogleLanguages,class,,1,16,I2 Localization
+8086,Assembly-CSharp,I2.Loc,GoogleTranslation.fnOnTranslated,class,MulticastDelegate,0,4,I2 Localization
+8087,Assembly-CSharp,I2.Loc,GoogleTranslation.fnOnTranslationReady,class,MulticastDelegate,0,4,I2 Localization
+8088,Assembly-CSharp,I2.Loc,GoogleTranslation.<>c__DisplayClass2_0,class,,4,2,I2 Localization
+8089,Assembly-CSharp,I2.Loc,GoogleTranslation.<WaitForTranslations>d__11,class,"IEnumerator<object>, IEnumerator, IDisposable",2,6,I2 Localization
+8090,Assembly-CSharp,I2.Loc,GoogleTranslation,class,,2,28,I2 Localization
+8091,Assembly-CSharp,I2.Loc,TranslationQuery,struct,,6,0,I2 Localization
+8092,Assembly-CSharp,I2.Loc,TranslationJob.eJobState,enum,,4,0,I2 Localization
+8093,Assembly-CSharp,I2.Loc,TranslationJob,class,IDisposable,1,3,I2 Localization
+8094,Assembly-CSharp,I2.Loc,TranslationJob_WWW,class,TranslationJob,1,2,I2 Localization
+8095,Assembly-CSharp,I2.Loc,TranslationJob_GET,class,TranslationJob_WWW,4,4,I2 Localization
+8096,Assembly-CSharp,I2.Loc,TranslationJob_Main,class,TranslationJob,6,3,I2 Localization
+8097,Assembly-CSharp,I2.Loc,TranslationJob_POST,class,TranslationJob_WWW,2,3,I2 Localization
+8098,Assembly-CSharp,I2.Loc,TranslationJob_WEB.<>c,class,,4,5,I2 Localization
+8099,Assembly-CSharp,I2.Loc,TranslationJob_WEB,class,TranslationJob_WWW,7,6,I2 Localization
+8100,Assembly-CSharp,I2.Loc,eLanguageDataFlags,enum,,4,0,I2 Localization
+8101,Assembly-CSharp,I2.Loc,LanguageData,class,,4,7,I2 Localization
+8102,Assembly-CSharp,I2.Loc,LanguageSource.fnOnSourceUpdated,class,MulticastDelegate,0,4,I2 Localization
+8103,Assembly-CSharp,I2.Loc,LanguageSource,class,"MonoBehaviour, ISerializationCallbackReceiver, ILanguageSource",21,10,I2 Localization
+8104,Assembly-CSharp,I2.Loc,LanguageSourceAsset,class,"ScriptableObject, ILanguageSource",1,3,I2 Localization
+8105,Assembly-CSharp,I2.Loc,ILanguageSource,interface,,0,2,I2 Localization
+8106,Assembly-CSharp,I2.Loc,LanguageSourceData.MissingTranslationAction,enum,,5,0,I2 Localization
+8107,Assembly-CSharp,I2.Loc,LanguageSourceData.eAllowUnloadLanguages,enum,,4,0,I2 Localization
+8108,Assembly-CSharp,I2.Loc,LanguageSourceData.eGoogleUpdateFrequency,enum,,8,0,I2 Localization
+8109,Assembly-CSharp,I2.Loc,LanguageSourceData.eGoogleUpdateSynchronization,enum,,4,0,I2 Localization
+8110,Assembly-CSharp,I2.Loc,LanguageSourceData.<>c,class,,7,8,I2 Localization
+8111,Assembly-CSharp,I2.Loc,LanguageSourceData.<Import_Google_Coroutine>d__65,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,I2 Localization
+8112,Assembly-CSharp,I2.Loc,LanguageSourceData,class,,27,79,I2 Localization
+8113,Assembly-CSharp,I2.Loc,eSpreadsheetUpdateMode,enum,,5,0,I2 Localization
+8114,Assembly-CSharp,I2.Loc,LocalizationReader,class,,0,11,I2 Localization
+8115,Assembly-CSharp,I2.Loc,Localize.TermModification,enum,,6,0,I2 Localization
+8116,Assembly-CSharp,I2.Loc,Localize.<>c,class,,5,6,I2 Localization
+8117,Assembly-CSharp,I2.Loc,Localize,class,MonoBehaviour,31,24,I2 Localization
+8118,Assembly-CSharp,I2.Loc,LocalizeDropdown,class,MonoBehaviour,1,9,I2 Localization
+8119,Assembly-CSharp,I2.Loc,LocalizationManager._GetParam,class,MulticastDelegate,0,4,I2 Localization
+8120,Assembly-CSharp,I2.Loc,LocalizationManager.OnLocalizeCallback,class,MulticastDelegate,0,4,I2 Localization
+8121,Assembly-CSharp,I2.Loc,LocalizationManager.<>c__DisplayClass33_0,class,,2,2,I2 Localization
+8122,Assembly-CSharp,I2.Loc,LocalizationManager.<>c__DisplayClass34_0,class,,2,2,I2 Localization
+8123,Assembly-CSharp,I2.Loc,LocalizationManager.<>c,class,,2,3,I2 Localization
+8124,Assembly-CSharp,I2.Loc,LocalizationManager.<>c__DisplayClass42_0,class,,1,2,I2 Localization
+8125,Assembly-CSharp,I2.Loc,LocalizationManager.<>c__DisplayClass43_0,class,,1,2,I2 Localization
+8126,Assembly-CSharp,I2.Loc,LocalizationManager.<Delayed_Import_Google>d__59,class,"IEnumerator<object>, IEnumerator, IDisposable",5,6,I2 Localization
+8127,Assembly-CSharp,I2.Loc,LocalizationManager.<>c__DisplayClass69_0,class,,1,2,I2 Localization
+8128,Assembly-CSharp,I2.Loc,LocalizationManager.<Coroutine_LocalizeAll>d__84,class,"IEnumerator<object>, IEnumerator, IDisposable",2,6,I2 Localization
+8129,Assembly-CSharp,I2.Loc,LocalizationManager,class,,16,68,I2 Localization
+8130,Assembly-CSharp,I2.Loc,ILocalizeTarget,class,ScriptableObject,0,9,I2 Localization
+8131,Assembly-CSharp,I2.Loc,LocalizeTarget<T>,class,ILocalizeTarget,1,2,I2 Localization
+8132,Assembly-CSharp,I2.Loc,ILocalizeTargetDescriptor,class,,2,4,I2 Localization
+8133,Assembly-CSharp,I2.Loc,LocalizeTargetDesc<T>,class,ILocalizeTargetDescriptor,0,3,I2 Localization
+8135,Assembly-CSharp,I2.Loc,LocalizeTarget_TextMeshPro_Label,class,LocalizeTarget<TextMeshPro>,4,14,I2 Localization
+8136,Assembly-CSharp,I2.Loc,LocalizeTarget_TextMeshPro_UGUI,class,LocalizeTarget<TextMeshProUGUI>,4,10,I2 Localization
+8137,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_AudioSource,class,LocalizeTarget<AudioSource>,0,10,I2 Localization
+8138,Assembly-CSharp,I2.Loc,LocalizeTargetDesc_Child,class,LocalizeTargetDesc<LocalizeTarget_UnityStandard_Child>,0,2,I2 Localization
+8139,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_Child,class,LocalizeTarget<GameObject>,0,11,I2 Localization
+8140,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_MeshRenderer,class,LocalizeTarget<MeshRenderer>,0,10,I2 Localization
+8141,Assembly-CSharp,I2.Loc,LocalizeTargetDesc_Prefab,class,LocalizeTargetDesc<LocalizeTarget_UnityStandard_Prefab>,0,2,I2 Localization
+8142,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_Prefab,class,LocalizeTarget<GameObject>,0,12,I2 Localization
+8143,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_SpriteRenderer,class,LocalizeTarget<SpriteRenderer>,0,10,I2 Localization
+8144,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityStandard_TextMesh,class,LocalizeTarget<TextMesh>,4,10,I2 Localization
+8145,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityUI_Image,class,LocalizeTarget<Image>,0,10,I2 Localization
+8146,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityUI_RawImage,class,LocalizeTarget<RawImage>,0,10,I2 Localization
+8147,Assembly-CSharp,I2.Loc,LocalizeTarget_UnityUI_Text,class,LocalizeTarget<Text>,4,11,I2 Localization
+8148,Assembly-CSharp,I2.Loc,eTermType,enum,,12,0,I2 Localization
+8149,Assembly-CSharp,I2.Loc,TranslationFlag,enum,,3,0,I2 Localization
+8150,Assembly-CSharp,I2.Loc,TermData,class,,6,10,I2 Localization
+8151,Assembly-CSharp,I2.Loc,TermsPopup,class,PropertyAttribute,1,3,I2 Localization
+8152,Assembly-CSharp,I2.Loc,AutoChangeCultureInfo,class,MonoBehaviour,0,2,I2 Localization
+8153,Assembly-CSharp,I2.Loc,CoroutineManager,class,MonoBehaviour,1,4,I2 Localization
+8154,Assembly-CSharp,I2.Loc,CustomLocalizeCallback,class,MonoBehaviour,1,4,I2 Localization
+8155,Assembly-CSharp,I2.Loc,HindiFixer.<>c,class,,2,3,I2 Localization
+8156,Assembly-CSharp,I2.Loc,HindiFixer,class,,0,2,I2 Localization
+8157,Assembly-CSharp,I2.Loc,I2Utils.<>c,class,,2,3,I2 Localization
+8158,Assembly-CSharp,I2.Loc,I2Utils,class,,2,15,I2 Localization
+8159,Assembly-CSharp,I2.Loc,ILocalizationParamsManager,interface,,0,1,I2 Localization
+8160,Assembly-CSharp,I2.Loc,LocalizationParamsManager.ParamValue,struct,,2,0,I2 Localization
+8161,Assembly-CSharp,I2.Loc,LocalizationParamsManager,class,"MonoBehaviour, ILocalizationParamsManager",2,7,I2 Localization
+8162,Assembly-CSharp,I2.Loc,LocalizedString,struct,,5,4,I2 Localization
+8163,Assembly-CSharp,I2.Loc,RTLFixer,class,,0,4,I2 Localization
+8164,Assembly-CSharp,I2.Loc,IsolatedArabicLetters,enum,,42,0,I2 Localization
+8165,Assembly-CSharp,I2.Loc,GeneralArabicLetters,enum,,42,0,I2 Localization
+8166,Assembly-CSharp,I2.Loc,ArabicMapping,class,,2,1,I2 Localization
+8167,Assembly-CSharp,I2.Loc,ArabicTable,class,,2,3,I2 Localization
+8168,Assembly-CSharp,I2.Loc,TashkeelLocation,class,,2,1,I2 Localization
+8169,Assembly-CSharp,I2.Loc,RTLFixerTool,class,,2,9,I2 Localization
+8170,Assembly-CSharp,I2.Loc,RegisterGlobalParameters,class,"MonoBehaviour, ILocalizationParamsManager",0,4,I2 Localization
+8171,Assembly-CSharp,I2.Loc,IResourceManager_Bundles,interface,,0,1,I2 Localization
+8172,Assembly-CSharp,I2.Loc,ResourceManager,class,MonoBehaviour,4,9,I2 Localization
+8173,Assembly-CSharp,I2.Loc,SetLanguage,class,MonoBehaviour,1,3,I2 Localization
+8174,Assembly-CSharp,I2.Loc,SetLanguageDropdown,class,MonoBehaviour,0,3,I2 Localization
+8175,Assembly-CSharp,I2.Loc,StringObfucator,class,,1,7,I2 Localization
+8176,Assembly-CSharp,I2.Loc.SimpleJSON,JSONBinaryTag,enum,,8,0,I2 Localization
+8177,Assembly-CSharp,I2.Loc.SimpleJSON,JSONNode.<get_Childs>d__17,class,"IEnumerable<JSONNode>, IEnumerable, IEnumerator<JSONNode>, IEnumerator, IDisposable",3,8,I2 Localization
+8178,Assembly-CSharp,I2.Loc.SimpleJSON,JSONNode.<get_DeepChilds>d__19,class,"IEnumerable<JSONNode>, IEnumerable, IEnumerator<JSONNode>, IEnumerator, IDisposable",6,10,I2 Localization
+8179,Assembly-CSharp,I2.Loc.SimpleJSON,JSONNode,class,,0,49,I2 Localization
+8180,Assembly-CSharp,I2.Loc.SimpleJSON,JSONArray.<get_Childs>d__13,class,"IEnumerable<JSONNode>, IEnumerable, IEnumerator<JSONNode>, IEnumerator, IDisposable",5,9,I2 Localization
+8181,Assembly-CSharp,I2.Loc.SimpleJSON,JSONArray.<GetEnumerator>d__14,class,"IEnumerator<object>, IEnumerator, IDisposable",4,7,I2 Localization
+8182,Assembly-CSharp,I2.Loc.SimpleJSON,JSONArray,class,"JSONNode, IEnumerable",1,14,I2 Localization
+8183,Assembly-CSharp,I2.Loc.SimpleJSON,JSONClass.<>c__DisplayClass12_0,class,,1,2,I2 Localization
+8184,Assembly-CSharp,I2.Loc.SimpleJSON,JSONClass.<get_Childs>d__14,class,"IEnumerable<JSONNode>, IEnumerable, IEnumerator<JSONNode>, IEnumerator, IDisposable",5,9,I2 Localization
+8185,Assembly-CSharp,I2.Loc.SimpleJSON,JSONClass.<GetEnumerator>d__15,class,"IEnumerator<object>, IEnumerator, IDisposable",4,7,I2 Localization
+8186,Assembly-CSharp,I2.Loc.SimpleJSON,JSONClass,class,"JSONNode, IEnumerable",1,15,I2 Localization
+8187,Assembly-CSharp,I2.Loc.SimpleJSON,JSONData,class,JSONNode,1,10,I2 Localization
+8188,Assembly-CSharp,I2.Loc.SimpleJSON,JSONLazyCreator,class,JSONNode,2,25,I2 Localization
+8189,Assembly-CSharp,I2.Loc.SimpleJSON,JSON,class,,0,1,I2 Localization
+8190,Assembly-CSharp,Os.Hex,HexMath,class,,13,21,game
+8191,Assembly-CSharp,Os.Hex,HexOnionVisualizer,class,MonoBehaviour,0,2,game
+8192,Assembly-CSharp,Os.Hex,HexOnionIterator,struct,,7,14,game
+8193,Assembly-CSharp,Os.Hex,HexOnionIteratorGizmo,class,MonoBehaviour,0,2,game
+8194,Assembly-CSharp,Os.Utils,Bitwise,class,,0,4,game
+8195,Assembly-CSharp,Os.Utils,ByteFloat,struct,,4,11,game
+8196,Assembly-CSharp,Os.Utils,ByteFloat2,struct,,2,13,game
+8197,Assembly-CSharp,Os.Utils,ByteFloat3,struct,,3,16,game
+8198,Assembly-CSharp,Os.Utils,SbyteFloat3,struct,,5,22,game
+8200,Assembly-CSharp,Os.Utils,DictPoolExtension,class,,0,1,game
+8201,Assembly-CSharp,Os.Utils,Extensions,class,,0,2,game
+8202,Assembly-CSharp,Os.Utils,ExtraMath,class,,3,56,game
+8203,Assembly-CSharp,Os.Utils,Intersections,class,,2,8,game
+8204,Assembly-CSharp,Os.Utils,NumberStrings,class,,1,2,game
+8205,Assembly-CSharp,Os.Utils,ListPool<T>,class,,1,4,game
+8206,Assembly-CSharp,Os.Utils,ListPoolExtension,class,,0,3,game
+8207,Assembly-CSharp,Os.Utils,PooledList<T>,struct,"IDisposable, IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable",1,16,game
+8208,Assembly-CSharp,Os.Utils,ScopedProfiler,struct,IDisposable,0,3,game
+8209,Assembly-CSharp,Os.Utils,Triplet<T>,struct,,3,3,game
+8210,Assembly-CSharp,Os.Utils,UnityEvent_Float,class,UnityEvent<float>,0,1,game
+8211,Assembly-CSharp,Os.Utils,UnityEvent_Int,class,UnityEvent<int>,0,1,game
+8212,Assembly-CSharp,Os.Utils,UnityFunctions.HirearchyEnumerator,struct,"IEnumerator<Transform>, IEnumerator, IDisposable, IEnumerable<Transform>, IEnumerable",6,9,game
+8213,Assembly-CSharp,Os.Utils,UnityFunctions,class,,0,5,game
+8214,Assembly-CSharp,Os.Utils.InEditor,EditorRoutineAttribute,class,Attribute,0,1,game
+8215,Assembly-CSharp,CielaSpike,Ninja,class,,2,1,Thread Ninja
+8216,Assembly-CSharp,CielaSpike,Task.RunningState,enum,,9,0,Thread Ninja
+8217,Assembly-CSharp,CielaSpike,Task.<Wait>d__19,class,"IEnumerator<object>, IEnumerator, IDisposable",3,6,Thread Ninja
+8218,Assembly-CSharp,CielaSpike,Task,class,IEnumerator,6,16,Thread Ninja
+8219,Assembly-CSharp,CielaSpike,TaskState,enum,,6,0,Thread Ninja
+8220,Assembly-CSharp,CielaSpike,ThreadNinjaMonoBehaviourExtensions,class,,0,2,Thread Ninja
+8221,Assembly-CSharp,,<PrivateImplementationDetails>.__StaticArrayInitTypeSize=24,struct,,0,0,game
+8222,Assembly-CSharp,,<PrivateImplementationDetails>,class,,1,1,game
