@@ -36,3 +36,22 @@ overlap, every object lies inside the file.
 | sharedassets2.assets | 11 | 85 | 3 | 4 |
 
 The object table is sorted by path id, not by offset.
+
+## Built-in objects (F8b, proven 2026-10-15)
+
+Unity 2020.3.18f1 layouts, little-endian; `string` = i32 length + bytes + align 4; `PPtr` = file id i32 +
+path id i64; arrays = i32 count + items. Objects are **not padded at their end** (GameObject in level0 is 67
+bytes, ending on a `bool`). Read by `ts_data::objects`, proven by `data/tests/objects.rs` (exact size for every
+object of the class in the install; Transform ↔ GameObject ↔ children ↔ father references agree).
+
+| Class (id) | Fields | Count in the build |
+|---|---|---:|
+| GameObject (1) | components `PPtr[]`, layer u32, name, tag u16, is active bool | 1,468 |
+| Transform (4) | game object, local rotation (x,y,z,w), local position, local scale, children `PPtr[]`, father | 381 |
+| RectTransform (224) | Transform + anchor min, anchor max, anchored position, size delta, pivot (all `Vector2`) | 1,087 |
+| MonoBehaviour (114) | game object, enabled bool (align 4), script `PPtr<MonoScript>`, name, *then the script's fields* (F8g) | 2,612 |
+| MonoScript (115) | name, execution order i32, properties hash [16], class name, namespace, assembly name | 1,109 |
+
+- `PPtr` with file id n > 0 points into `externals[n - 1]`; the external's path is matched by file name.
+- Every MonoBehaviour's script resolves to a MonoScript except one with a null script:
+  `globalgamemanagers.assets` path id 1115 `InputSystem.inputsettings` (its package is not in the build).
