@@ -48,3 +48,8 @@ Run times on the reference PC (16 threads, 32 GB): Il2CppDumper ~10 s, each Cpp2
   open in the GUI). To use the Ghidra MCP instead, open `work/ghidra/townscaper.gpr` in the GUI and start the
   MCP server there; check the active program is `GameAssembly.dll`.
 - Middleware types can have obfuscated names (`EONGqEcSkgpSiKfAgKEiugWqjmzy`: Rewired); game types don't.
+
+## Export (F5)
+
+- `tools/ghidra_export.sh` writes all 2,269 game methods to `work/decomp/` in ~5 minutes (12 GB heap),
+  0 failures. 448 rows point at a body another row already has (identical-code folding): their file repeats it.

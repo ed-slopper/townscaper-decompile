@@ -148,6 +148,8 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   - **Ghidra with the PDB** (`tools/ghidra_import.sh`, project `work/ghidra/townscaper`): the method bodies.
     The shipped `GameAssembly.pdb` names every il2cpp function (`Placemaker_WaveFunctionCollapse__IterateDecor_m…`),
     `ghidra/scripts/ApplyIl2CppNames.java` adds the C# name, signature and string literals. Read bodies here.
+  - `work/decomp/<Namespace>/<Type>/<Method>_<rva>.c` (`tools/ghidra_export.sh`, F5): Ghidra's pseudo-C of
+    every game method as files, for agents without the Ghidra MCP. Same names as the PDB; re-export after renaming.
   - `work/cpp2il-isil/**`: Cpp2IL's instruction-level dump, a second opinion when Ghidra's output is unclear.
   - `work/il2cppdumper/il2cpp.h`: the C structs of every type (Ghidra already has them from the PDB, F4).
 - The **Ghidra MCP server** (<https://github.com/bethington/ghidra-mcp>) lets an agent read and rename in a running
