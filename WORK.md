@@ -28,7 +28,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1b | `ts_game::os::utils::extra_math`: `ExtraMath` (43 methods: swaps, bilinear inverse, rotations, encapsulation, binary search over transforms, ...) | unowned | E1a | | Split of E1 |
+| E1b | `ts_game::os::utils::extra_math`: `ExtraMath` (43 methods: swaps, bilinear inverse, rotations, encapsulation, binary search over transforms, ...) | unowned | E1a | ed-slopper/wren (2026-10-16) | Split of E1 |
 | E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | | Split of E1 |
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
 | E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1a, E1b | | |
