@@ -188,49 +188,49 @@ rva,va,namespace,type,method,signature,status,notes
 0x1FC990,0x101FC990,Os.Utils,ByteFloat3,set_fz,public void set_fz(float value),checked,tests/os_utils.rs
 0x6CC2E0,0x106CC2E0,Os.Utils,Extensions,KeepGoing,"public static bool KeepGoing(Stopwatch stopwatch, int milliseconds)",dumped,
 0x6CC320,0x106CC320,Os.Utils,Extensions,SetSingleLayer,"public static void SetSingleLayer(Camera camera, string layerName, bool enabled)",dumped,
-0x2A3FC0,0x102A3FC0,Os.Utils,ExtraMath,SetW,"public static float4 SetW(float3 xyz, float w = 0)",dumped,
-0x3DC700,0x103DC700,Os.Utils,ExtraMath,XZtoXYZ,"public static Vector3 XZtoXYZ(Vector2 xz, float y = 0)",dumped,
-0x3DC700,0x103DC700,Os.Utils,ExtraMath,GetXYZfromXZ,"public static Vector3 GetXYZfromXZ(Vector2 xz, float y = 0)",dumped,
-0x3DC830,0x103DC830,Os.Utils,ExtraMath,GetXZ,public static float2 GetXZ(float3 xyz),dumped,
-0x6CCBB0,0x106CCBB0,Os.Utils,ExtraMath,ApplyRotate2DFactors,"public static float2 ApplyRotate2DFactors(float2 vector, float2 factors)",dumped,
-0x6CCC00,0x106CCC00,Os.Utils,ExtraMath,BinarySearchTransformX,"public static int BinarySearchTransformX(Transform transform, float x, int marginMin = 0, int marginMax = 0)",dumped,
-0x6CCCD0,0x106CCCD0,Os.Utils,ExtraMath,Center,public static int3 Center(int3x2 bounds0),dumped,
-0x6CCD20,0x106CCD20,Os.Utils,ExtraMath,Clamp01,public static Vector2 Clamp01(Vector2 vector),dumped,
-0x6CCD60,0x106CCD60,Os.Utils,ExtraMath,ClosestPointOnTriangle,"public static Vector3 ClosestPointOnTriangle(Vector3 point, Vector3 p0, Vector3 p1, Vector3 p2)",dumped,
-0x6CCEC0,0x106CCEC0,Os.Utils,ExtraMath,ClosestPoint,"public static int3 ClosestPoint(int3x2 bounds0, int3 pos)",dumped,
-0x6CCF10,0x106CCF10,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds0, int3x2 bounds1)",dumped,
-0x6CCF50,0x106CCF50,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds, int3 pos)",dumped,
-0x6CCF90,0x106CCF90,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds, float3 pos)",dumped,
-0x6CD000,0x106CD000,Os.Utils,ExtraMath,Cross2,"public static float Cross2(in Vector2 v0, in Vector2 v1)",dumped,
-0x6CD020,0x106CD020,Os.Utils,ExtraMath,Encapsulate,"public static int3x2 Encapsulate(int3x2 bounds, int3 hexPos3)",dumped,
-0x6CD090,0x106CD090,Os.Utils,ExtraMath,Encapsulate,"public static int3x2 Encapsulate(int3x2 bounds0, int3x2 bounds1)",dumped,
-0x6CD100,0x106CD100,Os.Utils,ExtraMath,Encapsulate,"public static Vector2 Encapsulate(Vector2 minMax, float value)",dumped,
-0x6CD160,0x106CD160,Os.Utils,ExtraMath,GetBarycentric,"public static Vector3 GetBarycentric(Vector3 point, Vector3 p0, Vector3 p1, Vector3 p2)",dumped,
-0x6CD400,0x106CD400,Os.Utils,ExtraMath,GetClampedMagnitudeOne,public static Vector3 GetClampedMagnitudeOne(Vector3 vector),dumped,
-0x6CD4A0,0x106CD4A0,Os.Utils,ExtraMath,GetClampedMagnitude,"public static Vector3 GetClampedMagnitude(Vector3 vector, float maxMagnitude)",dumped,
-0x6CD550,0x106CD550,Os.Utils,ExtraMath,GetRotate2DFactors,public static float2 GetRotate2DFactors(float radians),dumped,
-0x6CD620,0x106CD620,Os.Utils,ExtraMath,GetXYZWfromXZ,"public static float4 GetXYZWfromXZ(float2 xz, float y = 0, float w = 0)",dumped,
-0x6CD650,0x106CD650,Os.Utils,ExtraMath,Intersects,"public static bool Intersects(int3x2 bounds0, int3x2 bounds1)",dumped,
-0x6CD690,0x106CD690,Os.Utils,ExtraMath,InvBilinear,"public static Vector2 InvBilinear(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p)",dumped,
-0x6CD930,0x106CD930,Os.Utils,ExtraMath,InverseLerpUnclamped,"public static float InverseLerpUnclamped(float min, float max, float value)",dumped,
-0x6CD970,0x106CD970,Os.Utils,ExtraMath,OnEdge,"public static bool OnEdge(int3x2 bounds, int3 pos)",dumped,
-0x6CD9F0,0x106CD9F0,Os.Utils,ExtraMath,Pow2,public static float Pow2(float x),dumped,
-0x6CDA00,0x106CDA00,Os.Utils,ExtraMath,Pow2,public static int Pow2(int x),dumped,
-0x6CDA10,0x106CDA10,Os.Utils,ExtraMath,Pow,"public static int Pow(int x, uint pow)",dumped,
-0x6CDA40,0x106CDA40,Os.Utils,ExtraMath,Rotate2D180,public static float2 Rotate2D180(float2 vector),dumped,
-0x6CDA80,0x106CDA80,Os.Utils,ExtraMath,Rotate2D270,public static float2 Rotate2D270(float2 vector),dumped,
-0x6CDAB0,0x106CDAB0,Os.Utils,ExtraMath,Rotate2D90,public static float2 Rotate2D90(float2 vector),dumped,
-0x6CDAE0,0x106CDAE0,Os.Utils,ExtraMath,Rotate2D,"public static float2 Rotate2D(float2 vector, float degrees)",dumped,
-0x6CDC20,0x106CDC20,Os.Utils,ExtraMath,Rotate90Y,public static Vector3 Rotate90Y(Vector3 vector),dumped,
-0x6CDC50,0x106CDC50,Os.Utils,ExtraMath,SetA,"public static Color SetA(Color color, float a = 0)",dumped,
-0x6CDCA0,0x106CDCA0,Os.Utils,ExtraMath,SetW,"public static Vector4 SetW(Vector3 vector, float w = 0)",dumped,
-0x6CDCF0,0x106CDCF0,Os.Utils,ExtraMath,SetX,"public static float3 SetX(float3 vector, float x = 0)",dumped,
-0x6CDD20,0x106CDD20,Os.Utils,ExtraMath,SetX,"public static Vector2 SetX(Vector2 vector, float x = 0)",dumped,
-0x6CDD50,0x106CDD50,Os.Utils,ExtraMath,SetY,"public static float3 SetY(float3 vector, float y = 0)",dumped,
-0x6CDD80,0x106CDD80,Os.Utils,ExtraMath,SetY,"public static Vector2 SetY(Vector2 vector, float y = 0)",dumped,
-0x6CDDA0,0x106CDDA0,Os.Utils,ExtraMath,SetZ,"public static float3 SetZ(float3 vector, float z = 0)",dumped,
-0x6CDDD0,0x106CDDD0,Os.Utils,ExtraMath,ToneOffsetToPitch,public static float ToneOffsetToPitch(float tone),dumped,
-0x6CDE40,0x106CDE40,Os.Utils,ExtraMath,.cctor,private static void .cctor(),dumped,
+0x2A3FC0,0x102A3FC0,Os.Utils,ExtraMath,SetW,"public static float4 SetW(float3 xyz, float w = 0)",checked,tests/os_extra_math.rs
+0x3DC700,0x103DC700,Os.Utils,ExtraMath,XZtoXYZ,"public static Vector3 XZtoXYZ(Vector2 xz, float y = 0)",checked,tests/os_extra_math.rs
+0x3DC700,0x103DC700,Os.Utils,ExtraMath,GetXYZfromXZ,"public static Vector3 GetXYZfromXZ(Vector2 xz, float y = 0)",checked,tests/os_extra_math.rs
+0x3DC830,0x103DC830,Os.Utils,ExtraMath,GetXZ,public static float2 GetXZ(float3 xyz),checked,tests/os_extra_math.rs
+0x6CCBB0,0x106CCBB0,Os.Utils,ExtraMath,ApplyRotate2DFactors,"public static float2 ApplyRotate2DFactors(float2 vector, float2 factors)",checked,tests/os_extra_math.rs
+0x6CCC00,0x106CCC00,Os.Utils,ExtraMath,BinarySearchTransformX,"public static int BinarySearchTransformX(Transform transform, float x, int marginMin = 0, int marginMax = 0)",ported,needs Transform children (E11) for a harness check
+0x6CCCD0,0x106CCCD0,Os.Utils,ExtraMath,Center,public static int3 Center(int3x2 bounds0),checked,tests/os_extra_math.rs
+0x6CCD20,0x106CCD20,Os.Utils,ExtraMath,Clamp01,public static Vector2 Clamp01(Vector2 vector),checked,tests/os_extra_math.rs
+0x6CCD60,0x106CCD60,Os.Utils,ExtraMath,ClosestPointOnTriangle,"public static Vector3 ClosestPointOnTriangle(Vector3 point, Vector3 p0, Vector3 p1, Vector3 p2)",checked,tests/os_extra_math.rs
+0x6CCEC0,0x106CCEC0,Os.Utils,ExtraMath,ClosestPoint,"public static int3 ClosestPoint(int3x2 bounds0, int3 pos)",checked,tests/os_extra_math.rs
+0x6CCF10,0x106CCF10,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds0, int3x2 bounds1)",checked,tests/os_extra_math.rs
+0x6CCF50,0x106CCF50,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds, int3 pos)",checked,tests/os_extra_math.rs
+0x6CCF90,0x106CCF90,Os.Utils,ExtraMath,Contains,"public static bool Contains(int3x2 bounds, float3 pos)",checked,tests/os_extra_math.rs
+0x6CD000,0x106CD000,Os.Utils,ExtraMath,Cross2,"public static float Cross2(in Vector2 v0, in Vector2 v1)",checked,tests/os_extra_math.rs
+0x6CD020,0x106CD020,Os.Utils,ExtraMath,Encapsulate,"public static int3x2 Encapsulate(int3x2 bounds, int3 hexPos3)",checked,tests/os_extra_math.rs
+0x6CD090,0x106CD090,Os.Utils,ExtraMath,Encapsulate,"public static int3x2 Encapsulate(int3x2 bounds0, int3x2 bounds1)",checked,tests/os_extra_math.rs
+0x6CD100,0x106CD100,Os.Utils,ExtraMath,Encapsulate,"public static Vector2 Encapsulate(Vector2 minMax, float value)",checked,tests/os_extra_math.rs
+0x6CD160,0x106CD160,Os.Utils,ExtraMath,GetBarycentric,"public static Vector3 GetBarycentric(Vector3 point, Vector3 p0, Vector3 p1, Vector3 p2)",checked,tests/os_extra_math.rs
+0x6CD400,0x106CD400,Os.Utils,ExtraMath,GetClampedMagnitudeOne,public static Vector3 GetClampedMagnitudeOne(Vector3 vector),checked,tests/os_extra_math.rs
+0x6CD4A0,0x106CD4A0,Os.Utils,ExtraMath,GetClampedMagnitude,"public static Vector3 GetClampedMagnitude(Vector3 vector, float maxMagnitude)",checked,tests/os_extra_math.rs
+0x6CD550,0x106CD550,Os.Utils,ExtraMath,GetRotate2DFactors,public static float2 GetRotate2DFactors(float radians),checked,tests/os_extra_math.rs
+0x6CD620,0x106CD620,Os.Utils,ExtraMath,GetXYZWfromXZ,"public static float4 GetXYZWfromXZ(float2 xz, float y = 0, float w = 0)",checked,tests/os_extra_math.rs
+0x6CD650,0x106CD650,Os.Utils,ExtraMath,Intersects,"public static bool Intersects(int3x2 bounds0, int3x2 bounds1)",checked,tests/os_extra_math.rs
+0x6CD690,0x106CD690,Os.Utils,ExtraMath,InvBilinear,"public static Vector2 InvBilinear(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p)",checked,tests/os_extra_math.rs
+0x6CD930,0x106CD930,Os.Utils,ExtraMath,InverseLerpUnclamped,"public static float InverseLerpUnclamped(float min, float max, float value)",checked,tests/os_extra_math.rs
+0x6CD970,0x106CD970,Os.Utils,ExtraMath,OnEdge,"public static bool OnEdge(int3x2 bounds, int3 pos)",checked,tests/os_extra_math.rs
+0x6CD9F0,0x106CD9F0,Os.Utils,ExtraMath,Pow2,public static float Pow2(float x),checked,tests/os_extra_math.rs
+0x6CDA00,0x106CDA00,Os.Utils,ExtraMath,Pow2,public static int Pow2(int x),checked,tests/os_extra_math.rs
+0x6CDA10,0x106CDA10,Os.Utils,ExtraMath,Pow,"public static int Pow(int x, uint pow)",checked,tests/os_extra_math.rs
+0x6CDA40,0x106CDA40,Os.Utils,ExtraMath,Rotate2D180,public static float2 Rotate2D180(float2 vector),checked,tests/os_extra_math.rs
+0x6CDA80,0x106CDA80,Os.Utils,ExtraMath,Rotate2D270,public static float2 Rotate2D270(float2 vector),checked,tests/os_extra_math.rs
+0x6CDAB0,0x106CDAB0,Os.Utils,ExtraMath,Rotate2D90,public static float2 Rotate2D90(float2 vector),checked,tests/os_extra_math.rs
+0x6CDAE0,0x106CDAE0,Os.Utils,ExtraMath,Rotate2D,"public static float2 Rotate2D(float2 vector, float degrees)",checked,tests/os_extra_math.rs
+0x6CDC20,0x106CDC20,Os.Utils,ExtraMath,Rotate90Y,public static Vector3 Rotate90Y(Vector3 vector),checked,tests/os_extra_math.rs
+0x6CDC50,0x106CDC50,Os.Utils,ExtraMath,SetA,"public static Color SetA(Color color, float a = 0)",checked,tests/os_extra_math.rs
+0x6CDCA0,0x106CDCA0,Os.Utils,ExtraMath,SetW,"public static Vector4 SetW(Vector3 vector, float w = 0)",checked,tests/os_extra_math.rs
+0x6CDCF0,0x106CDCF0,Os.Utils,ExtraMath,SetX,"public static float3 SetX(float3 vector, float x = 0)",checked,tests/os_extra_math.rs
+0x6CDD20,0x106CDD20,Os.Utils,ExtraMath,SetX,"public static Vector2 SetX(Vector2 vector, float x = 0)",checked,tests/os_extra_math.rs
+0x6CDD50,0x106CDD50,Os.Utils,ExtraMath,SetY,"public static float3 SetY(float3 vector, float y = 0)",checked,tests/os_extra_math.rs
+0x6CDD80,0x106CDD80,Os.Utils,ExtraMath,SetY,"public static Vector2 SetY(Vector2 vector, float y = 0)",checked,tests/os_extra_math.rs
+0x6CDDA0,0x106CDDA0,Os.Utils,ExtraMath,SetZ,"public static float3 SetZ(float3 vector, float z = 0)",checked,tests/os_extra_math.rs
+0x6CDDD0,0x106CDDD0,Os.Utils,ExtraMath,ToneOffsetToPitch,public static float ToneOffsetToPitch(float tone),checked,tests/os_extra_math.rs
+0x6CDE40,0x106CDE40,Os.Utils,ExtraMath,.cctor,private static void .cctor(),checked,tests/os_extra_math.rs
 0x3E6E40,0x103E6E40,Os.Utils,Intersections,BoxBox,"public static bool BoxBox(Vector3 min0, Vector3 max0, Vector3 min1, Vector3 max1)",dumped,
 0x3E6E90,0x103E6E90,Os.Utils,Intersections,OrientedBoxOrientedBoxInternal,"private static bool OrientedBoxOrientedBoxInternal(Matrix4x4 box0, Matrix4x4 box1, HashSet<Vector3> axisList)",dumped,
 0x3E80B0,0x103E80B0,Os.Utils,Intersections,OrientedBoxOrientedBox,"public static bool OrientedBoxOrientedBox(Matrix4x4 box0, Matrix4x4 box1)",dumped,

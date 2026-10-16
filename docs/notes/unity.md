@@ -130,3 +130,14 @@ Rule: **port** what decides a result the game computes and reads back (positions
 | I2 Localization | A port of the parts the game uses (`Localize`, `LocalizationManager` lookups, `LocalizationParamsManager`), reading the player's `LanguageSourceAsset` / `LanguageSourceData` through `ts_data` (C4) |
 | Crosstales FileBrowser, StandaloneFileBrowser | The `rfd` crate (native file dialogs) |
 | Fury SDK (platform, achievements, store) | No-op STANDINs |
+
+## Trigonometry and pow (E1b)
+
+The game's `Math.Cos` / `Math.Sin` / `Math.Pow` run in Intel's libm (`__libm_sse2_*_precise`, linked into
+GameAssembly.dll); the port uses Rust's `f64` functions (the platform CRT). Rounded to `float` they agree on
+everything the harness tried in the game's range (`tests/os_extra_math.rs`: angles |x| ≤ 10⁴, pitch
+exponents), but **huge arguments differ**: `cos(1e20)` reduces differently (0.754 here, 0.618 in the game).
+The game never passes such angles; if a port ever needs them, port Intel's argument reduction.
+
+Also from E1b: `ExtraMath.Cross2` (arguments `in`, by reference) computes on the x87 stack and rounds once;
+plain `f32` arithmetic is 1 ulp off there (`conv::x87_mul_add` pattern).

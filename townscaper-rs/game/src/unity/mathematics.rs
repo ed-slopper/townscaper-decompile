@@ -12,6 +12,22 @@ pub struct Float2 {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
+pub struct Float3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+/// Column-major 3x2: `c0`, `c1` (the game keeps integer bounds in it: `c0` min, `c1` max).
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct Int3x2 {
+    pub c0: Int3,
+    pub c1: Int3,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct Float4 {
     pub x: f32,
     pub y: f32,
@@ -64,6 +80,9 @@ pub struct Float4x4 {
 
 pub const fn f2(x: f32, y: f32) -> Float2 {
     Float2 { x, y }
+}
+pub const fn f3(x: f32, y: f32, z: f32) -> Float3 {
+    Float3 { x, y, z }
 }
 pub const fn f4(x: f32, y: f32, z: f32, w: f32) -> Float4 {
     Float4 { x, y, z, w }
