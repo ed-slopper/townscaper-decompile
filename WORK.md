@@ -22,7 +22,12 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F11 | `ts_game::unity`: the Unity and .NET semantics the game's results depend on, exact: `Mathf` (Unity's own `Approximately`, `Repeat`, `PingPong`, `SmoothDamp`, `RoundToInt` banker's rounding, ...), `Vector2/3/4`, `Quaternion` (Unity's `Euler`, `LookRotation`, `Slerp`), `Matrix4x4`, `UnityEngine.Random` (Xorshift128, `InitState`, `Range` int/float rules), `System.Random` if used, `Unity.Mathematics` (`float2/3`, `math.*`), `List<T>.Sort` (introsort: unstable, the game's order depends on it), `Dictionary`/`HashSet` iteration order where the game iterates them | unowned | F6 | | [est] Port only what the game calls: find the calls in `function-index.csv` / Cpp2IL `[Calls]`. Split before claiming |
+| F11a | `ts_game::unity::mathf`: every `Mathf` member the game calls (`RoundToInt` (done in F9c), `Min`, `Max`, `Lerp`, `Clamp01`, `InverseLerp`, `Clamp`, `FloorToInt`, `CeilToInt`, `Abs`, `MoveTowards`, `Sign`, `NextPowerOfTwo`, `PerlinNoise`, and the rest of the 287 call sites' list), each checked against the game on edge + fixed-seed inputs | any | F9c | ed-slopper/wren (2026-10-15) | Split of F11 (survey of the game's calls: Cpp2IL `[Calls]` over `Placemaker`/`Os`) |
+| F11b | `ts_game::unity::{vector, quaternion, matrix}`: the `Vector2/3/4`, `Quaternion`, `Matrix4x4`, `Bounds`, `Rect`, `Plane`, `Ray`, `Color`, `Color32` members the game calls (operators, `normalized`, `magnitude`, `Cross`, `Lerp`, `LookRotation`, `MultiplyPoint`, `TRS`, `inverse`, ...), checked against the game | any | F9c | | Split of F11 |
+| F11c | `ts_game::unity::random`: `UnityEngine.Random` (Xorshift128 state, `InitState`, `value`, `Range` int/float, `insideUnitSphere`) on the game's state, checked sequence by sequence (main thread) | any | F9c | | Split of F11 |
+| F11d | `ts_game::unity::mathematics`: the `Unity.Mathematics` types and functions the game uses (`float2/3/4`, `int2/3`, `int2x2`, `quaternion`, `float4x4`, `math.*`, and their `GetHashCode`, which decides dictionary order), checked against the game | any | F9c | | Split of F11 |
+| F11e | `ts_game::unity::collections`: .NET collection behaviour the results depend on: `List<T>.Sort` (introsort, unstable) and `BinarySearch`, `Dictionary<K,V>` / `HashSet<T>` iteration order (buckets, free list reuse after `Remove`) for the key types the game uses, checked against the game | any | F9c, F11d | | Split of F11 |
+| F11f | Host-side Unity APIs (`Time`, `DateTime`, `Mesh` building, `RectTransform`, `Physics.Raycast`, ...): decide per API whether Bevy stands in (tag STANDIN) or it needs a port; write it in `docs/notes/unity.md` | any | F11a | | Split of F11 |
 
 ## P1 Core engine
 
@@ -131,3 +136,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F9b done.
 - 2026-10-15 ed-slopper/wren: F9c done (F9 complete).
 - 2026-10-15 ed-slopper/wren: F10 done.
+- 2026-10-15 ed-slopper/wren: split F11 into F11a–F11f from a survey of the game's calls into Unity/.NET.
