@@ -29,7 +29,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E3c | Patch generation: `GridGenerator.IteratePatch` 0xE30F50 (hex patch → triangulate → random merge into quads → subdivide → sort, `HexPatch.State`), `MotivatePatch` / `UnmotivatePatch`; which RNG and in what order | unowned | E3b | ed-slopper/wren (2026-10-16) | Split of E3 |
 | E3d | Clusters and bits: `IterateCluster`, `IterateBit` 0xE2D6A0 (relaxation, 255 iterations), `Motivate`/`Unmotivate` for clusters and bits, `Measure`, `IterateBits` / `IterateFocus` / `IterateGenerateCenter` / `SceneProcessIteration`, `OnEnable` | unowned | E3c | | Split of E3 |
 | E3e | Grid queries and meshes: `GetQuad` (2), `GetVertOrIterate`, `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `PopulateBorderMesh`, `SetQuadMesh`; gizmos read only | unowned | E3d | | Split of E3 |
 | E4 | The graph: `Placemaker.Graphs` (`Graph` 42 methods incl. `AddVoxel` 0xE829E0, `Iterate` 0xE89CF0, `Save` 0xE8F920; `Corner`, `Square`, `Qube`, `Flow`/`FlowData`/`FlowTarget`, `Action`, `ModuleContainer`, `OrientedModuleSides`, `SideCounts`, `ShadowMesh`, `VoxelMesh`), `Voxel`, `VoxelType`, `MaterialType` | unowned | E3e | | [est] Split before claiming |
@@ -125,6 +124,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E2 | `ts_game::os::hex`: `HexMath` (cube/plane/world conversions, rotations, `HexRound`, `HexClamp` with the original's corner bug, every static axis and matrix bit for bit) and `HexOnionIterator` (the ring walk: `GetAt`, `Increment`/`Decrement`, a 1,500-step random walk); all 35 rows `checked`; the two editor gizmos `read`, not ported. Harness gained `static_field` | P1 | ed-slopper/wren | 2026-10-16 | 66f0f22 |
 | E3a | `ts_game::placemaker::quads` (`Quad`, `Vert`: byte for byte, `AddQuad`'s angle sort is `atan2(d.x, d.y)`), `grid_generation` (`GridConstants`, `MotivationCounter`, `HexPatch`, `HexCluster`, `CustomGridPatch`, `CustomGridLibrary.GetRandom`), `GridBit`; `ts_data::grid` reads the 40-patch library asset. 19 rows `checked`, 15 `ported` (records, empty enumerator), `Quad.ToString` waits on E13 | P1 | ed-slopper/wren | 2026-10-16 | 4f54363 |
 | E3b | `ts_game::placemaker::grid_generator` coordinate maths: `HexToPlane` (4), `PlaneToHex`, `HexToPatchHex` (2), `HexToPatchHexes`, `HexToGridCentroid`, `GetClosestClusterPos`, `GetPatchOffset`, `GetClusterOffset`, `GetStartingHex`, `GetSubdivisions`, `IsBorder`, `IsNewGrid`, `GetVertCost`, `diagonal`; all 18 rows `checked` (1,500 random grid positions near the 36/72/1152 lattices) | P1 | ed-slopper/wren | 2026-10-16 | f0d4d4a |
+| E3c | `GridGenerator` patches: `IteratePatch` (custom patches by centroid offset, procedural hexagon, triangulate, hashed quad merge, subdivide, sort; the sort's three-corner minimum kept), `MotivatePatch` / `UnmotivatePatch`; 3 rows `checked` (96 patches / 1,509 steps, 400 random motivation steps); notes/grid.md | P1 | ed-slopper/wren | 2026-10-16 | 14d8573 |
 
 ## Changes to the board
 
@@ -164,3 +164,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: claim E3b.
 - 2026-10-16 ed-slopper/wren: E3b done.
 - 2026-10-16 ed-slopper/wren: claim E3c.
+- 2026-10-16 ed-slopper/wren: E3c done.
