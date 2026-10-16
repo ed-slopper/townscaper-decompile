@@ -73,6 +73,30 @@ impl Harness {
         serde_json::from_str(&line).expect("harness reply")
     }
 
+    /// An instance method of a value type, on the value `this` (its bytes) of class `this_class`; the reply has
+    /// `this_after` (the value after the call) and `args_after` (raw arguments after the call: `out` / `ref`).
+    pub fn call_on_value(
+        &mut self,
+        method: &str,
+        this_class: &str,
+        this: &[u8],
+        args: Vec<Value>,
+        param_types: &[&str],
+        main: bool,
+    ) -> Result<Value, CallError> {
+        let hex: String = this.iter().map(|x| format!("{x:02x}")).collect();
+        let mut req = json!({"call": method, "args": args, "main": main, "this_raw": {"class": this_class, "raw": hex}});
+        if !param_types.is_empty() {
+            req["param_types"] = json!(param_types);
+        }
+        let r = self.request(req);
+        if r["ok"] == json!(true) {
+            Ok(r)
+        } else {
+            Err(CallError(r["error"].as_str().unwrap_or("?").to_string()))
+        }
+    }
+
     /// Call `Namespace.Class.Method` with arguments built by [`arg`]; returns the reply or the error.
     pub fn call(&mut self, method: &str, args: Vec<Value>, param_types: &[&str], main: bool) -> Result<Value, CallError> {
         let mut req = json!({"call": method, "args": args, "main": main});
@@ -142,6 +166,11 @@ pub mod ret {
     }
     pub fn f32(r: &Value) -> f32 {
         f32::from_le_bytes(bytes(r)[..4].try_into().unwrap())
+    }
+    /// A hex field of the reply (`this_after`, or `args_after[i]`) as bytes.
+    pub fn hex_field(v: &Value) -> Vec<u8> {
+        let s = v.as_str().expect("hex field");
+        (0..s.len()).step_by(2).map(|i| u8::from_str_radix(&s[i..i + 2], 16).unwrap()).collect()
     }
     pub fn string(r: &Value) -> String {
         r["string"].as_str().expect("string reply").to_string()

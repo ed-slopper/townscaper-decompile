@@ -7,7 +7,11 @@
 //!     `{"array": "System.Single", "raw": hex}` a new array of a value type, `{"null": true}`;
 //!   - `param_types` (optional): picks the overload by il2cpp's parameter type names;
 //!   - `main` (optional): run on Unity's main thread (needed by most UnityEngine APIs);
-//!   - `on` (optional): call on the first object of that type in the scene (`FindObjectOfType`, inactive too).
+//!   - `on` (optional): call on the first object of that type in the scene (`FindObjectOfType`, inactive too);
+//!   - `this_raw` (optional): `{"class": "UnityEngine.Vector3", "raw": hex}`: an instance method of a value type
+//!     on that value (boxed); the value after the call comes back as `this_after`.
+//! Raw arguments are passed by pointer, so `ref` / `out` parameters work: every raw argument's bytes after the
+//! call come back in `args_after` (hex, in argument order; `null` for non-raw arguments).
 //! Reply: `{"id":1, "ok":true, "type":"System.Int32", "raw":"02000000"}`, or `"string"`, or
 //!   `{"array": elem type, "raw": hex, "n": len}`, `{"object": class}`, `{"null": true}`, `{"void": true}`;
 //!   errors: `{"ok":false, "error": text}` (managed exceptions formatted by il2cpp).
@@ -122,13 +126,25 @@ impl Ctx {
 
     unsafe fn call_inner(&self, req: &Value) -> Result<Value, String> {
         let call = req["call"].as_str().ok_or("no call")?;
-        let (class_name, method) = call.rsplit_once('.').ok_or("call is Namespace.Class.Method")?;
+        // constructors are `.ctor` / `.cctor`: `UnityEngine.Bounds..ctor`
+        let (class_name, method) = match call.strip_suffix("..ctor").or(call.strip_suffix("..cctor")) {
+            Some(c) => (c, if call.ends_with("..ctor") { ".ctor" } else { ".cctor" }),
+            None => call.rsplit_once('.').ok_or("call is Namespace.Class.Method")?,
+        };
         let class = self.find_class(class_name)?;
         let args = req["args"].as_array().cloned().unwrap_or_default();
         let m = self.find_method(class, method, args.len(), req["param_types"].as_array())?;
-        let this = match req["on"].as_str() {
-            Some(t) => self.find_object(t)?,
-            None => std::ptr::null_mut(),
+        let mut this_size = 0usize;
+        let this = match (req["on"].as_str(), req.get("this_raw")) {
+            (Some(t), _) => self.find_object(t)?,
+            (None, Some(v)) if v.is_object() => {
+                let k = self.find_class(v["class"].as_str().ok_or("this_raw.class")?)?;
+                let raw = unhex(v["raw"].as_str().ok_or("this_raw.raw")?)?;
+                this_size = raw.len();
+                // value-type instance methods take the unboxed data as `this`
+                (self.api.il2cpp_object_unbox)((self.api.il2cpp_value_box)(k, raw.as_ptr() as Ptr))
+            }
+            _ => std::ptr::null_mut(),
         };
 
         // Argument storage must outlive the invoke.
@@ -159,6 +175,32 @@ impl Ctx {
         if !exc.is_null() {
             return Err(self.exception_text(exc));
         }
+        let mut store_i = 0;
+        let args_after: Vec<Value> = args
+            .iter()
+            .map(|a| {
+                if a.get("raw").is_some() && a.get("array").is_none() {
+                    store_i += 1;
+                    json!(hex(&store[store_i - 1]))
+                } else {
+                    Value::Null
+                }
+            })
+            .collect();
+        let this_after = if this_size > 0 {
+            json!(hex(std::slice::from_raw_parts(this as *const u8, this_size)))
+        } else {
+            Value::Null
+        };
+        let mut v = self.reply(m, r, &tname_of(self, m))?;
+        v["args_after"] = json!(args_after);
+        if this_size > 0 {
+            v["this_after"] = this_after;
+        }
+        Ok(v)
+    }
+
+    unsafe fn reply(&self, m: Ptr, r: Ptr, _t: &str) -> Result<Value, String> {
         let rt = (self.api.il2cpp_method_get_return_type)(m);
         let tname = self.type_name(rt);
         let kind = (self.api.il2cpp_type_get_type)(rt);
@@ -197,6 +239,10 @@ impl Ctx {
         let oc = (self.api.il2cpp_object_get_class)(r);
         Ok(json!({"type": tname, "object": format!("{}.{}", cstr((self.api.il2cpp_class_get_namespace)(oc)), cstr((self.api.il2cpp_class_get_name)(oc)))}))
     }
+}
+
+unsafe fn tname_of(ctx: &Ctx, m: Ptr) -> String {
+    ctx.type_name((ctx.api.il2cpp_method_get_return_type)(m))
 }
 
 // ---- main-thread dispatch: a WH_GETMESSAGE hook on Unity's window thread runs queued jobs ----

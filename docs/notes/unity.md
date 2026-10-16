@@ -30,3 +30,23 @@ fixed-seed spreads): float functions 26,886, int/array 8,150, `PerlinNoise` 6,32
   around 0), Ken Perlin's permutation (the engine's `int[512]` is the same 256 twice), integer part by
   truncation, fade input `minss(1, f)`, fade `((6t − 15)t + 10)·((t·t)·t)`, lerps `(b − a)t + a`, all SSE
   single precision; the wrapper's `(n + 0.69) / 1.483` is x87.
+
+## Vectors, quaternions, matrices, geometry (F11b, proven)
+
+`unity::{vector, quaternion, geometry}`: the members the game calls of `Vector2/3/4`, `Vector2Int`,
+`Quaternion`, `Matrix4x4`, `Bounds`, `Rect`, `Plane`, `Ray`, `Color`, `Color32`, equal to the game on fixed-seed
+inputs with zeros, axes, NaN, huge values (`game/tests/unity_vectors.rs`: 6 groups, ~70,000 calls).
+
+- Managed members are Unity's C# definitions; magnitudes are `(float)Math.Sqrt((double)sum)`;
+  `float.GetHashCode` is the bits with ±0 → 0; `Color32(Color)` is `(byte)Mathf.Round(Clamp01(c) * 255)`;
+  `Color.yellow` is (1, 0.92156863, 0.015686275, 1).
+- Native members read from UnityPlayer.dll: `Quaternion.Inverse` = conjugate; `Quaternion.Lerp` clamps `t`
+  (NaN stays NaN), picks the hemisphere by the dot, normalises with `(float)sqrt` in double;
+  `LookRotation` = `LookRotationToMatrix` + Shoemake `MatrixToQuaternion`, else from-to rotation from +Z,
+  else identity; `Matrix4x4.inverse` = Mesa's Gauss-Jordan (`InvertMatrix4x4_Full`), zeros when singular;
+  `TRS` = `QuaternionToMatrix` with scaled columns; `lossyScale` = column lengths, x negated by a negative
+  3×3 determinant; `LookAt` = `LookRotationToMatrix` + translation.
+- `LookRotationToMatrix` with a NaN input or a frame failing `|y·y − 1| <= 1e-6` writes **nothing**:
+  `Matrix4x4.LookAt` then returns uninitialised stack. Our port uses identity there (STANDIN) and the test skips
+  those inputs (`LookMatrix::Unwritten`).
+- The harness passes value-type `this` unboxed (il2cpp's value-type methods take the data pointer).
