@@ -29,7 +29,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E3b | `GridGenerator` coordinate maths: static `HexToPlane` (4) / `PlaneToHex`, `HexToPatchHex` (2), `HexToPatchHexes`, `HexToGridCentroid`, `GetClosestClusterPos`, `GetPatchOffset`, `GetClusterOffset`, `GetStartingHex`, `GetSubdivisions`, `IsBorder`, `IsNewGrid`, `GetVertCost`, `.cctor` | unowned | E3a | ed-slopper/wren (2026-10-16)
 | E3c | Patch generation: `GridGenerator.IteratePatch` 0xE30F50 (hex patch → triangulate → random merge into quads → subdivide → sort, `HexPatch.State`), `MotivatePatch` / `UnmotivatePatch`; which RNG and in what order | unowned | E3b | | Split of E3 |
 | E3d | Clusters and bits: `IterateCluster`, `IterateBit` 0xE2D6A0 (relaxation, 255 iterations), `Motivate`/`Unmotivate` for clusters and bits, `Measure`, `IterateBits` / `IterateFocus` / `IterateGenerateCenter` / `SceneProcessIteration`, `OnEnable` | unowned | E3c | | Split of E3 |
 | E3e | Grid queries and meshes: `GetQuad` (2), `GetVertOrIterate`, `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `PopulateBorderMesh`, `SetQuadMesh`; gizmos read only | unowned | E3d | | Split of E3 |
@@ -125,6 +124,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E1c | `ts_game::os::intersections`: `Intersections` (`BoxBox`, the oriented box/box and box/triangle separating-axis tests `PropPlacer` uses, Möller–Trumbore `TriangleRay`, plane-based `TriangleTriangle`) and `NumberStrings`; all 10 rows `checked` (1,500 random near-touching cases per test with both answers frequent, 300 numbers) | P1 | ed-slopper/wren | 2026-10-16 | 35d327e |
 | E2 | `ts_game::os::hex`: `HexMath` (cube/plane/world conversions, rotations, `HexRound`, `HexClamp` with the original's corner bug, every static axis and matrix bit for bit) and `HexOnionIterator` (the ring walk: `GetAt`, `Increment`/`Decrement`, a 1,500-step random walk); all 35 rows `checked`; the two editor gizmos `read`, not ported. Harness gained `static_field` | P1 | ed-slopper/wren | 2026-10-16 | 66f0f22 |
 | E3a | `ts_game::placemaker::quads` (`Quad`, `Vert`: byte for byte, `AddQuad`'s angle sort is `atan2(d.x, d.y)`), `grid_generation` (`GridConstants`, `MotivationCounter`, `HexPatch`, `HexCluster`, `CustomGridPatch`, `CustomGridLibrary.GetRandom`), `GridBit`; `ts_data::grid` reads the 40-patch library asset. 19 rows `checked`, 15 `ported` (records, empty enumerator), `Quad.ToString` waits on E13 | P1 | ed-slopper/wren | 2026-10-16 | 4f54363 |
+| E3b | `ts_game::placemaker::grid_generator` coordinate maths: `HexToPlane` (4), `PlaneToHex`, `HexToPatchHex` (2), `HexToPatchHexes`, `HexToGridCentroid`, `GetClosestClusterPos`, `GetPatchOffset`, `GetClusterOffset`, `GetStartingHex`, `GetSubdivisions`, `IsBorder`, `IsNewGrid`, `GetVertCost`, `diagonal`; all 18 rows `checked` (1,500 random grid positions near the 36/72/1152 lattices) | P1 | ed-slopper/wren | 2026-10-16 | f0d4d4a |
 
 ## Changes to the board
 
@@ -162,3 +162,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: split E3 into E3a–E3e; claim E3a.
 - 2026-10-16 ed-slopper/wren: E3a done.
 - 2026-10-16 ed-slopper/wren: claim E3b.
+- 2026-10-16 ed-slopper/wren: E3b done.
