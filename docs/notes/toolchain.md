@@ -53,3 +53,18 @@ Run times on the reference PC (16 threads, 32 GB): Il2CppDumper ~10 s, each Cpp2
 
 - `tools/ghidra_export.sh` writes all 2,269 game methods to `work/decomp/` in ~5 minutes (12 GB heap),
   0 failures. 448 rows point at a body another row already has (identical-code folding): their file repeats it.
+
+## Checking harness (F9, proven 2026-10-15)
+
+- `townscaper-rs/harness` (32-bit, its own workspace): `ts_harness_launch` copies the install to
+  `work/harness/game` once and starts the copy windowed with `ts_harness.dll` loaded (remote `LoadLibraryW`).
+  IL2CPP is up ~0.3 s after start; the world scene's objects (`WorldMaster`) are found after ~1.3 s.
+- The DLL serves JSON-line calls on 127.0.0.1:47615 through the exported il2cpp C API (protocol:
+  `harness/src/server.rs`). Calls run on the DLL's thread, or with `"main": true` on Unity's main thread
+  (a `WH_GETMESSAGE` hook on the game window's thread runs the queue).
+- `townscaper-rs/check` (`ts_check`): the client tests use. Comparisons run only with `TS_HARNESS=1`;
+  the game copy stays up between test runs (send `{"cmd":"quit"}` to close it).
+- First comparison: `ts_game::unity::mathf::round_to_int` = `Mathf.RoundToInt` (0xA3C0A0) on 3,317 inputs,
+  all equal, NaN / infinities / out-of-range included (x86 `cvttsd2si` gives `i32::MIN`; Rust's `as` would
+  saturate: `ts_game::unity::conv`).
+- IL2CPP strips unused BCL methods (`Enumerable.Sum` is not in the build): call only what the build has.

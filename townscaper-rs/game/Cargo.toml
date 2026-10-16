@@ -5,3 +5,6 @@ edition = "2021"
 description = "Townscaper's game code (Placemaker, Os) ported 1:1; no Bevy"
 
 [dependencies]
+
+[dev-dependencies]
+ts_check = { path = "../check" }

@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "game", "data", "vorbisref"]
+members = [".", "game", "data", "vorbisref", "check"]
 exclude = ["harness"]
 resolver = "2"
 

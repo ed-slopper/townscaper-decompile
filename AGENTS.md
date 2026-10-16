@@ -172,6 +172,8 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   | `townscaper` | `townscaper-rs/` | The app: window, input, drawing, audio, the frame loop | yes |
   | `ts_game` | `townscaper-rs/game` | The ported game code (`os::*`, `placemaker::*`) and the Unity semantics it needs (`unity::*`) | **no** |
   | `ts_data` | `townscaper-rs/data` | Readers of the player's own files (`Townscaper_Data/*.assets`, `.resS`, `.resource`, saves) | **no** |
+  | `ts_check` | `townscaper-rs/check` | Test client of the checking harness (F9): call the original game's methods | **no** |
+  | `ts_harness` | `townscaper-rs/harness` | The harness itself, 32-bit, own workspace: runs inside a copy of the game | **no** |
   | `ts_vorbisref` | `townscaper-rs/vorbisref` | Unpatched Xiph libvorbis 1.3.4 (vendored, BSD), only to rebuild the Vorbis headers FMOD strips (F8e) | **no** |
 
   `ts_game` and `ts_data` never depend on Bevy, so every ported function can be called and tested on its own.
@@ -179,7 +181,9 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   `cargo +stable-x86_64-pc-windows-msvc run --release` in `townscaper-rs/`. Tests: `cargo test -p ts_game -p ts_data`.
   Tests that need the player's install read it from `TOWNSCAPER_DIR` and skip when it is not set.
 - A function is **checked** only when it is shown equal to the original on the comparison harness (row F9): the
-  same inputs fed to the original (in the running game) and to ours, outputs compared exactly. Run the build and
+  same inputs fed to the original (in the running game) and to ours, outputs compared exactly. Build the
+  harness once (`townscaper-rs/harness/README.md`), then `TS_HARNESS=1 cargo test -p ts_game`; write the test
+  with `ts_check` (`game/tests/unity_mathf.rs` is the pattern: edge inputs + a fixed-seed spread). Run the build and
   the tests that cover your system before marking a row done.
 
 ## 16. End of every session

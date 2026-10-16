@@ -5421,6 +5421,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ts_check"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "ts_data"
 version = "0.1.0"
 dependencies = [
@@ -5436,6 +5443,9 @@ dependencies = [
 [[package]]
 name = "ts_game"
 version = "0.1.0"
+dependencies = [
+ "ts_check",
+]
 
 [[package]]
 name = "ts_vorbisref"

@@ -1,0 +1,8 @@
+[package]
+name = "ts_check"
+version = "0.1.0"
+edition = "2021"
+description = "Client of the checking harness (row F9c): call the original game's methods from tests and compare; no Bevy"
+
+[dependencies]
+serde_json = "1"
