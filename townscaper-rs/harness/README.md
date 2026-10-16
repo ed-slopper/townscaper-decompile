@@ -14,4 +14,8 @@ townscaper-rs/harness/target/i686-pc-windows-msvc/release/ts_harness_launch.exe
   exports (`il2cpp_domain_get`, `il2cpp_class_from_name`, `il2cpp_runtime_invoke`, ...). Log:
   `work/harness/harness.log`.
 
+- With `--keep` the game stays up and the DLL serves calls on `127.0.0.1:47615` (JSON lines; protocol in
+  `src/server.rs`): `{"call":"UnityEngine.Mathf.RoundToInt","args":[{"raw":"00002040"}],"main":true}`.
+  `{"cmd":"quit"}` closes the game.
+
 No C# mod loader is used (no .NET SDK needed). Everything it reads stays on the player's PC.

@@ -55,6 +55,14 @@ api! {
     il2cpp_array_length: fn(Ptr) -> u32;
     il2cpp_class_array_element_size: fn(Ptr) -> i32;
     il2cpp_free: fn(Ptr) -> ();
+    il2cpp_class_from_type: fn(Ptr) -> Ptr;
+    il2cpp_class_value_size: fn(Ptr, *mut u32) -> i32;
+    il2cpp_class_is_valuetype: fn(Ptr) -> u8;
+    il2cpp_class_get_type: fn(Ptr) -> Ptr;
+    il2cpp_class_get_namespace: fn(Ptr) -> *const c_char;
+    il2cpp_class_get_element_class: fn(Ptr) -> Ptr;
+    il2cpp_type_get_object: fn(Ptr) -> Ptr;
+    il2cpp_format_exception: fn(Ptr, *mut c_char, i32) -> ();
 }
 
 /// A C string from il2cpp (borrowed).

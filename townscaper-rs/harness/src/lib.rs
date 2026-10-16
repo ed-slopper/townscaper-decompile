@@ -2,6 +2,7 @@
 //! A thread waits for IL2CPP, attaches to its domain and reports what it finds to `TS_HARNESS_LOG`.
 
 pub mod il2cpp;
+pub mod server;
 
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -56,7 +57,8 @@ fn probe() {
         let methods = api.methods(class);
         let names: Vec<String> = methods.iter().map(|(n, p, _)| format!("{n}/{p}")).collect();
         log(&format!("harness: Placemaker.TextSaveSystem: {} methods: {}", methods.len(), names.join(", ")));
-        log("harness: ready");
+        let ctx: &'static server::Ctx = Box::leak(Box::new(server::Ctx { api, domain }));
+        server::serve(ctx);
     }
 }
 
