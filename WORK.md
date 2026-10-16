@@ -22,7 +22,6 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F11f | Host-side Unity APIs (`Time`, `DateTime`, `Mesh` building, `RectTransform`, `Physics.Raycast`, ...): decide per API whether Bevy stands in (tag STANDIN) or it needs a port; write it in `docs/notes/unity.md` | any | F11a | ed-slopper/wren (2026-10-15) | Split of F11 |
 
 ## P1 Core engine
 
@@ -41,15 +40,18 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E8 | Boot and the main loop as Bevy systems in the game's order: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7 | | Who ticks whom each frame (Unity's Awake/Start/Update/LateUpdate order, script execution order from `globalgamemanagers`); scene `level0..2` wiring from F8f |
 | E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7 | | GPU passes: need the shaders (C3) to check |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7 | | |
+| E11 | `ts_game::unity::transform`: Unity's `Transform` hierarchy math the game reads back (`position`/`rotation`/`lossyScale` from the parent chain, `TransformPoint`, `InverseTransformPoint`, `TransformDirection`, `localToWorldMatrix`, `SetParent` keeping world pose), exact (native code in UnityPlayer.dll), checked with the harness on real scene transforms | unowned | F11b | | Gap of F11f |
+| E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
+| E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | | Gap of F11f; needed by G3/G3a |
 
 ## P2 Gameplay systems
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8 | | Placing and removing blocks, colours, the click feel |
+| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Placing and removing blocks, colours, the click feel |
 | G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8 | | |
 | G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
-| G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
+| G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9, E13 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
 | G4 | Undo / redo: find where it lives (`Graph` actions? `UndoRedoFeedback`, `UndoRedoButtons`), port it | unowned | E4 | | |
 | G5 | Life: `BirdFlock` (17), `Bird`, `BirdLanding`, `BirdSpot`, `ButterflyFlock`, `Butterfly`, `ButterflyLanding` | unowned | E8 | | |
 | G6 | Audio: `AmbientSound`, `AudioSnapshotManager`, `AudioSourcePool`, `ClickParticleSound`, `WaterSound`, `UiAudio`, `Beatbox`, `ManySound`/`ManySoundsManager`, `MenuMusic` | unowned | E8 | | |
@@ -115,6 +117,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F11c | `ts_game::unity::random::Rand`: the engine's xorshift128 (`InitState`, `value`, `Range` float/int, `insideUnitSphere` with its unit vector) read from UnityPlayer.dll; equal to the game on 7,200 draws + 300 seeds with the state compared each round. Harness learnt `native` (engine functions by PDB address) and `batch` (several calls in one main-thread job, no frame between). The game never seeds `Random` (cosmetic uses only): notes in `unity.md` | P0 | ed-slopper/wren | 2026-10-15 | 4766afb |
 | F11d | `ts_game::unity::mathematics`: the out-of-line `Unity.Mathematics` members the game calls (`length`/`normalize(float2)`, int `abs`/`max`/`mul`, `float4x4(int4x4)`, the shuffle-based `math.inverse(float4x4)`, `int3.GetHashCode`) and `Unity.Mathematics.Random` (xorshift32: ctor, `NextFloat` both forms, `NextInt`), equal to the game (1,500 rounds + 1,000 seeds × 6 steps); notes in `unity.md` | P0 | ed-slopper/wren | 2026-10-15 | 8fe48ea |
 | F11e | `ts_game::unity::collections`: the BCL's introsort (`sort_by`, depth limit from the backing array's length), `binary_search`, `list_grow` (List capacity), `SlotMap` (Dictionary / HashSet slot-order iteration with LIFO slot reuse). Equal to the game: 514 tie-heavy sorts incl. 4 through heapsort (antiqsort inputs), binary searches with duplicates, 60 Dictionary/HashSet op sequences. Harness learnt generic classes (`Type.GetType` names), object handles (`new`, `keep`), arrays returned after calls; notes in `unity.md` | P0 | ed-slopper/wren | 2026-10-15 | c25105f |
+| F11f | Host-side Unity / .NET APIs surveyed (Cpp2IL `[Calls]` from the game's code) and decided per family: Bevy hosts display, audio, timing, UI, mesh upload; exact ports for what the game reads back: new rows E11 (Transform math), E12 (camera projection + `Physics.Raycast` picking), E13 (.NET string/number formatting in saves). Table in `docs/notes/unity.md` | P0 | ed-slopper/wren | 2026-10-15 | F11fCOMMIT |
 
 ## Changes to the board
 
@@ -142,3 +145,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F11c done.
 - 2026-10-15 ed-slopper/wren: F11d done.
 - 2026-10-15 ed-slopper/wren: F11e done.
+- 2026-10-15 ed-slopper/wren: F11f done (F11 complete); added E11, E12, E13 (gaps of F11f); G1 Needs E12, G3a Needs E13.

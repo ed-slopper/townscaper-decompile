@@ -100,3 +100,24 @@ remove / clear sequences on a real `Dictionary<int,int>` and `HashSet<int>` with
 - `Dictionary` / `HashSet` enumerate their slots in order; a new key takes the most recently freed slot (LIFO),
   else the next unused one; `Clear` empties everything (`unity::collections::SlotMap`). Hash codes decide
   buckets only, never order.
+
+## Host-side APIs: Bevy or port? (F11f, decided 2026-10-15)
+
+Survey: Cpp2IL `[Calls]` from the game's code into everything not covered above (call sites in brackets).
+Rule: **port** what decides a result the game computes and reads back (positions, picks, saved bytes);
+**Bevy hosts** what only shows, plays or times things, marked `STANDIN:` where our behaviour differs.
+
+| Unity / .NET API | Sites | Decision |
+|---|---:|---|
+| `Transform`, `Component`, `GameObject`, `Behaviour` | 569+513+124+70 | Scene graph → Bevy entities. The **transform math the game reads back** (`position`, `rotation`, `lossyScale`, `TransformPoint`, `InverseTransformPoint`, `localToWorldMatrix`, parent composition) is ported exactly: row **E11** |
+| `Camera` (`ScreenPointToRay`, `WorldToScreenPoint`, projection), `Physics.Raycast`, `MeshCollider`, `RaycastHit` | 48+3+… | Picking which block the pointer hits decides what is built: ported exactly, row **E12**. Drawing through the camera is Bevy's |
+| `string`, `int`/`float` `ToString`/`Parse`, `StringBuilder` | 144+40 | Where text reaches a file or the shareable town string (`TextSaveSystem`, `SaveSystem`, `MetaSave`), .NET's exact formatting/parsing (invariant culture, `float` round-trip) is ported: row **E13**; UI text is Bevy's |
+| `Time` (`unscaledTime`, `deltaTime`, `frameCount`, `timeScale`) | 134 | Bevy `Time` (STANDIN where Unity's frame timing differs); frame-exact timing of the original can't be reproduced anyway |
+| `Mesh`, `MeshFilter` (`SetVertices`, `SetTriangles`, `SetUVs`, `RecalculateBounds`) | 95+44 | The game builds the vertex data (ported with E7); uploading/drawing is Bevy's `Mesh` |
+| `Shader`, `Material`, `Texture2D`, `RenderTexture`, `ImageConversion`, `Graphics` | 33+25+12+10+16 | Rendering: rows C3 (shaders as WGSL) and E9 (bake passes); PNG encode/decode for save cards via the `image` crate (byte-exact only if G3 needs it) |
+| `Screen`, `RectTransform`, `CanvasGroup`, uGUI, TextMeshPro | 68+105+19 | Bevy UI (G7); layout numbers the game reads back (`GameViewRect`, `UiScaler`) are ported with their rows |
+| `AudioSource`, `AudioMixer` snapshots | 46 | Bevy audio, clips from F8e (G6, C5) |
+| `Input`, Rewired (`Player`, `ReInput`, `InputMapper`, `ControllerHelper`, `MapHelper`) | 26+45+16+40+15+16 | Row **F7** (humans): Bevy input under a port of the game's `ActionInputManager` / `ControlBinding` layer |
+| `File`, `Directory`, `Path`, `Application.persistentDataPath`, `XmlSerializer`, `DateTime`, `PlayerPrefs` | 13+14+12+11+11+15 | Saving (G3): same folders, file names and bytes; `DateTime` for save card dates as .NET formats them |
+| `Debug`, `Gizmos`, `Stopwatch`, `Profiler` | 95+57+11 | Debug only: dropped (no STANDIN needed) |
+| `Delegate`, `Action`, exceptions, `ListPool` | — | Language / the game's own code (`Os.Utils`, E1) |
