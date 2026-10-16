@@ -29,7 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E3d | Clusters and bits: `IterateCluster`, `IterateBit` 0xE2D6A0 (relaxation, 255 iterations), `Motivate`/`Unmotivate` for clusters and bits, `Measure`, `IterateBits` / `IterateFocus` / `IterateGenerateCenter` / `SceneProcessIteration`, `OnEnable` | unowned | E3c | | Split of E3 |
+| E3d | Clusters and bits: `IterateCluster`, `IterateBit` 0xE2D6A0 (relaxation, 255 iterations), `Motivate`/`Unmotivate` for clusters and bits, `Measure`, `IterateBits` / `IterateFocus` / `IterateGenerateCenter` / `SceneProcessIteration`, `OnEnable` | unowned | E3c | ed-slopper/wren (2026-10-16) | Split of E3 |
 | E3e | Grid queries and meshes: `GetQuad` (2), `GetVertOrIterate`, `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `PopulateBorderMesh`, `SetQuadMesh`; gizmos read only | unowned | E3d | | Split of E3 |
 | E4 | The graph: `Placemaker.Graphs` (`Graph` 42 methods incl. `AddVoxel` 0xE829E0, `Iterate` 0xE89CF0, `Save` 0xE8F920; `Corner`, `Square`, `Qube`, `Flow`/`FlowData`/`FlowTarget`, `Action`, `ModuleContainer`, `OrientedModuleSides`, `SideCounts`, `ShadowMesh`, `VoxelMesh`), `Voxel`, `VoxelType`, `MaterialType` | unowned | E3e | | [est] Split before claiming |
 | E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4 | | |
@@ -165,3 +165,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: E3b done.
 - 2026-10-16 ed-slopper/wren: claim E3c.
 - 2026-10-16 ed-slopper/wren: E3c done.
+- 2026-10-16 ed-slopper/wren: claim E3d.
