@@ -1,5 +1,6 @@
 [workspace]
 members = [".", "game", "data", "vorbisref"]
+exclude = ["harness"]
 resolver = "2"
 
 [package]

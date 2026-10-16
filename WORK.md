@@ -22,7 +22,6 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F9a | Harness, part 1: `townscaper-rs/harness` (32-bit, `i686-pc-windows-msvc`): a launcher that copies the player's game to `work/harness/game` (never touches the install), starts it and injects `ts_harness.dll`; the DLL waits for IL2CPP, attaches, finds `Assembly-CSharp` and a game class through the exported `il2cpp_*` API and logs it | any | F6 | ed-slopper/wren (2026-10-15) | Split of F9 (no .NET SDK here, so no C# mod loader: Rust + the il2cpp C API instead) |
 | F9b | Harness, part 2: the DLL serves requests on 127.0.0.1 (JSON lines): call a static method by `Namespace.Class.Method` with primitive / string / array args, return the result; instance calls on scene objects found by type; run on Unity's main thread where the API needs it | any | F9a | | Split of F9 |
 | F9c | Harness, part 3: `ts_game` test support that starts the harness, sends calls and compares the original's results with our port's, exactly; first use: a Unity-semantics function of F11 | any | F9b | | Split of F9 |
 | F10 | `tools/guard.py` + CI: fail if a game file or decompiler output is committed (extensions, `dump.cs`, `il2cpp.h`, size/magic checks), `function-index.csv` well-formed, every `` `Ns.Type.Method` 0x… `` doc comment in `townscaper-rs/` names a real row; `cargo test -p ts_game -p ts_data` on push | any | F2, F6 | | |
@@ -110,6 +109,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F8e | `ts_data::audio` (`AudioClip` layout, FSB5 bank parser, Vorbis packets) + `ts_data::vorbis` (headers FMOD strips rebuilt by CRC match with unpatched libvorbis 1.3.4 in the new crate `ts_vorbisref`, vendored from the Xiph releases; decode with `lewton`). All 90 clips decode to exactly their sample count; the five setup headers and their qualities are in `files.md`; `birdsappear` is silent in the build (-97.6 dBFS) | P0 | ed-slopper/wren | 2026-10-15 | c24d4d2 |
 | F8f | `ts_data::scene`: a scene file as a GameObject tree with named components (Unity class names, MonoBehaviour script names), `--example dump_scene`. Proven on `level0..2` (34 / 115 / 1,065 GameObjects, each once, every component named); what each scene holds in `files.md` | P0 | ed-slopper/wren | 2026-10-15 | fbbe816 |
 | F8g | `ts_data::layout`: the game's MonoBehaviour / ScriptableObject fields read by generated layouts (`data/layouts.json`, names and types only, from `tools/layouts.ps1` over Cpp2IL's attributed DLLs + `dump.cs` fallback) and Unity 2020.3's rules (enums 4 bytes, align after small fields and arrays, built-in structs). **All 2,611 MonoBehaviours with a script read to their exact size**; `--example dump_script`; rules and steps in `files.md` | P0 | ed-slopper/wren | 2026-10-15 | 6c4f1e6 |
+| F9a | `townscaper-rs/harness` (32-bit, own workspace): `ts_harness_launch` copies the install to `work/harness/game` once (install untouched), starts it windowed and loads `ts_harness.dll` with `LoadLibraryW` on a remote thread; the DLL finds the il2cpp C API, attaches and logs. Run: IL2CPP up 0.3 s after start, 56 assemblies, `Placemaker.TextSaveSystem` found with its 10 methods | P0 | ed-slopper/wren | 2026-10-15 | F9aCOMMIT |
 
 ## Changes to the board
 
@@ -127,3 +127,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F8f done.
 - 2026-10-15 ed-slopper/wren: F8g done (F8 complete).
 - 2026-10-15 ed-slopper/wren: split F9 into F9a–F9c (Rust + il2cpp C API, no C# loader); C1/C3/C5 Needs `F8` = F8a–F8g, all done.
+- 2026-10-15 ed-slopper/wren: F9a done.

@@ -13,3 +13,4 @@ __pycache__/
 
 # Rust
 townscaper-rs/target/
+townscaper-rs/harness/target/
