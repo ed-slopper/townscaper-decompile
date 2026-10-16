@@ -29,7 +29,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E3e | Grid queries and meshes: `GetQuad` (2), `GetVertOrIterate`, `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `PopulateBorderMesh`, `SetQuadMesh`; gizmos read only | unowned | E3d | ed-slopper/wren (2026-10-16) | Split of E3 |
 | E4 | The graph: `Placemaker.Graphs` (`Graph` 42 methods incl. `AddVoxel` 0xE829E0, `Iterate` 0xE89CF0, `Save` 0xE8F920; `Corner`, `Square`, `Qube`, `Flow`/`FlowData`/`FlowTarget`, `Action`, `ModuleContainer`, `OrientedModuleSides`, `SideCounts`, `ShadowMesh`, `VoxelMesh`), `Voxel`, `VoxelType`, `MaterialType` | unowned | E3e | | [est] Split before claiming |
 | E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4 | | |
 | E5a | `Placemaker.Modules.Processing` (`ModuleImporter`, `ProtoModule`, `DecorProfile`, `MaterialCluster`, ...): the editor-time import of module meshes; port only what the shipped game runs | unowned | E5 | | Mostly editor code [est] |
@@ -125,6 +124,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E3b | `ts_game::placemaker::grid_generator` coordinate maths: `HexToPlane` (4), `PlaneToHex`, `HexToPatchHex` (2), `HexToPatchHexes`, `HexToGridCentroid`, `GetClosestClusterPos`, `GetPatchOffset`, `GetClusterOffset`, `GetStartingHex`, `GetSubdivisions`, `IsBorder`, `IsNewGrid`, `GetVertCost`, `diagonal`; all 18 rows `checked` (1,500 random grid positions near the 36/72/1152 lattices) | P1 | ed-slopper/wren | 2026-10-16 | f0d4d4a |
 | E3c | `GridGenerator` patches: `IteratePatch` (custom patches by centroid offset, procedural hexagon, triangulate, hashed quad merge, subdivide, sort; the sort's three-corner minimum kept), `MotivatePatch` / `UnmotivatePatch`; 3 rows `checked` (96 patches / 1,509 steps, 400 random motivation steps); notes/grid.md | P1 | ed-slopper/wren | 2026-10-16 | 14d8573 |
 | E3d | `GridGenerator` clusters and bits: Motivate/Unmotivate (bits, clusters), `IterateCluster` (patches, gather, relax), `IterateBit` (verts, relax, clusters, compose, mesh: `BitMesh` data for Bevy), `IterateBits`, `IterateFocus` (bounds passed in), `IterateGenerateCenter`, `OnEnable`, `SceneProcessIteration`; 16 rows `checked` (4 bits from scratch at every state change, 2 focus rounds), `Measure` read (no callers) | P1 | ed-slopper/wren | 2026-10-16 | bc8254f |
+| E3e | `GridGenerator` queries and meshes: `GetQuad` (plane point, edge), `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `GetVertOrIterate`, `PopulateBorderMesh` (`BorderMesh` data; `Graph.border`, `AoBaker` inputs passed in); 7 rows `checked` on a finished neighbourhood (400 points, 120 strips, 150 verts + border meshes); `SetQuadMesh` (no callers) and gizmos read. With E3a–E3d the grid section is complete: every `Placemaker.Quads*` / `GridGenerator` / `GridBit` row `checked` or `ported`/`read` with a reason | P1 | ed-slopper/wren | 2026-10-16 | 75ffb13 |
 
 ## Changes to the board
 
@@ -168,3 +168,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: claim E3d.
 - 2026-10-16 ed-slopper/wren: E3d done.
 - 2026-10-16 ed-slopper/wren: claim E3e.
+- 2026-10-16 ed-slopper/wren: E3e done; the grid section E3 (E3a–E3e) is complete.
