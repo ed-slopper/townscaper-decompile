@@ -422,26 +422,26 @@ rva,va,namespace,type,method,signature,status,notes
 0xE28660,0x10E28660,Placemaker,GridBit,get_done,public bool get_done(),ported,ts_game::placemaker::grid_generator::GridBit
 0xE289A0,0x10E289A0,Placemaker,GridGenerator,AppendQuadList,"public bool AppendQuadList(List<Quad> nodes, Vector2 planeCameraDir, ref int hoverIndex, int steps)",dumped,
 0xE29AB0,0x10E29AB0,Placemaker,GridGenerator,GetAdjecentQuad,public Quad GetAdjecentQuad(Quad quad),dumped,
-0xE2A0E0,0x10E2A0E0,Placemaker,GridGenerator,GetClosestClusterPos,private int3 GetClosestClusterPos(int3 hexPos),dumped,
+0xE2A0E0,0x10E2A0E0,Placemaker,GridGenerator,GetClosestClusterPos,private int3 GetClosestClusterPos(int3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE2A2A0,0x10E2A2A0,Placemaker,GridGenerator,GetClostestVertPosition,public Vert GetClostestVertPosition(float2 planePos),dumped,
-0xE2A590,0x10E2A590,Placemaker,GridGenerator,GetClusterOffset,public static int2 GetClusterOffset(),dumped,
-0xE2A5B0,0x10E2A5B0,Placemaker,GridGenerator,GetPatchOffset,public int2 GetPatchOffset(int2 clusterPos),dumped,
+0xE2A590,0x10E2A590,Placemaker,GridGenerator,GetClusterOffset,public static int2 GetClusterOffset(),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2A5B0,0x10E2A5B0,Placemaker,GridGenerator,GetPatchOffset,public int2 GetPatchOffset(int2 clusterPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE2A740,0x10E2A740,Placemaker,GridGenerator,GetQuad,"public Quad GetQuad(int2 hexWithinPatch, int2 corner0, int2 corner1)",dumped,
 0xE2AD80,0x10E2AD80,Placemaker,GridGenerator,GetQuad,public Quad GetQuad(float2 planePos),dumped,
-0xE2BB20,0x10E2BB20,Placemaker,GridGenerator,GetStartingHex,public static int2 GetStartingHex(int onionIndex),dumped,
-0xE2BB80,0x10E2BB80,Placemaker,GridGenerator,GetSubdivisions,private int GetSubdivisions(int2 hexPos),dumped,
-0xE2BBD0,0x10E2BBD0,Placemaker,GridGenerator,GetVertCost,public float GetVertCost(float2 hexPos),dumped,
+0xE2BB20,0x10E2BB20,Placemaker,GridGenerator,GetStartingHex,public static int2 GetStartingHex(int onionIndex),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2BB80,0x10E2BB80,Placemaker,GridGenerator,GetSubdivisions,private int GetSubdivisions(int2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2BBD0,0x10E2BBD0,Placemaker,GridGenerator,GetVertCost,public float GetVertCost(float2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE2BC70,0x10E2BC70,Placemaker,GridGenerator,GetVertOrIterate,"public Vert GetVertOrIterate(int2 hexPos, Func<bool> keepGoing)",dumped,
-0xE2C590,0x10E2C590,Placemaker,GridGenerator,HexToGridCentroid,public int3 HexToGridCentroid(int3 hexPos),dumped,
-0xE2C850,0x10E2C850,Placemaker,GridGenerator,HexToPatchHex,private int3 HexToPatchHex(float3 hexPos),dumped,
-0xE2CA10,0x10E2CA10,Placemaker,GridGenerator,HexToPatchHex,public int2 HexToPatchHex(int2 hexPos),dumped,
-0xE2CAF0,0x10E2CAF0,Placemaker,GridGenerator,HexToPatchHexes,"public void HexToPatchHexes(int3 hexPos, out int3x3 patchPositions, out byte mask)",dumped,
-0xE2D0C0,0x10E2D0C0,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(float3 hexPos),dumped,
-0xE2D150,0x10E2D150,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(int3 hexPos),dumped,
-0xE2D210,0x10E2D210,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(float2 hexPos),dumped,
-0xE2D290,0x10E2D290,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(int2 hexPos),dumped,
-0xE2D330,0x10E2D330,Placemaker,GridGenerator,IsBorder,private bool IsBorder(int2 hexPos),dumped,
-0xE2D570,0x10E2D570,Placemaker,GridGenerator,IsNewGrid,private bool IsNewGrid(int3 hexPos),dumped,
+0xE2C590,0x10E2C590,Placemaker,GridGenerator,HexToGridCentroid,public int3 HexToGridCentroid(int3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2C850,0x10E2C850,Placemaker,GridGenerator,HexToPatchHex,private int3 HexToPatchHex(float3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2CA10,0x10E2CA10,Placemaker,GridGenerator,HexToPatchHex,public int2 HexToPatchHex(int2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2CAF0,0x10E2CAF0,Placemaker,GridGenerator,HexToPatchHexes,"public void HexToPatchHexes(int3 hexPos, out int3x3 patchPositions, out byte mask)",checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D0C0,0x10E2D0C0,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(float3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D150,0x10E2D150,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(int3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D210,0x10E2D210,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(float2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D290,0x10E2D290,Placemaker,GridGenerator,HexToPlane,public static float2 HexToPlane(int2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D330,0x10E2D330,Placemaker,GridGenerator,IsBorder,private bool IsBorder(int2 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
+0xE2D570,0x10E2D570,Placemaker,GridGenerator,IsNewGrid,private bool IsNewGrid(int3 hexPos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE2D6A0,0x10E2D6A0,Placemaker,GridGenerator,IterateBit,"public void IterateBit(GridBit bit, Func<bool> keepGoing)",dumped,
 0xE2F8B0,0x10E2F8B0,Placemaker,GridGenerator,IterateBits,public bool IterateBits(Func<bool> keepGoing),dumped,
 0xE2F950,0x10E2F950,Placemaker,GridGenerator,IterateCluster,"private void IterateCluster(HexCluster cluster, Func<bool> keepGoing)",dumped,
@@ -454,7 +454,7 @@ rva,va,namespace,type,method,signature,status,notes
 0xE34FE0,0x10E34FE0,Placemaker,GridGenerator,MotivatePatch,"private HexPatch MotivatePatch(int2 patchPos, int2 sourcePos)",dumped,
 0xE35220,0x10E35220,Placemaker,GridGenerator,OnDrawGizmos,private void OnDrawGizmos(),dumped,
 0xE37450,0x10E37450,Placemaker,GridGenerator,OnEnable,private void OnEnable(),dumped,
-0xE37890,0x10E37890,Placemaker,GridGenerator,PlaneToHex,public static float3 PlaneToHex(float2 planePos),dumped,
+0xE37890,0x10E37890,Placemaker,GridGenerator,PlaneToHex,public static float3 PlaneToHex(float2 planePos),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE37920,0x10E37920,Placemaker,GridGenerator,PopulateBorderMesh,"public void PopulateBorderMesh(Vert vert, Mesh mesh)",dumped,
 0xE38830,0x10E38830,Placemaker,GridGenerator,SceneProcessIteration,public void SceneProcessIteration(),dumped,
 0xE38BB0,0x10E38BB0,Placemaker,GridGenerator,SetQuadMesh,public void SetQuadMesh(List<BitMeshQuadChange> changes),dumped,
@@ -463,7 +463,7 @@ rva,va,namespace,type,method,signature,status,notes
 0xE391C0,0x10E391C0,Placemaker,GridGenerator,UnmotivateClusterChildren,private void UnmotivateClusterChildren(HexCluster cluster),dumped,
 0xE39280,0x10E39280,Placemaker,GridGenerator,UnmotivateCluster,"private void UnmotivateCluster(HexCluster cluster, int2 sourcePos)",dumped,
 0xE392C0,0x10E392C0,Placemaker,GridGenerator,UnmotivatePatch,"private void UnmotivatePatch(int2 patchPos, int2 sourcePos)",dumped,
-0xE39320,0x10E39320,Placemaker,GridGenerator,.cctor,private static void .cctor(),dumped,
+0xE39320,0x10E39320,Placemaker,GridGenerator,.cctor,private static void .cctor(),checked,ts_game::placemaker::grid_generator; tests/placemaker_grid.rs
 0xE393C0,0x10E393C0,Placemaker,GridGenerator,.ctor,public void .ctor(),dumped,
 0x1E73E0,0x101E73E0,Placemaker,GridGenerator.<>c,.ctor,public void .ctor(),dumped,
 0x1F1440,0x101F1440,Placemaker,GridGenerator.<>c,<SceneProcessIteration>b__46_0,internal bool <SceneProcessIteration>b__46_0(),dumped,
