@@ -28,8 +28,11 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1 | `ts_game::os::utils` = `Os.Utils`: `ExtraMath` (56 methods), `Intersections`, `Bitwise`, `ByteFloat`/`ByteFloat2`/`ByteFloat3`/`SbyteFloat3`, `NumberStrings`, list/dict pool extensions, `UnityFunctions`, `ScopedProfiler` | unowned | F6, F11 | | Leaf code, good first port; everything else calls it |
-| E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1 | | |
+| E1a | `ts_game::os::utils`: `Bitwise` and the packed floats `ByteFloat`, `ByteFloat2`, `ByteFloat3`, `SbyteFloat3` (byte/sbyte ↔ float conversions, operators, indexers, `normal`, hashes, `int3x3 *`): the module meshes in `ModuleLibrary` are stored in them | unowned | F6, F11a, F11b, F11d | ed-slopper/wren (2026-10-15) | Split of E1 (65 methods) |
+| E1b | `ts_game::os::utils::extra_math`: `ExtraMath` (43 methods: swaps, bilinear inverse, rotations, encapsulation, binary search over transforms, ...) | unowned | E1a | | Split of E1 |
+| E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | | Split of E1 |
+| E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
+| E2 | `ts_game::os::hex` = `Os.Hex`: `HexMath` (21), `HexOnionIterator` (14, the ring-by-ring walk), visualiser gizmos | unowned | E1a, E1b | | |
 | E3 | The irregular grid: `GridGenerator` (45 methods: hex patch → random merge of triangles into quads → subdivision → relaxation), `Placemaker.Quads` (`Quad`, `Vert`), `Placemaker.Quads.GridGeneration` (`HexPatch`, `HexCluster`, `CustomGridPatch`/`Importer`/`Library`, `MotivationCounter`, `GridConstants`), `GridBit` | unowned | E2 | | [est] The heart of the look; seed and RNG order must match (`UnityEngine.Random` vs `System.Random`: find which). Split before claiming |
 | E4 | The graph: `Placemaker.Graphs` (`Graph` 42 methods incl. `AddVoxel` 0xE829E0, `Iterate` 0xE89CF0, `Save` 0xE8F920; `Corner`, `Square`, `Qube`, `Flow`/`FlowData`/`FlowTarget`, `Action`, `ModuleContainer`, `OrientedModuleSides`, `SideCounts`, `ShadowMesh`, `VoxelMesh`), `Voxel`, `VoxelType`, `MaterialType` | unowned | E3 | | [est] Split before claiming |
 | E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4 | | |
@@ -147,3 +150,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F11e done.
 - 2026-10-15 ed-slopper/wren: F11f done (F11 complete); added E11, E12, E13 (gaps of F11f); G1 Needs E12, G3a Needs E13.
 - 2026-10-15 ed-slopper/wren: F7 decided by ed-slopper (proposal accepted); P0 complete.
+- 2026-10-15 ed-slopper/wren: split E1 into E1a–E1d; E2 Needs E1a, E1b.
