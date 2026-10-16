@@ -5427,6 +5427,8 @@ dependencies = [
  "crc32fast",
  "lewton",
  "md-5",
+ "serde",
+ "serde_json",
  "texture2ddecoder",
  "ts_vorbisref",
 ]

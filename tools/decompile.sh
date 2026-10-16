@@ -5,6 +5,7 @@
 #   1. Il2CppDumper  -> work/il2cppdumper  (dump.cs, script.json, il2cpp.h, DummyDll/)
 #   2. Cpp2IL        -> work/cpp2il-cs     (diffable C# with signatures, offsets, attributes)
 #   3. Cpp2IL        -> work/cpp2il-isil   (per-method ISIL: readable instruction-level bodies)
+#   4. Cpp2IL        -> work/cpp2il-dll-attr (DLLs with attributes, for tools/layouts.ps1)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 GAME="${1:-${TOWNSCAPER_DIR:-C:/GOG Games/Townscaper}}"
@@ -33,6 +34,11 @@ fi
 if [ ! -d "$WORK/cpp2il-isil" ]; then
   "$BIN/Cpp2IL.exe" --game-path "$GAME" --exe-name Townscaper \
     --output-as isil --output-to "$WORK/cpp2il-isil"
+fi
+
+if [ ! -d "$WORK/cpp2il-dll-attr" ]; then
+  # DLLs with [SerializeField] etc. restored: input of tools/layouts.ps1 (F8g)
+  "$BIN/Cpp2IL.exe" --game-path "$GAME" --exe-name Townscaper     --use-processor attributeanalyzer,attributeinjector     --output-as dll_empty --output-to "$WORK/cpp2il-dll-attr"
 fi
 
 echo "done: $WORK"

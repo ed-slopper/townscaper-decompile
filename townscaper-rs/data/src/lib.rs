@@ -4,6 +4,7 @@
 
 pub mod audio;
 pub mod install;
+pub mod layout;
 pub mod mesh;
 pub mod objects;
 pub mod scene;
