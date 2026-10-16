@@ -243,7 +243,7 @@ pub fn from_to_rotation(from: Vector3, to: Vector3) -> Matrix3 {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct Matrix4x4 {
     /// Column-major: `m[row + col * 4]` (Unity's field order m00, m10, m20, m30, m01, ...).
     pub m: [f32; 16],

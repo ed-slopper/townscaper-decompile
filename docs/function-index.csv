@@ -931,8 +931,8 @@ rva,va,namespace,type,method,signature,status,notes
 0x3CCFB0,0x103CCFB0,Placemaker,UniversalStopwatch,KeepGoing,public static bool KeepGoing(),dumped,
 0x3CD020,0x103CD020,Placemaker,UniversalStopwatch,StartCounting,public static bool StartCounting(),dumped,
 0x3CD0D0,0x103CD0D0,Placemaker,UniversalStopwatch,.cctor,private static void .cctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,Voxel,.ctor,public void .ctor(),dumped,
-0x3D5A30,0x103D5A30,Placemaker,Voxel,System.IComparable<Placemaker.Voxel>.CompareTo,private int System.IComparable<Placemaker.Voxel>.CompareTo(Voxel other),dumped,
+0x1F53D0,0x101F53D0,Placemaker,Voxel,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x3D5A30,0x103D5A30,Placemaker,Voxel,System.IComparable<Placemaker.Voxel>.CompareTo,private int System.IComparable<Placemaker.Voxel>.CompareTo(Voxel other),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x1F53D0,0x101F53D0,Placemaker,VoxelBobEffect,.ctor,public void .ctor(),dumped,
 0x3D4DE0,0x103D4DE0,Placemaker,VoxelBobEffect,ClickBobEffect,"public void ClickBobEffect(Vector3 position, bool add)",dumped,
 0x3D4E40,0x103D4E40,Placemaker,VoxelBobEffect,SetPressed,public void SetPressed(Vector3 pos),dumped,
@@ -1016,12 +1016,12 @@ rva,va,namespace,type,method,signature,status,notes
 0x32A000,0x1032A000,Placemaker.Audio,ManySoundsManager,OnUpdate,public void OnUpdate(),dumped,
 0x32A730,0x1032A730,Placemaker.Audio,ManySoundsManager,PlaySound,"public void PlaySound(ManySoundsManager.SoundType soundType, Vector3 pos, float pitch = 0, float volume = 1)",dumped,
 0x32AAB0,0x1032AAB0,Placemaker.Audio,ManySoundsManager,.ctor,public void .ctor(),dumped,
-0x7B2A90,0x107B2A90,Placemaker.Graphs,Action,GetReverse,public Action GetReverse(),dumped,
-0x7B2AD0,0x107B2AD0,Placemaker.Graphs,Action,ToString,public override string ToString(),dumped,
-0x7B2D20,0x107B2D20,Placemaker.Graphs,Action,.ctor,"public void .ctor(int2 hexPos, byte height, VoxelType inType, VoxelType outType, int actionId)",dumped,
-0x443F70,0x10443F70,Placemaker.Graphs,Corner,AddSquare,public void AddSquare(Square quad0),dumped,
-0x444240,0x10444240,Placemaker.Graphs,Corner,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x444840,0x10444840,Placemaker.Graphs,Corner,.ctor,public void .ctor(),dumped,
+0x7B2A90,0x107B2A90,Placemaker.Graphs,Action,GetReverse,public Action GetReverse(),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x7B2AD0,0x107B2AD0,Placemaker.Graphs,Action,ToString,public override string ToString(),read,debug text; waits on E13 (string.Format)
+0x7B2D20,0x107B2D20,Placemaker.Graphs,Action,.ctor,"public void .ctor(int2 hexPos, byte height, VoxelType inType, VoxelType outType, int actionId)",checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x443F70,0x10443F70,Placemaker.Graphs,Corner,AddSquare,public void AddSquare(Square quad0),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x444240,0x10444240,Placemaker.Graphs,Corner,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
+0x444840,0x10444840,Placemaker.Graphs,Corner,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0x1F53D0,0x101F53D0,Placemaker.Graphs,Flow,.ctor,public void .ctor(),dumped,
 0x6CF970,0x106CF970,Placemaker.Graphs,Flow,AddFlowTarget,public void AddFlowTarget(float3 worldPos),dumped,
 0x6D0500,0x106D0500,Placemaker.Graphs,Flow,FlowTwoFlows,"private void FlowTwoFlows(ref Flow.FlowCalcData flow0, ref Flow.FlowCalcData flow1, float spaceDist)",dumped,
@@ -1030,7 +1030,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x6D2AA0,0x106D2AA0,Placemaker.Graphs,Flow,SetupFlowData,private void SetupFlowData(ref Flow.FlowCalcData flow0),dumped,
 0x6D2BA0,0x106D2BA0,Placemaker.Graphs,Flow,Update,private void Update(),dumped,
 0x6CF900,0x106CF900,Placemaker.Graphs,FlowData,.cctor,private static void .cctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Graphs,FlowTarget,.ctor,public void .ctor(),dumped,
+0x1F53D0,0x101F53D0,Placemaker.Graphs,FlowTarget,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0xE829E0,0x10E829E0,Placemaker.Graphs,Graph,AddVoxel,"public Voxel AddVoxel(int2 hexPos, byte height, VoxelType voxelType, bool instantIntegration)",dumped,
 0xE83110,0x10E83110,Placemaker.Graphs,Graph,ApplyAction,"public void ApplyAction(Action action, bool playEffect)",dumped,
 0xE83440,0x10E83440,Placemaker.Graphs,Graph,BeginLoad,public void BeginLoad(SaveData saveData),dumped,
@@ -1077,33 +1077,33 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker.Graphs,Graph.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(),dumped,
 0x1E73E0,0x101E73E0,Placemaker.Graphs,Graph.<>c,.ctor,public void .ctor(),dumped,
 0x1F2EA0,0x101F2EA0,Placemaker.Graphs,Graph.<>c,.cctor,private static void .cctor(),dumped,
-0x330990,0x10330990,Placemaker.Graphs,ModuleContainer,.ctor,public void .ctor(),dumped,
-0x6FC550,0x106FC550,Placemaker.Graphs,OrientedModuleSides,System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo,private int System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo(OrientedModuleSides other),dumped,
-0x1D4430,0x101D4430,Placemaker.Graphs,Qube,OnDrawGizmos,private void OnDrawGizmos(),dumped,
+0x330990,0x10330990,Placemaker.Graphs,ModuleContainer,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x6FC550,0x106FC550,Placemaker.Graphs,OrientedModuleSides,System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo,private int System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo(OrientedModuleSides other),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x1D4430,0x101D4430,Placemaker.Graphs,Qube,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
 0x841200,0x10841200,Placemaker.Graphs,Qube,GetNormal,public Vector3 GetNormal(),dumped,
-0x841250,0x10841250,Placemaker.Graphs,Qube,OnDrawGizmosSelected,private void OnDrawGizmosSelected(),dumped,
+0x841250,0x10841250,Placemaker.Graphs,Qube,OnDrawGizmosSelected,private void OnDrawGizmosSelected(),read,editor gizmos; not ported
 0x842670,0x10842670,Placemaker.Graphs,Qube,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 ts)",dumped,
 0x8434A0,0x108434A0,Placemaker.Graphs,Qube,Test,private void Test(),dumped,
-0x843780,0x10843780,Placemaker.Graphs,Qube,.ctor,public void .ctor(),dumped,
-0x843810,0x10843810,Placemaker.Graphs,Qube,get_empty,public bool get_empty(),dumped,
-0x843820,0x10843820,Placemaker.Graphs,Qube,get_fullyCovered,public bool get_fullyCovered(),dumped,
-0x4FCBD0,0x104FCBD0,Placemaker.Graphs,Qube.Relation,GetHashCode,public override int GetHashCode(),dumped,
-0x4FCD60,0x104FCD60,Placemaker.Graphs,Qube.Relation,.cctor,private static void .cctor(),dumped,
-0x4FCDB0,0x104FCDB0,Placemaker.Graphs,Qube.Relation,.ctor,"public void .ctor(Qube qube, sbyte indexInOther)",dumped,
-0x4FCA60,0x104FCA60,Placemaker.Graphs,Qube.Relation6,get_Item,public Qube.Relation get_Item(int key),dumped,
-0x4FCB00,0x104FCB00,Placemaker.Graphs,Qube.Relation6,set_Item,"public void set_Item(int key, Qube.Relation value)",dumped,
-0x9760D0,0x109760D0,Placemaker.Graphs,ShadowMesh,.ctor,public void .ctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Graphs,Square,.ctor,public void .ctor(),dumped,
-0x316B50,0x10316B50,Placemaker.Graphs,Square,GetCorner,public Corner GetCorner(sbyte index),dumped,
-0x316BD0,0x10316BD0,Placemaker.Graphs,Square,GetRelation,public Square.Relation GetRelation(sbyte index),dumped,
-0x316C60,0x10316C60,Placemaker.Graphs,Square,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x3170F0,0x103170F0,Placemaker.Graphs,Square,SetCorner,"public void SetCorner(sbyte index, Corner value)",dumped,
-0x317180,0x10317180,Placemaker.Graphs,Square,SetRelation,"public void SetRelation(sbyte index, sbyte indexInOther, Square value)",dumped,
-0x3172A0,0x103172A0,Placemaker.Graphs,Square,get_bitQuadId,public int3 get_bitQuadId(),dumped,
-0x4FCC70,0x104FCC70,Placemaker.Graphs,Square.Relation,GetHashCode,public override int GetHashCode(),dumped,
-0x4FCD10,0x104FCD10,Placemaker.Graphs,Square.Relation,.cctor,private static void .cctor(),dumped,
-0x4FCDB0,0x104FCDB0,Placemaker.Graphs,Square.Relation,.ctor,"public void .ctor(Square qube, sbyte indexInOther)",dumped,
-0x1E73E0,0x101E73E0,Placemaker.Graphs,VoxelMesh,.ctor,public void .ctor(),dumped,
+0x843780,0x10843780,Placemaker.Graphs,Qube,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x843810,0x10843810,Placemaker.Graphs,Qube,get_empty,public bool get_empty(),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x843820,0x10843820,Placemaker.Graphs,Qube,get_fullyCovered,public bool get_fullyCovered(),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCBD0,0x104FCBD0,Placemaker.Graphs,Qube.Relation,GetHashCode,public override int GetHashCode(),read,"the identity hash of the object (RuntimeHelpers); ids hash instead, only lookups depend on it"
+0x4FCD60,0x104FCD60,Placemaker.Graphs,Qube.Relation,.cctor,private static void .cctor(),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCDB0,0x104FCDB0,Placemaker.Graphs,Qube.Relation,.ctor,"public void .ctor(Qube qube, sbyte indexInOther)",ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCA60,0x104FCA60,Placemaker.Graphs,Qube.Relation6,get_Item,public Qube.Relation get_Item(int key),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCB00,0x104FCB00,Placemaker.Graphs,Qube.Relation6,set_Item,"public void set_Item(int key, Qube.Relation value)",ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x9760D0,0x109760D0,Placemaker.Graphs,ShadowMesh,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x1F53D0,0x101F53D0,Placemaker.Graphs,Square,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x316B50,0x10316B50,Placemaker.Graphs,Square,GetCorner,public Corner GetCorner(sbyte index),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x316BD0,0x10316BD0,Placemaker.Graphs,Square,GetRelation,public Square.Relation GetRelation(sbyte index),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x316C60,0x10316C60,Placemaker.Graphs,Square,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
+0x3170F0,0x103170F0,Placemaker.Graphs,Square,SetCorner,"public void SetCorner(sbyte index, Corner value)",ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x317180,0x10317180,Placemaker.Graphs,Square,SetRelation,"public void SetRelation(sbyte index, sbyte indexInOther, Square value)",checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x3172A0,0x103172A0,Placemaker.Graphs,Square,get_bitQuadId,public int3 get_bitQuadId(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCC70,0x104FCC70,Placemaker.Graphs,Square.Relation,GetHashCode,public override int GetHashCode(),read,"the identity hash of the object (RuntimeHelpers); ids hash instead, only lookups depend on it"
+0x4FCD10,0x104FCD10,Placemaker.Graphs,Square.Relation,.cctor,private static void .cctor(),checked,placemaker::graphs; tests/placemaker_graphs.rs
+0x4FCDB0,0x104FCDB0,Placemaker.Graphs,Square.Relation,.ctor,"public void .ctor(Square qube, sbyte indexInOther)",ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x1E73E0,0x101E73E0,Placemaker.Graphs,VoxelMesh,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0x7C1740,0x107C1740,Placemaker.Life,Bird,OnDrawGizmos,private void OnDrawGizmos(),dumped,
 0x7C1AA0,0x107C1AA0,Placemaker.Life,Bird,System.IComparable<Placemaker.Life.Bird>.CompareTo,private int System.IComparable<Placemaker.Life.Bird>.CompareTo(Bird other),dumped,
 0x7C1AD0,0x107C1AD0,Placemaker.Life,Bird,System.IComparable<UnityEngine.Vector3>.CompareTo,private int System.IComparable<UnityEngine.Vector3>.CompareTo(Vector3 other),dumped,

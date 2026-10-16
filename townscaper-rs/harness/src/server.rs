@@ -86,9 +86,10 @@ impl Ctx {
         Err(format!("class {full} not found"))
     }
 
-    /// A class by `Namespace.Name`, or by a `Type.GetType` name for generic instantiations (contains `` ` ``).
+    /// A class by `Namespace.Name`, or by a `Type.GetType` name (generic instantiations, nested `A+B` types,
+    /// assembly-qualified names).
     unsafe fn resolve_class(&self, name: &str) -> Result<Ptr, String> {
-        if !name.contains('`') {
+        if !name.contains(['`', '+', ',']) {
             return self.find_class(name);
         }
         let ty = self.find_class("System.Type")?;

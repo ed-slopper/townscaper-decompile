@@ -4,3 +4,4 @@
 
 pub mod grid_generator;
 pub mod quads;
+pub mod graphs;
