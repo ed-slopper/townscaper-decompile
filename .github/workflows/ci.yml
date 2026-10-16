@@ -1,0 +1,23 @@
+# Row F10. Guard on every push; the Bevy-free crates' tests (tests needing the player's game skip here:
+# CI has no game files, by design). The Bevy app and the 32-bit harness are not built in CI.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No game files, no decompiler output; index and address refs
+        run: python3 -I tools/guard.py
+
+  crates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test ts_game, ts_data, ts_check, ts_vorbisref
+        working-directory: townscaper-rs
+        run: cargo test -p ts_game -p ts_data -p ts_check -p ts_vorbisref
