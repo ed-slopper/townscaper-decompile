@@ -5444,6 +5444,7 @@ dependencies = [
 name = "ts_game"
 version = "0.1.0"
 dependencies = [
+ "serde_json",
  "ts_check",
 ]
 
