@@ -32,3 +32,19 @@ Run times on the reference PC (16 threads, 32 GB): Il2CppDumper ~10 s, each Cpp2
   our Java replacement for the naming part.
 - Don't import `GameAssembly.dll` into another project's Ghidra (one may be open in the GUI with the MCP
   server): `tools/ghidra_import.sh` makes its own project in `work/ghidra/`.
+
+## Ghidra (F3, proven 2026-10-15)
+
+- `tools/ghidra_import.sh`: import + auto-analysis with the PDB took **1,761 s** (29 min) headless with 12 GB
+  heap. The PDB applicator resolves ~290,000 types; a few hundred "failed to align" warnings on CRT structs
+  are harmless.
+- Every il2cpp function has its PDB name: `<Type>_<Method>_m<hash>` (`WaveFunctionCollapse_IterateDecor_mDE24…`).
+  `ApplyIl2CppNames.java` adds a plate comment with the C# name(s) and il2cpp signature to 57,582 functions,
+  labels 25,445 metadata globals (`Method$…`, `Field$…`, `TypeInfo` slots) and 11,492 string literals
+  (`StringLiteral_…`, value as EOL comment). No function was left `FUN_*`, so it renamed none.
+- The PDB's structs carry the fields: bodies read `__this->___decorUpdates_12`, `list->____size_2`
+  (il2cpp's mangling: `___<name>_<index>`). No need to import `il2cpp.h`.
+- `tools/ghidra_decompile.sh 0x3D88D0 [...]` prints bodies headless in ~25 s per run (project must not be
+  open in the GUI). To use the Ghidra MCP instead, open `work/ghidra/townscaper.gpr` in the GUI and start the
+  MCP server there; check the active program is `GameAssembly.dll`.
+- Middleware types can have obfuscated names (`EONGqEcSkgpSiKfAgKEiugWqjmzy`: Rewired); game types don't.

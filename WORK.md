@@ -13,16 +13,14 @@ Columns:
 
 Where things stand (2026-10-15): the build is identified and the decompile pipeline runs from the player's own
 install (`tools/decompile.sh`: Il2CppDumper + Cpp2IL into `work/`). The game's own code is indexed: 448 types,
-2,269 methods with bodies in `docs/function-index.csv`, all `dumped`, none read, ported or checked. The Ghidra
-project with the shipped PDB is being built (F3). There is no Unity project yet (F6) and no checking harness (F9).
+2,269 methods with bodies in `docs/function-index.csv`, all `dumped`, none read, ported or checked. Ghidra has the
+whole build with PDB names, C# names and field names (F3). There is no Unity project yet (F6) and no checking harness (F9).
 
 ## P0 Foundations
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| F3 | Ghidra project of `GameAssembly.dll` with the shipped `GameAssembly.pdb` and Il2CppDumper's `script.json` applied (`tools/ghidra_import.sh`, `ghidra/scripts/ApplyIl2CppNames.java`); check that a game method decompiles with its name (WFC `IterateDecor` 0x3D88D0), write the timings and snags in `docs/notes/toolchain.md` | any | F1 | ed-slopper/wren (2026-10-15) | Headless, separate project in `work/ghidra/` (never import into another project) |
-| F4 | il2cpp's C structs in Ghidra: `work/il2cppdumper/il2cpp.h` through Il2CppDumper's `il2cpp_header_to_ghidra.py` (or a Java port: Ghidra 12 has no Jython) so `__this->fields.master` reads as fields, not offsets; at least the `Placemaker*` and `Os*` types | any | F3 | | [est] The PDB already has the C++ types; check whether they carry the fields first, this may be half done |
-| F5 | `ghidra/scripts/ExportDecomp.java`: write every game method's pseudo-C to `work/decomp/<Namespace>/<Type>/<Method>_<rva>.c` (only `owner = game` rows of `function-index.csv`), so agents without the Ghidra MCP can read bodies | any | F3 | | Output stays in `work/` |
+| F5 | `ghidra/scripts/ExportDecomp.java` (start from `DecompileRva.java`): write every game method's pseudo-C to `work/decomp/<Namespace>/<Type>/<Method>_<rva>.c` (only `owner = game` rows of `function-index.csv`), so agents without the Ghidra MCP can read bodies | any | F3 | | Output stays in `work/` |
 | F6 | `unity/`: an empty Unity 2020.3.18f1 project with the packages the game ships (Unity.Mathematics, TextMeshPro, uGUI; versions from `ScriptingAssemblies.json` and the DLLs' assembly versions), `Assets/Scripts/Placemaker`, `Assets/Scripts/Os`, assembly layout as the original (`Assembly-CSharp-firstpass` for `Plugins/`), and it opens and compiles | any | | | Needs Unity 2020.3.18f1 on the PC (Hub) |
 | F7 | Decide what to do with the paid / closed middleware the game calls: Rewired (input, 170 types), I2 Localization (115), Crosstales FileBrowser (64), Thread Ninja, StandaloneFileBrowser, FuryStudios SDK: buy and install them locally (gitignored), write `STANDIN` facades with the same API, or replace with Unity's own | humans | | | Blocks the Ui and input rows; facades are the cheapest path [est] |
 | F8 | Assets from the player's own install into `unity/Assets/Game/` (gitignored): AssetRipper (pinned, fetched like the other tools) over `Townscaper_Data`, with scenes `level0..2`, prefabs, ScriptableObjects (module library, palettes, custom grids), meshes, textures, audio; script references re-pointed at our `Placemaker.*` types by GUID / name | any | F6 | | [est] Shaders come out as compiled DXBC: C3 |
@@ -97,9 +95,12 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Who | Date | Commit |
 |---|---|---|---|---|---|
-| F1 | Identify the reference build (GOG, Unity 2020.3.18f1, IL2CPP x86, metadata v27, PDB shipped; `tools/identify.py`) and the decompile pipeline from the player's own install: pinned Il2CppDumper v6.7.46 + Cpp2IL 2022.1.0-pre-release.21 (`tools/fetch_tools.sh`), `tools/decompile.sh` → `work/` (dump.cs, script.json, il2cpp.h, DummyDll, diffable C#, ISIL) | P0 | ed-slopper/wren | 2026-10-15 | see git log |
-| F2 | Index the game's own code: `tools/index.py` → `docs/type-index.csv` (every type of `Assembly-CSharp` and `-firstpass`, owner game/middleware) and `docs/function-index.csv` (2,269 game methods with RVA, VA, signature, status) | P0 | ed-slopper/wren | 2026-10-15 | see git log |
+| F1 | Identify the reference build (GOG, Unity 2020.3.18f1, IL2CPP x86, metadata v27, PDB shipped; `tools/identify.py`) and the decompile pipeline from the player's own install: pinned Il2CppDumper v6.7.46 + Cpp2IL 2022.1.0-pre-release.21 (`tools/fetch_tools.sh`), `tools/decompile.sh` → `work/` (dump.cs, script.json, il2cpp.h, DummyDll, diffable C#, ISIL) | P0 | ed-slopper/wren | 2026-10-15 | 3bbb81c |
+| F2 | Index the game's own code: `tools/index.py` → `docs/type-index.csv` (every type of `Assembly-CSharp` and `-firstpass`, owner game/middleware) and `docs/function-index.csv` (2,269 game methods with RVA, VA, signature, status) | P0 | ed-slopper/wren | 2026-10-15 | 3bbb81c |
+| F3 | Ghidra project of `GameAssembly.dll` with the shipped PDB (`tools/ghidra_import.sh`, own project in `work/ghidra/`): auto-analysis 1,761 s; `ApplyIl2CppNames.java` put the C# name and il2cpp signature on 57,582 functions (none left `FUN_`), 25,445 metadata labels, 11,492 string literals; `tools/ghidra_decompile.sh <rva>` prints a body (WFC `IterateDecor` 0x3D88D0: 750 lines, fields by name). Notes in `docs/notes/toolchain.md` | P0 | ed-slopper/wren | 2026-10-15 | F3COMMIT |
+| F4 | il2cpp's C structs in Ghidra: **nothing to do**, the PDB carries them with their fields (`__this->___decorUpdates_12`, `list->____size_2`), checked on 0x3D88D0. Il2CppDumper's `il2cpp.h` is only needed for builds without the PDB | P0 | ed-slopper/wren | 2026-10-15 | F3COMMIT |
 
 ## Changes to the board
 
 - 2026-10-15 ed-slopper/wren: board created (F1–F10, E1–E10, G1–G8, C1–C4, X1–X4, L1–L3).
+- 2026-10-15 ed-slopper/wren: F3 done; F4 closed as not needed (the PDB has the structs).
