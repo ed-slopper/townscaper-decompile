@@ -121,3 +121,12 @@ Rule: **port** what decides a result the game computes and reads back (positions
 | `File`, `Directory`, `Path`, `Application.persistentDataPath`, `XmlSerializer`, `DateTime`, `PlayerPrefs` | 13+14+12+11+11+15 | Saving (G3): same folders, file names and bytes; `DateTime` for save card dates as .NET formats them |
 | `Debug`, `Gizmos`, `Stopwatch`, `Profiler` | 95+57+11 | Debug only: dropped (no STANDIN needed) |
 | `Delegate`, `Action`, exceptions, `ListPool` | — | Language / the game's own code (`Os.Utils`, E1) |
+
+## Middleware (F7, decided by ed-slopper 2026-10-15)
+
+| Middleware | Replacement |
+|---|---|
+| Rewired (input) | Bevy input (keyboard, mouse, gamepads via gilrs) under a port of the game's own `ActionInputManager` / `ControlBinding` / `KeyboardAndMouseControlRemap` layer (G7d) |
+| I2 Localization | A port of the parts the game uses (`Localize`, `LocalizationManager` lookups, `LocalizationParamsManager`), reading the player's `LanguageSourceAsset` / `LanguageSourceData` through `ts_data` (C4) |
+| Crosstales FileBrowser, StandaloneFileBrowser | The `rfd` crate (native file dialogs) |
+| Fury SDK (platform, achievements, store) | No-op STANDINs |
