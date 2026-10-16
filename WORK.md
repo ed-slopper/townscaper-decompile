@@ -22,7 +22,6 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F8c | `Mesh` (vertex channels and streams, index buffer, sub-meshes, bounds) | unowned | F8b | ed-slopper/wren (2026-10-15) | Split of F8 |
 | F8d | `Texture2D` (format, mips, image data in `.resS`), decoded for the formats the game uses | unowned | F8b | | Split of F8 |
 | F8e | `AudioClip` (FSB5 in `.resource`) → samples (Vorbis) | unowned | F8b | | Split of F8 |
 | F8f | Scenes: `level0..2` as a GameObject tree with components; a dump tool printing it (names only) | unowned | F8b | | Split of F8 |
@@ -108,6 +107,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F6 | `townscaper-rs/` Cargo workspace: app `townscaper` on Bevy 0.20 (window titled with the build check, STANDIN sky colour and fixed camera), `ts_game` (module skeleton `os::{utils, hex}`, `placemaker`, `unity`) and `ts_data` without Bevy; `ts_data::install` finds and identifies the install (Unity version, metadata v27, both md5s), `ts_data::serialized::Header` reads the SerializedFile header (formats 9–22). Tests: header unit tests + every `.assets`/`level*`/`globalgamemanagers` of the reference install parses with its exact file size. First app build 12 min (MSVC); the window opens (RTX 3060, no errors) | P0 | ed-slopper/wren | 2026-10-15 | d09981a |
 | F8a | `ts_data::serialized::SerializedFile`: the whole metadata of a format-22 SerializedFile without type trees (types, object table, script refs, externals, ref types, user info); all nine files of the reference install read to exactly their metadata end, 8,478 objects, none overlapping; layout in `docs/notes/files.md` | P0 | ed-slopper/wren | 2026-10-15 | ba03e8b |
 | F8b | `ts_data::objects`: `GameObject`, `Transform`/`RectTransform`, `MonoBehaviour` header, `MonoScript` with Unity 2020.3 layouts, and `AssetSet` (all nine files, `PPtr` resolution across externals, script of a MonoBehaviour). Proven on the install: 1,468 + 381 + 1,087 + 1,109 + 2,612 objects read to their exact size, Transform/GameObject/children/father references agree, every MonoBehaviour's script resolves (one null-script asset noted in `files.md`) | P0 | ed-slopper/wren | 2026-10-15 | 3893498 |
+| F8c | `ts_data::mesh::Mesh`: Unity 2020.3 Mesh layout, index decode (u16/u32), vertex stream layout and channel decode (all `VertexFormat`s, half floats), streamed data via `.resS`. Proven on all 114 meshes of the install: exact size, indices < vertex count, sub-meshes inside the index buffer, every position inside the mesh's bounds; notes in `files.md` (the modules are not Unity meshes: see C2) | P0 | ed-slopper/wren | 2026-10-15 | F8cCOMMIT |
 
 ## Changes to the board
 
@@ -119,3 +119,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: split F8 into F8a–F8g (no type trees in the build: we supply the layouts).
 - 2026-10-15 ed-slopper/wren: F8a done.
 - 2026-10-15 ed-slopper/wren: F8b done.
+- 2026-10-15 ed-slopper/wren: F8c done.

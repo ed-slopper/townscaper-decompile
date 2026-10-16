@@ -3,5 +3,6 @@
 //! Nothing read here is ever written into the repo: the files are the player's.
 
 pub mod install;
+pub mod mesh;
 pub mod objects;
 pub mod serialized;

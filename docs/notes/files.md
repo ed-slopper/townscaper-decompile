@@ -55,3 +55,16 @@ object of the class in the install; Transform ↔ GameObject ↔ children ↔ fa
 - `PPtr` with file id n > 0 points into `externals[n - 1]`; the external's path is matched by file name.
 - Every MonoBehaviour's script resolves to a MonoScript except one with a null script:
   `globalgamemanagers.assets` path id 1115 `InputSystem.inputsettings` (its package is not in the build).
+
+## Mesh (F8c, proven 2026-10-15)
+
+`ts_data::mesh::Mesh`, Unity 2020.3 layout (field order in the doc comments of `Mesh::read`): name, sub-meshes
+(48 bytes each), blend shapes, bind poses, bone data, compression u8, readable / keep vertices / keep indices,
+index format, index buffer, vertex data (count, `ChannelInfo[]` of 4 bytes, bytes), compressed mesh (11
+packed bit vectors + UV info), local AABB, usage flags, two baked collision meshes, mesh metrics ×2,
+`StreamingInfo` (offset **u64**, size u32, path).
+
+Vertex streams follow each other, each start aligned to 16; a stream's stride is the sum of its channels'
+sizes. In the build: **114 meshes, 6,974 vertices**, none compressed, none streamed to `.resS`, all channels
+Float32 (2, 3 or 4 components). Inferred: so few vertices means the building modules are not Unity `Mesh`
+objects; they are likely in the `ModuleLibrary` asset's own fields (F8g, C2).
