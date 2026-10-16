@@ -6,3 +6,4 @@ pub mod install;
 pub mod mesh;
 pub mod objects;
 pub mod serialized;
+pub mod texture;

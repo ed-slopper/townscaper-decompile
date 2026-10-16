@@ -68,3 +68,16 @@ Vertex streams follow each other, each start aligned to 16; a stream's stride is
 sizes. In the build: **114 meshes, 6,974 vertices**, none compressed, none streamed to `.resS`, all channels
 Float32 (2, 3 or 4 components). Inferred: so few vertices means the building modules are not Unity `Mesh`
 objects; they are likely in the `ModuleLibrary` asset's own fields (F8g, C2).
+
+## Texture2D (F8d, proven 2026-10-15)
+
+`ts_data::texture::Texture2D`, Unity 2020.3 layout: name, forced fallback format, downscale fallback, alpha
+optional (align), width, height, complete image size, mips stripped, format, mip count, readable,
+pre-processed, ignore master limit, streaming mipmaps (align), streaming priority, image count, dimension,
+texture settings (filter, aniso, mip bias, wrap U/V/W), lightmap format, colour space, platform blob,
+image data, `StreamingInfo`. Rows are stored bottom-up.
+
+In the build: **36 textures**, formats Alpha8 ×12, RGB24 ×7, RGBA32 ×8, DXT1 ×3, DXT5 ×4, BC7 ×2; all decode
+to RGBA8 (BC7 through `texture2ddecoder`), one is empty (no data). Checked by eye on the BC7 sky clouds and the
+DXT5 logo sheet (`cargo run -p ts_data --example dump_textures -- ../work/textures`: output stays in `work/`).
+Inferred: so few textures means the town's look is mostly shaders and vertex colours, not textures (C3).
