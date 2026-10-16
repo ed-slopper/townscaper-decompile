@@ -5424,13 +5424,23 @@ dependencies = [
 name = "ts_data"
 version = "0.1.0"
 dependencies = [
+ "crc32fast",
+ "lewton",
  "md-5",
  "texture2ddecoder",
+ "ts_vorbisref",
 ]
 
 [[package]]
 name = "ts_game"
 version = "0.1.0"
+
+[[package]]
+name = "ts_vorbisref"
+version = "0.1.0"
+dependencies = [
+ "cc",
+]
 
 [[package]]
 name = "ttf-parser"

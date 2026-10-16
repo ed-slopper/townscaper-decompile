@@ -6,7 +6,8 @@ Townscaper rewritten 1:1 in Rust on Bevy. Rules: [`../AGENTS.md`](../AGENTS.md);
 |---|---|---|
 | `townscaper` | `.` | The app (Bevy): window, input, drawing, audio, the frame loop |
 | `ts_game` | `game/` | The game's code ported from `GameAssembly.dll` (`os`, `placemaker`) + Unity semantics (`unity`); no Bevy |
-| `ts_data` | `data/` | Readers of the player's own files (install check, Unity `SerializedFile`); no Bevy |
+| `ts_data` | `data/` | Readers of the player's own files: install check, SerializedFile, GameObject/Transform/MonoBehaviour/MonoScript, Mesh, Texture2D, AudioClip + FSB5 Vorbis; no Bevy |
+| `ts_vorbisref` | `vorbisref/` | Unpatched libvorbis 1.3.4 (vendored, BSD) to rebuild FMOD's stripped Vorbis headers |
 
 ```bash
 cargo +stable-x86_64-pc-windows-msvc run --release        # the app

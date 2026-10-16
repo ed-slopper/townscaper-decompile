@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "game", "data"]
+members = [".", "game", "data", "vorbisref"]
 resolver = "2"
 
 [package]

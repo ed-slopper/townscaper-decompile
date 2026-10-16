@@ -5,5 +5,8 @@ edition = "2021"
 description = "Readers of the player's own Townscaper files; no Bevy"
 
 [dependencies]
+ts_vorbisref = { path = "../vorbisref" }
 md-5 = "0.10"
 texture2ddecoder = "0.1.2"
+lewton = "0.10.2"
+crc32fast = "1.5.2"

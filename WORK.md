@@ -22,7 +22,6 @@ checks the player's install is the reference build and reads Unity file headers 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | F7 | What replaces the middleware the game calls: Rewired (input) → Bevy input + our port of `ActionInputManager`/`ControlBinding`; I2 Localization → port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser (file dialogs) → `rfd` or ours; Fury SDK (platform, achievements) → no-op STANDINs. Confirm or change | humans | | | Proposal; blocks G7d, G8, C4 |
-| F8e | `AudioClip` (FSB5 in `.resource`) → samples (Vorbis) | unowned | F8b | ed-slopper/wren (2026-10-15) | Split of F8 |
 | F8f | Scenes: `level0..2` as a GameObject tree with components; a dump tool printing it (names only) | unowned | F8b | | Split of F8 |
 | F8g | The game's MonoBehaviour/ScriptableObject bodies: their serialized field layouts generated from `dump.cs` by Unity's serialization rules (public or `[SerializeField]`, not static/const/readonly, serializable types, 4-byte alignment after byte/bool/arrays), then read by name | unowned | F8b | | Split of F8 |
 | F9 | Checking harness: run code inside the original game and compare with ours. MelonLoader or BepInEx 6 (IL2CPP) on the player's copy, a plugin that calls a game method with given inputs and writes the result as JSON, and Rust tests in `townscaper-rs/game/tests/` that feed the same inputs to our port; exact compare | any | F6 | | [est] Split: F9a (loader + hello world in the original), F9b (call a method by name, dump the result), F9c (Rust compare runner) |
@@ -108,6 +107,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F8b | `ts_data::objects`: `GameObject`, `Transform`/`RectTransform`, `MonoBehaviour` header, `MonoScript` with Unity 2020.3 layouts, and `AssetSet` (all nine files, `PPtr` resolution across externals, script of a MonoBehaviour). Proven on the install: 1,468 + 381 + 1,087 + 1,109 + 2,612 objects read to their exact size, Transform/GameObject/children/father references agree, every MonoBehaviour's script resolves (one null-script asset noted in `files.md`) | P0 | ed-slopper/wren | 2026-10-15 | 3893498 |
 | F8c | `ts_data::mesh::Mesh`: Unity 2020.3 Mesh layout, index decode (u16/u32), vertex stream layout and channel decode (all `VertexFormat`s, half floats), streamed data via `.resS`. Proven on all 114 meshes of the install: exact size, indices < vertex count, sub-meshes inside the index buffer, every position inside the mesh's bounds; notes in `files.md` (the modules are not Unity meshes: see C2) | P0 | ed-slopper/wren | 2026-10-15 | 18ecc85 |
 | F8d | `ts_data::texture::Texture2D`: Unity 2020.3 layout, streamed data, mip 0 to RGBA8 for every format the build uses (Alpha8, RGB24, RGBA32, ARGB32, BGRA32, DXT1, DXT5, BC7 via `texture2ddecoder`). Proven on all 36 textures: exact size, data size = complete image size; BC7 and DXT5 checked by eye (`--example dump_textures`, output in `work/`) | P0 | ed-slopper/wren | 2026-10-15 | 39f16ef |
+| F8e | `ts_data::audio` (`AudioClip` layout, FSB5 bank parser, Vorbis packets) + `ts_data::vorbis` (headers FMOD strips rebuilt by CRC match with unpatched libvorbis 1.3.4 in the new crate `ts_vorbisref`, vendored from the Xiph releases; decode with `lewton`). All 90 clips decode to exactly their sample count; the five setup headers and their qualities are in `files.md`; `birdsappear` is silent in the build (-97.6 dBFS) | P0 | ed-slopper/wren | 2026-10-15 | F8eCOMMIT |
 
 ## Changes to the board
 
@@ -121,3 +121,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F8b done.
 - 2026-10-15 ed-slopper/wren: F8c done.
 - 2026-10-15 ed-slopper/wren: F8d done.
+- 2026-10-15 ed-slopper/wren: F8e done; new crate `ts_vorbisref` (vendored BSD libvorbis 1.3.4 + libogg 1.3.5) added to the workspace.

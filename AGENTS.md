@@ -172,6 +172,7 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   | `townscaper` | `townscaper-rs/` | The app: window, input, drawing, audio, the frame loop | yes |
   | `ts_game` | `townscaper-rs/game` | The ported game code (`os::*`, `placemaker::*`) and the Unity semantics it needs (`unity::*`) | **no** |
   | `ts_data` | `townscaper-rs/data` | Readers of the player's own files (`Townscaper_Data/*.assets`, `.resS`, `.resource`, saves) | **no** |
+  | `ts_vorbisref` | `townscaper-rs/vorbisref` | Unpatched Xiph libvorbis 1.3.4 (vendored, BSD), only to rebuild the Vorbis headers FMOD strips (F8e) | **no** |
 
   `ts_game` and `ts_data` never depend on Bevy, so every ported function can be called and tested on its own.
 - Build on Windows with the **MSVC** toolchain (the GNU one needs `dlltool`):

@@ -81,3 +81,25 @@ In the build: **36 textures**, formats Alpha8 ×12, RGB24 ×7, RGBA32 ×8, DXT1 
 to RGBA8 (BC7 through `texture2ddecoder`), one is empty (no data). Checked by eye on the BC7 sky clouds and the
 DXT5 logo sheet (`cargo run -p ts_data --example dump_textures -- ../work/textures`: output stays in `work/`).
 Inferred: so few textures means the town's look is mostly shaders and vertex colours, not textures (C3).
+
+## AudioClip and FSB5 (F8e, proven 2026-10-15)
+
+`ts_data::audio::AudioClip`, Unity 2020.3 layout: name, load type, channels, frequency, bits per sample,
+length (f32 s), tracker format, ambisonic (align), subsound index, preload, load in background, legacy 3D
+(align), resource (source path, offset **u64**, size **u64**), compression format.
+
+The sound is an **FMOD FSB5** bank (version 1, 60-byte header) in `sharedassets0..2.resource`, one sound per
+bank. Sample header: u64 bit field (extra chunks 1 bit, frequency index 4, stereo 1, data offset 28 ×32,
+sample count 30), then extra chunks (u32: more 1 bit, size 24, type 7; type 11 = Vorbis: setup CRC32 + seek
+table). Vorbis data = packets each prefixed by a u16 length.
+
+- **90 clips**, all Vorbis (FSB5 mode 15), mono or stereo, 44,100 or 48,000 Hz, 17,174 packets; bank and
+  clip agree on channels, rate and length for all 90.
+- FMOD strips the Vorbis identification and setup headers. `ts_vorbisref` (unpatched Xiph libvorbis 1.3.4,
+  vendored) rebuilds them: the setup header written at the right VBR quality has the stored CRC. The build
+  uses **five** setup headers: mono q 0.51 (`d6e0bbd4`), stereo q 0.36 (`b6b3868b`), 0.6 (`be82e3b1`),
+  0.7 (`a4f666fc`), 0.9 (`6d39bf3e`). The aoTuV-patched encoder (`vorbis_rs`) reproduces four but not
+  stereo q 0.36 (used only by the music `soft-piano-vibes`), so it must be plain libvorbis.
+- `ts_data::vorbis::decode` (lewton) gives exactly the bank's sample count for all 90 clips.
+- `birdsappear` (0.36 s, stereo 48 kHz, full-size packets) decodes to -97.6 dBFS RMS, the level of 16-bit
+  dither: the clip is effectively silent in the build (same decoder and quality give normal levels elsewhere).

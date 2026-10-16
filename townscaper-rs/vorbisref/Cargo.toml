@@ -1,0 +1,10 @@
+[package]
+name = "ts_vorbisref"
+version = "0.1.0"
+edition = "2021"
+description = "Unpatched Xiph libvorbis 1.3.4 encoder, only to regenerate the Vorbis headers FMOD strips from FSB5 banks"
+license = "BSD-3-Clause"
+links = "ts_vorbisref"
+
+[build-dependencies]
+cc = "1"
