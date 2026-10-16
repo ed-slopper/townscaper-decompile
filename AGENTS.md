@@ -134,7 +134,8 @@ New people: add your own line (in a `board-` commit) before you claim a row, and
   `grep -rn STANDIN townscaper-rs` lists every stand-in left (row X3 empties it).
 - **Mark progress in `docs/function-index.csv`**, column `status`: `dumped` (nothing yet) → `read` (understood,
   notes written) → `ported` (Rust in `townscaper-rs/`) → `checked` (proven equal to the original, section 15).
-  The `notes` column takes a short pointer (`notes/wfc.md`). `tools/index.py` keeps these when it rebuilds.
+  The `notes` column takes a short pointer (`notes/wfc.md`). `tools/index.py` keeps these when it rebuilds;
+  `python -I tools/mark.py checked "tests/x.rs" Ns.Type[.Method] ...` sets them.
 - **Run `python -I tools/guard.py` before every push** (CI runs it too, with the Bevy-free crates' tests).
 - **Do not chase a gap outside your task.** Note it in the system's notes and add a row.
 

@@ -142,50 +142,50 @@ rva,va,namespace,type,method,signature,status,notes
 0x3DD360,0x103DD360,Os.Hex,HexOnionIteratorGizmo,OnDrawGizmos,private void OnDrawGizmos(),dumped,
 0x1F53D0,0x101F53D0,Os.Hex,HexOnionVisualizer,.ctor,public void .ctor(),dumped,
 0x3DDDF0,0x103DDDF0,Os.Hex,HexOnionVisualizer,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x7C1B90,0x107C1B90,Os.Utils,Bitwise,GetByte,"public static byte GetByte(bool bit0 = False, bool bit1 = False, bool bit2 = False, bool bit3 = False, bool bit4 = False, bool bit5 = False, bool bit6 = False, bool bit7 = False)",dumped,
-0x7C1C10,0x107C1C10,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(int b, int index)",dumped,
-0x7C1C30,0x107C1C30,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(byte b, int index)",dumped,
-0x7C1C50,0x107C1C50,Os.Utils,Bitwise,SetBit,"public static void SetBit(ref byte b, int index, bool value)",dumped,
-0x1FC320,0x101FC320,Os.Utils,ByteFloat,get_f,public float get_f(),dumped,
-0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat,set_f,public void set_f(float value),dumped,
-0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat,.ctor,public void .ctor(float value),dumped,
-0x1FC9D0,0x101FC9D0,Os.Utils,ByteFloat,ByteToFloat,public static float ByteToFloat(byte b),dumped,
-0x1FC9D0,0x101FC9D0,Os.Utils,ByteFloat,op_Explicit,public static float op_Explicit(ByteFloat b),dumped,
-0x1FC9F0,0x101FC9F0,Os.Utils,ByteFloat,Equals,public override bool Equals(object obj),dumped,
-0x1FCA60,0x101FCA60,Os.Utils,ByteFloat,FloatToByte,public static byte FloatToByte(float f),dumped,
-0x1FCA60,0x101FCA60,Os.Utils,ByteFloat,op_Explicit,public static ByteFloat op_Explicit(float f),dumped,
-0x1FCA90,0x101FCA90,Os.Utils,ByteFloat,GetHashCode,public override int GetHashCode(),dumped,
-0x1FCAA0,0x101FCAA0,Os.Utils,ByteFloat,op_Equality,"public static bool op_Equality(ByteFloat a, ByteFloat b)",dumped,
-0x1FCAB0,0x101FCAB0,Os.Utils,ByteFloat,op_Inequality,"public static bool op_Inequality(ByteFloat a, ByteFloat b)",dumped,
-0x1FC210,0x101FC210,Os.Utils,ByteFloat2,Equals,public override bool Equals(object obj),dumped,
-0x1FC290,0x101FC290,Os.Utils,ByteFloat2,GetHashCode,public override int GetHashCode(),dumped,
-0x1FC2B0,0x101FC2B0,Os.Utils,ByteFloat2,.ctor,"public void .ctor(float fx, float fy)",dumped,
-0x1FC320,0x101FC320,Os.Utils,ByteFloat2,get_fx,public float get_fx(),dumped,
-0x1FC350,0x101FC350,Os.Utils,ByteFloat2,get_fy,public float get_fy(),dumped,
-0x1FC380,0x101FC380,Os.Utils,ByteFloat2,op_Equality,"public static bool op_Equality(ByteFloat2 a, ByteFloat2 b)",dumped,
-0x1FC3B0,0x101FC3B0,Os.Utils,ByteFloat2,op_Explicit,public static ByteFloat2 op_Explicit(Vector2 f),dumped,
-0x1FC420,0x101FC420,Os.Utils,ByteFloat2,op_Explicit,public static int2 op_Explicit(ByteFloat2 b),dumped,
-0x1FC440,0x101FC440,Os.Utils,ByteFloat2,op_Explicit,public static ByteFloat2 op_Explicit(int2 f),dumped,
-0x1FC460,0x101FC460,Os.Utils,ByteFloat2,op_Explicit,public static Vector2 op_Explicit(ByteFloat2 b),dumped,
-0x1FC4B0,0x101FC4B0,Os.Utils,ByteFloat2,op_Inequality,"public static bool op_Inequality(ByteFloat2 a, ByteFloat2 b)",dumped,
-0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat2,set_fx,public void set_fx(float value),dumped,
-0x1FC520,0x101FC520,Os.Utils,ByteFloat2,set_fy,public void set_fy(float value),dumped,
-0x1FC320,0x101FC320,Os.Utils,ByteFloat3,get_fx,public float get_fx(),dumped,
-0x1FC350,0x101FC350,Os.Utils,ByteFloat3,get_fy,public float get_fy(),dumped,
-0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat3,set_fx,public void set_fx(float value),dumped,
-0x1FC520,0x101FC520,Os.Utils,ByteFloat3,set_fy,public void set_fy(float value),dumped,
-0x1FC560,0x101FC560,Os.Utils,ByteFloat3,Equals,public override bool Equals(object obj),dumped,
-0x1FC610,0x101FC610,Os.Utils,ByteFloat3,GetHashCode,public override int GetHashCode(),dumped,
-0x1FC640,0x101FC640,Os.Utils,ByteFloat3,.ctor,"public void .ctor(float fx, float fy, float fz)",dumped,
-0x1FC6D0,0x101FC6D0,Os.Utils,ByteFloat3,get_Item,public byte get_Item(int key),dumped,
-0x1FC730,0x101FC730,Os.Utils,ByteFloat3,get_fz,public float get_fz(),dumped,
-0x1FC760,0x101FC760,Os.Utils,ByteFloat3,get_normal,public Vector3 get_normal(),dumped,
-0x1FC7D0,0x101FC7D0,Os.Utils,ByteFloat3,op_Equality,"public static bool op_Equality(ByteFloat3 a, ByteFloat3 b)",dumped,
-0x1FC800,0x101FC800,Os.Utils,ByteFloat3,op_Explicit,public static ByteFloat3 op_Explicit(Vector3 f),dumped,
-0x1FC8A0,0x101FC8A0,Os.Utils,ByteFloat3,op_Explicit,public static Vector3 op_Explicit(ByteFloat3 b),dumped,
-0x1FC8F0,0x101FC8F0,Os.Utils,ByteFloat3,op_Inequality,"public static bool op_Inequality(ByteFloat3 a, ByteFloat3 b)",dumped,
-0x1FC920,0x101FC920,Os.Utils,ByteFloat3,set_Item,"public void set_Item(int key, byte value)",dumped,
-0x1FC990,0x101FC990,Os.Utils,ByteFloat3,set_fz,public void set_fz(float value),dumped,
+0x7C1B90,0x107C1B90,Os.Utils,Bitwise,GetByte,"public static byte GetByte(bool bit0 = False, bool bit1 = False, bool bit2 = False, bool bit3 = False, bool bit4 = False, bool bit5 = False, bool bit6 = False, bool bit7 = False)",checked,tests/os_utils.rs
+0x7C1C10,0x107C1C10,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(int b, int index)",checked,tests/os_utils.rs
+0x7C1C30,0x107C1C30,Os.Utils,Bitwise,IsBitSet,"public static bool IsBitSet(byte b, int index)",checked,tests/os_utils.rs
+0x7C1C50,0x107C1C50,Os.Utils,Bitwise,SetBit,"public static void SetBit(ref byte b, int index, bool value)",checked,tests/os_utils.rs
+0x1FC320,0x101FC320,Os.Utils,ByteFloat,get_f,public float get_f(),checked,tests/os_utils.rs
+0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat,set_f,public void set_f(float value),checked,tests/os_utils.rs
+0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat,.ctor,public void .ctor(float value),checked,tests/os_utils.rs
+0x1FC9D0,0x101FC9D0,Os.Utils,ByteFloat,ByteToFloat,public static float ByteToFloat(byte b),checked,tests/os_utils.rs
+0x1FC9D0,0x101FC9D0,Os.Utils,ByteFloat,op_Explicit,public static float op_Explicit(ByteFloat b),checked,tests/os_utils.rs
+0x1FC9F0,0x101FC9F0,Os.Utils,ByteFloat,Equals,public override bool Equals(object obj),ported,"boxed Equals(object): same fields as op_Equality, no harness test"
+0x1FCA60,0x101FCA60,Os.Utils,ByteFloat,FloatToByte,public static byte FloatToByte(float f),checked,tests/os_utils.rs
+0x1FCA60,0x101FCA60,Os.Utils,ByteFloat,op_Explicit,public static ByteFloat op_Explicit(float f),checked,tests/os_utils.rs
+0x1FCA90,0x101FCA90,Os.Utils,ByteFloat,GetHashCode,public override int GetHashCode(),checked,tests/os_utils.rs
+0x1FCAA0,0x101FCAA0,Os.Utils,ByteFloat,op_Equality,"public static bool op_Equality(ByteFloat a, ByteFloat b)",checked,tests/os_utils.rs
+0x1FCAB0,0x101FCAB0,Os.Utils,ByteFloat,op_Inequality,"public static bool op_Inequality(ByteFloat a, ByteFloat b)",checked,tests/os_utils.rs
+0x1FC210,0x101FC210,Os.Utils,ByteFloat2,Equals,public override bool Equals(object obj),ported,"boxed Equals(object): same fields as op_Equality, no harness test"
+0x1FC290,0x101FC290,Os.Utils,ByteFloat2,GetHashCode,public override int GetHashCode(),checked,tests/os_utils.rs
+0x1FC2B0,0x101FC2B0,Os.Utils,ByteFloat2,.ctor,"public void .ctor(float fx, float fy)",checked,tests/os_utils.rs
+0x1FC320,0x101FC320,Os.Utils,ByteFloat2,get_fx,public float get_fx(),checked,tests/os_utils.rs
+0x1FC350,0x101FC350,Os.Utils,ByteFloat2,get_fy,public float get_fy(),checked,tests/os_utils.rs
+0x1FC380,0x101FC380,Os.Utils,ByteFloat2,op_Equality,"public static bool op_Equality(ByteFloat2 a, ByteFloat2 b)",checked,tests/os_utils.rs
+0x1FC3B0,0x101FC3B0,Os.Utils,ByteFloat2,op_Explicit,public static ByteFloat2 op_Explicit(Vector2 f),checked,tests/os_utils.rs
+0x1FC420,0x101FC420,Os.Utils,ByteFloat2,op_Explicit,public static int2 op_Explicit(ByteFloat2 b),checked,tests/os_utils.rs
+0x1FC440,0x101FC440,Os.Utils,ByteFloat2,op_Explicit,public static ByteFloat2 op_Explicit(int2 f),checked,tests/os_utils.rs
+0x1FC460,0x101FC460,Os.Utils,ByteFloat2,op_Explicit,public static Vector2 op_Explicit(ByteFloat2 b),checked,tests/os_utils.rs
+0x1FC4B0,0x101FC4B0,Os.Utils,ByteFloat2,op_Inequality,"public static bool op_Inequality(ByteFloat2 a, ByteFloat2 b)",checked,tests/os_utils.rs
+0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat2,set_fx,public void set_fx(float value),checked,tests/os_utils.rs
+0x1FC520,0x101FC520,Os.Utils,ByteFloat2,set_fy,public void set_fy(float value),checked,tests/os_utils.rs
+0x1FC320,0x101FC320,Os.Utils,ByteFloat3,get_fx,public float get_fx(),checked,tests/os_utils.rs
+0x1FC350,0x101FC350,Os.Utils,ByteFloat3,get_fy,public float get_fy(),checked,tests/os_utils.rs
+0x1FC4E0,0x101FC4E0,Os.Utils,ByteFloat3,set_fx,public void set_fx(float value),checked,tests/os_utils.rs
+0x1FC520,0x101FC520,Os.Utils,ByteFloat3,set_fy,public void set_fy(float value),checked,tests/os_utils.rs
+0x1FC560,0x101FC560,Os.Utils,ByteFloat3,Equals,public override bool Equals(object obj),ported,"boxed Equals(object): same fields as op_Equality, no harness test"
+0x1FC610,0x101FC610,Os.Utils,ByteFloat3,GetHashCode,public override int GetHashCode(),checked,tests/os_utils.rs
+0x1FC640,0x101FC640,Os.Utils,ByteFloat3,.ctor,"public void .ctor(float fx, float fy, float fz)",checked,tests/os_utils.rs
+0x1FC6D0,0x101FC6D0,Os.Utils,ByteFloat3,get_Item,public byte get_Item(int key),checked,tests/os_utils.rs
+0x1FC730,0x101FC730,Os.Utils,ByteFloat3,get_fz,public float get_fz(),checked,tests/os_utils.rs
+0x1FC760,0x101FC760,Os.Utils,ByteFloat3,get_normal,public Vector3 get_normal(),checked,tests/os_utils.rs
+0x1FC7D0,0x101FC7D0,Os.Utils,ByteFloat3,op_Equality,"public static bool op_Equality(ByteFloat3 a, ByteFloat3 b)",checked,tests/os_utils.rs
+0x1FC800,0x101FC800,Os.Utils,ByteFloat3,op_Explicit,public static ByteFloat3 op_Explicit(Vector3 f),checked,tests/os_utils.rs
+0x1FC8A0,0x101FC8A0,Os.Utils,ByteFloat3,op_Explicit,public static Vector3 op_Explicit(ByteFloat3 b),checked,tests/os_utils.rs
+0x1FC8F0,0x101FC8F0,Os.Utils,ByteFloat3,op_Inequality,"public static bool op_Inequality(ByteFloat3 a, ByteFloat3 b)",checked,tests/os_utils.rs
+0x1FC920,0x101FC920,Os.Utils,ByteFloat3,set_Item,"public void set_Item(int key, byte value)",checked,tests/os_utils.rs
+0x1FC990,0x101FC990,Os.Utils,ByteFloat3,set_fz,public void set_fz(float value),checked,tests/os_utils.rs
 0x6CC2E0,0x106CC2E0,Os.Utils,Extensions,KeepGoing,"public static bool KeepGoing(Stopwatch stopwatch, int milliseconds)",dumped,
 0x6CC320,0x106CC320,Os.Utils,Extensions,SetSingleLayer,"public static void SetSingleLayer(Camera camera, string layerName, bool enabled)",dumped,
 0x2A3FC0,0x102A3FC0,Os.Utils,ExtraMath,SetW,"public static float4 SetW(float3 xyz, float w = 0)",dumped,
@@ -241,27 +241,27 @@ rva,va,namespace,type,method,signature,status,notes
 0x3EA3B0,0x103EA3B0,Os.Utils,Intersections,.cctor,private static void .cctor(),dumped,
 0x334970,0x10334970,Os.Utils,NumberStrings,Get,public static string Get(int number),dumped,
 0x334A60,0x10334A60,Os.Utils,NumberStrings,.cctor,private static void .cctor(),dumped,
-0x1FC7D0,0x101FC7D0,Os.Utils,SbyteFloat3,op_Equality,"public static bool op_Equality(SbyteFloat3 a, SbyteFloat3 b)",dumped,
-0x1FC8F0,0x101FC8F0,Os.Utils,SbyteFloat3,op_Inequality,"public static bool op_Inequality(SbyteFloat3 a, SbyteFloat3 b)",dumped,
-0x96E980,0x1096E980,Os.Utils,SbyteFloat3,Equals,public override bool Equals(object obj),dumped,
-0x96EA30,0x1096EA30,Os.Utils,SbyteFloat3,GetHashCode,public override int GetHashCode(),dumped,
-0x96EA60,0x1096EA60,Os.Utils,SbyteFloat3,ToString,public override string ToString(),dumped,
-0x96EAF0,0x1096EAF0,Os.Utils,SbyteFloat3,.ctor,"public void .ctor(float fx, float fy, float fz)",dumped,
-0x96EB60,0x1096EB60,Os.Utils,SbyteFloat3,.ctor,"public void .ctor(int x, int y, int z)",dumped,
-0x96EB80,0x1096EB80,Os.Utils,SbyteFloat3,get_Item,public sbyte get_Item(int key),dumped,
-0x96EBE0,0x1096EBE0,Os.Utils,SbyteFloat3,get_fx,public float get_fx(),dumped,
-0x96EC10,0x1096EC10,Os.Utils,SbyteFloat3,get_fy,public float get_fy(),dumped,
-0x96EC40,0x1096EC40,Os.Utils,SbyteFloat3,get_fz,public float get_fz(),dumped,
-0x96EC70,0x1096EC70,Os.Utils,SbyteFloat3,get_normal,public Vector3 get_normal(),dumped,
-0x96ECD0,0x1096ECD0,Os.Utils,SbyteFloat3,op_Explicit,public static Vector3 op_Explicit(SbyteFloat3 b),dumped,
-0x96ED20,0x1096ED20,Os.Utils,SbyteFloat3,op_Explicit,public static int3 op_Explicit(SbyteFloat3 b),dumped,
-0x96ED40,0x1096ED40,Os.Utils,SbyteFloat3,op_Explicit,public static SbyteFloat3 op_Explicit(int3 f),dumped,
-0x96ED60,0x1096ED60,Os.Utils,SbyteFloat3,op_Explicit,public static SbyteFloat3 op_Explicit(Vector3 f),dumped,
-0x96EDE0,0x1096EDE0,Os.Utils,SbyteFloat3,op_Multiply,"public static SbyteFloat3 op_Multiply(int3x3 a, SbyteFloat3 b)",dumped,
-0x96EE70,0x1096EE70,Os.Utils,SbyteFloat3,set_Item,"public void set_Item(int key, sbyte value)",dumped,
-0x96EEE0,0x1096EEE0,Os.Utils,SbyteFloat3,set_fx,public void set_fx(float value),dumped,
-0x96EF10,0x1096EF10,Os.Utils,SbyteFloat3,set_fy,public void set_fy(float value),dumped,
-0x96EF40,0x1096EF40,Os.Utils,SbyteFloat3,set_fz,public void set_fz(float value),dumped,
+0x1FC7D0,0x101FC7D0,Os.Utils,SbyteFloat3,op_Equality,"public static bool op_Equality(SbyteFloat3 a, SbyteFloat3 b)",checked,tests/os_utils.rs
+0x1FC8F0,0x101FC8F0,Os.Utils,SbyteFloat3,op_Inequality,"public static bool op_Inequality(SbyteFloat3 a, SbyteFloat3 b)",checked,tests/os_utils.rs
+0x96E980,0x1096E980,Os.Utils,SbyteFloat3,Equals,public override bool Equals(object obj),ported,"boxed Equals(object): same fields as op_Equality, no harness test"
+0x96EA30,0x1096EA30,Os.Utils,SbyteFloat3,GetHashCode,public override int GetHashCode(),checked,tests/os_utils.rs
+0x96EA60,0x1096EA60,Os.Utils,SbyteFloat3,ToString,public override string ToString(),checked,tests/os_utils.rs
+0x96EAF0,0x1096EAF0,Os.Utils,SbyteFloat3,.ctor,"public void .ctor(float fx, float fy, float fz)",checked,tests/os_utils.rs
+0x96EB60,0x1096EB60,Os.Utils,SbyteFloat3,.ctor,"public void .ctor(int x, int y, int z)",checked,tests/os_utils.rs
+0x96EB80,0x1096EB80,Os.Utils,SbyteFloat3,get_Item,public sbyte get_Item(int key),checked,tests/os_utils.rs
+0x96EBE0,0x1096EBE0,Os.Utils,SbyteFloat3,get_fx,public float get_fx(),checked,tests/os_utils.rs
+0x96EC10,0x1096EC10,Os.Utils,SbyteFloat3,get_fy,public float get_fy(),checked,tests/os_utils.rs
+0x96EC40,0x1096EC40,Os.Utils,SbyteFloat3,get_fz,public float get_fz(),checked,tests/os_utils.rs
+0x96EC70,0x1096EC70,Os.Utils,SbyteFloat3,get_normal,public Vector3 get_normal(),checked,tests/os_utils.rs
+0x96ECD0,0x1096ECD0,Os.Utils,SbyteFloat3,op_Explicit,public static Vector3 op_Explicit(SbyteFloat3 b),checked,tests/os_utils.rs
+0x96ED20,0x1096ED20,Os.Utils,SbyteFloat3,op_Explicit,public static int3 op_Explicit(SbyteFloat3 b),checked,tests/os_utils.rs
+0x96ED40,0x1096ED40,Os.Utils,SbyteFloat3,op_Explicit,public static SbyteFloat3 op_Explicit(int3 f),checked,tests/os_utils.rs
+0x96ED60,0x1096ED60,Os.Utils,SbyteFloat3,op_Explicit,public static SbyteFloat3 op_Explicit(Vector3 f),checked,tests/os_utils.rs
+0x96EDE0,0x1096EDE0,Os.Utils,SbyteFloat3,op_Multiply,"public static SbyteFloat3 op_Multiply(int3x3 a, SbyteFloat3 b)",checked,tests/os_utils.rs
+0x96EE70,0x1096EE70,Os.Utils,SbyteFloat3,set_Item,"public void set_Item(int key, sbyte value)",checked,tests/os_utils.rs
+0x96EEE0,0x1096EEE0,Os.Utils,SbyteFloat3,set_fx,public void set_fx(float value),checked,tests/os_utils.rs
+0x96EF10,0x1096EF10,Os.Utils,SbyteFloat3,set_fy,public void set_fy(float value),checked,tests/os_utils.rs
+0x96EF40,0x1096EF40,Os.Utils,SbyteFloat3,set_fz,public void set_fz(float value),checked,tests/os_utils.rs
 0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,.ctor,public void .ctor(string name),dumped,
 0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
 0x3CCD90,0x103CCD90,Os.Utils,UnityEvent_Float,.ctor,public void .ctor(),dumped,

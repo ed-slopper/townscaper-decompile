@@ -28,7 +28,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1a | `ts_game::os::utils`: `Bitwise` and the packed floats `ByteFloat`, `ByteFloat2`, `ByteFloat3`, `SbyteFloat3` (byte/sbyte ↔ float conversions, operators, indexers, `normal`, hashes, `int3x3 *`): the module meshes in `ModuleLibrary` are stored in them | unowned | F6, F11a, F11b, F11d | ed-slopper/wren (2026-10-15) | Split of E1 (65 methods) |
 | E1b | `ts_game::os::utils::extra_math`: `ExtraMath` (43 methods: swaps, bilinear inverse, rotations, encapsulation, binary search over transforms, ...) | unowned | E1a | | Split of E1 |
 | E1c | `Intersections` (box/box, oriented boxes, box/triangle, triangle/ray, triangle/triangle) and `NumberStrings` | unowned | E1a | | Split of E1 |
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
@@ -121,6 +120,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | F11e | `ts_game::unity::collections`: the BCL's introsort (`sort_by`, depth limit from the backing array's length), `binary_search`, `list_grow` (List capacity), `SlotMap` (Dictionary / HashSet slot-order iteration with LIFO slot reuse). Equal to the game: 514 tie-heavy sorts incl. 4 through heapsort (antiqsort inputs), binary searches with duplicates, 60 Dictionary/HashSet op sequences. Harness learnt generic classes (`Type.GetType` names), object handles (`new`, `keep`), arrays returned after calls; notes in `unity.md` | P0 | ed-slopper/wren | 2026-10-15 | c25105f |
 | F11f | Host-side Unity / .NET APIs surveyed (Cpp2IL `[Calls]` from the game's code) and decided per family: Bevy hosts display, audio, timing, UI, mesh upload; exact ports for what the game reads back: new rows E11 (Transform math), E12 (camera projection + `Physics.Raycast` picking), E13 (.NET string/number formatting in saves). Table in `docs/notes/unity.md` | P0 | ed-slopper/wren | 2026-10-15 | 5648cdd |
 | F7 | Middleware decided by ed-slopper (2026-10-15: "accept the proposal on the board"): Rewired → Bevy input under a port of the game's `ActionInputManager` / `ControlBinding` layer; I2 Localization → a port of the parts the game uses, reading the player's `LanguageSourceData`; Crosstales / StandaloneFileBrowser → `rfd`; Fury SDK (platform, achievements) → no-op STANDINs. In `docs/notes/unity.md` | humans | ed-slopper | 2026-10-15 | c2f22b1 |
+| E1a | `ts_game::os::utils`: `Bitwise`, `ByteFloat`, `ByteFloat2`, `ByteFloat3`, `SbyteFloat3` (61 rows `checked` against the game in `tests/os_utils.rs`, the 4 boxed `Equals(object)` `ported`). Found by the harness: `SbyteFloat3 * int3x3` dots each column with the vector (the transpose of `math.mul`); `FloatToByte` clamps only the top (negatives wrap); SbyteFloat3's scale is 254 and its `normal` has no −1. `tools/mark.py` sets index statuses | P1 | ed-slopper/wren | 2026-10-15 | E1aCOMMIT |
 
 ## Changes to the board
 
@@ -151,3 +151,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-15 ed-slopper/wren: F11f done (F11 complete); added E11, E12, E13 (gaps of F11f); G1 Needs E12, G3a Needs E13.
 - 2026-10-15 ed-slopper/wren: F7 decided by ed-slopper (proposal accepted); P0 complete.
 - 2026-10-15 ed-slopper/wren: split E1 into E1a–E1d; E2 Needs E1a, E1b.
+- 2026-10-15 ed-slopper/wren: E1a done.
