@@ -1175,14 +1175,14 @@ rva,va,namespace,type,method,signature,status,notes
 0x6FC920,0x106FC920,Placemaker.Modules,OutlineUv,get_y,public int get_y(),checked,tests/placemaker_modules.rs
 0x6FC950,0x106FC950,Placemaker.Modules,OutlineUv,set_x,public void set_x(int value),checked,tests/placemaker_modules.rs
 0x6FC9C0,0x106FC9C0,Placemaker.Modules,OutlineUv,set_y,public void set_y(int value),checked,tests/placemaker_modules.rs
-0x1E73E0,0x101E73E0,Placemaker.Modules.Processing,DecorProfile,.ctor,public void .ctor(),dumped,
-0x3208C0,0x103208C0,Placemaker.Modules.Processing,MappedMaterialSettings,.ctor,public void .ctor(),dumped,
-0x32C740,0x1032C740,Placemaker.Modules.Processing,MaterialCluster,.ctor,public void .ctor(),dumped,
-0x3309F0,0x103309F0,Placemaker.Modules.Processing,ModuleImporter,Awake,private void Awake(),dumped,
-0x330AE0,0x10330AE0,Placemaker.Modules.Processing,ModuleImporter,.ctor,public void .ctor(),dumped,
-0x840770,0x10840770,Placemaker.Modules.Processing,ProtoModule,.ctor,public void .ctor(),dumped,
-0x840970,0x10840970,Placemaker.Modules.Processing,ProtoModule,get_worldPos,public Vector3 get_worldPos(),dumped,
-0x840610,0x10840610,Placemaker.Modules.Processing,ProtoModuleMesh,.ctor,public void .ctor(),dumped,
+0x1E73E0,0x101E73E0,Placemaker.Modules.Processing,DecorProfile,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x3208C0,0x103208C0,Placemaker.Modules.Processing,MappedMaterialSettings,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x32C740,0x1032C740,Placemaker.Modules.Processing,MaterialCluster,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x3309F0,0x103309F0,Placemaker.Modules.Processing,ModuleImporter,Awake,private void Awake(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x330AE0,0x10330AE0,Placemaker.Modules.Processing,ModuleImporter,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x840770,0x10840770,Placemaker.Modules.Processing,ProtoModule,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x840970,0x10840970,Placemaker.Modules.Processing,ProtoModule,get_worldPos,public Vector3 get_worldPos(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
+0x840610,0x10840610,Placemaker.Modules.Processing,ProtoModuleMesh,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
 0x704D90,0x10704D90,Placemaker.Props,PropAchievements,OnStart,public void OnStart(),dumped,
 0x704E00,0x10704E00,Placemaker.Props,PropAchievements,PropDisabled,public void PropDisabled(PropAchievements.Achievement achievement),dumped,
 0x704E70,0x10704E70,Placemaker.Props,PropAchievements,PropEnabled,public void PropEnabled(PropAchievements.Achievement achievement),dumped,

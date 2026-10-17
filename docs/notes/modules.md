@@ -72,3 +72,13 @@ are kept as asset pointers (`AssetRef`, STANDIN); they map one to one onto the g
   (the list is sorted). Checked on overlapping pairs of the decor the modules reference and on random pairs.
 - The constructors only make empty lists (`Default` here); `ModuleLibrary..ctor` leaves `waterSides` null.
 - `PropPlacement` is kept as a record here; its methods are row E10.
+
+## The module import (E5a, read: not ported)
+
+`Placemaker.Modules.Processing` (`ModuleImporter`, `ProtoModule`, `ProtoModuleMesh`, `MaterialCluster`,
+`DecorProfile`, `MappedMaterialSettings`) is the editor-time step that turned modelled meshes into the
+`ModuleLibrary` asset. What survives in the build is 8 functions: constructors that make empty lists,
+`ModuleImporter.Awake` (deactivates its own object, `toDisable` and `prefabContainer`) and
+`ProtoModule.get_worldPos` (`coordinate` as floats + 0.5 each). No MonoBehaviour of the build uses any of these
+scripts (`list_scripts`), and nothing outside the namespace calls them, so the shipped game never runs them:
+the asset (E5d) is all it needs. Marked `read`.
