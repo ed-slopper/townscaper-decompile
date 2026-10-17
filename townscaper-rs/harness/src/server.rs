@@ -35,6 +35,7 @@
 //! writes) an instance field: value types as `raw`, references as a kept `handle`.
 //! `static_field` with `"keep": true` also returns a reference field's object as a `handle`; `{"array_raw": n}`
 //! returns the element bytes of a value-type array held by handle `n`.
+//! `{"addr": n}` returns the address of the object held by handle `n` (to match references in raw values).
 //! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
 //! the field's value as `{"type", "raw"}` (value types by value, references as the 4-byte pointer).
 
@@ -297,6 +298,11 @@ impl Ctx {
                 }
                 Err(e) => json!({"ok": false, "error": e}),
             };
+        }
+        if let Some(h) = req.get("addr").and_then(Value::as_u64) {
+            // the object's address, to compare with references inside value types
+            let p = (self.api.il2cpp_gchandle_get_target)(h as u32);
+            return json!({"ok": true, "addr": p as usize as u64});
         }
         if req.get("array_raw").is_some() {
             return match self.array_raw(req) {

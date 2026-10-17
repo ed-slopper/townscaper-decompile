@@ -48,7 +48,7 @@ impl Harness {
                     return Err("harness launcher failed (see work/harness/harness.log)".into());
                 }
                 let t = Instant::now();
-                loop {
+                let s = loop {
                     if let Some(s) = connect() {
                         break s;
                     }
@@ -56,7 +56,20 @@ impl Harness {
                         return Err("harness did not listen".into());
                     }
                     std::thread::sleep(Duration::from_millis(200));
+                };
+                // The harness answers once il2cpp is up, before Unity has set up its scripting classes: a Unity
+                // call that early crashes the player. Wait for the first scene load in the player log.
+                let log = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../work/harness/game/harness_player.log");
+                loop {
+                    if std::fs::read_to_string(&log).map(|l| l.contains("UnloadTime:")).unwrap_or(false) {
+                        break;
+                    }
+                    if t.elapsed() > Duration::from_secs(120) {
+                        return Err(format!("the player never loaded its first scene ({})", log.display()));
+                    }
+                    std::thread::sleep(Duration::from_millis(250));
                 }
+                s
             }
         };
         stream.set_read_timeout(Some(Duration::from_secs(60))).ok();
@@ -94,6 +107,19 @@ impl Harness {
             Ok(r)
         } else {
             Err(CallError(r["error"].as_str().unwrap_or("?").to_string()))
+        }
+    }
+
+    /// Wait (up to a minute) until an object of `class` is in the scene (the world scene loads after the first).
+    pub fn wait_for_object(&mut self, class: &str) {
+        let t = Instant::now();
+        loop {
+            let r = self.request(json!({"call": "UnityEngine.Object.GetInstanceID", "on": class, "args": [], "main": true}));
+            if r["ok"] == json!(true) {
+                return;
+            }
+            assert!(t.elapsed() < Duration::from_secs(60), "no {class} in the scene: {r}");
+            std::thread::sleep(Duration::from_millis(500));
         }
     }
 
