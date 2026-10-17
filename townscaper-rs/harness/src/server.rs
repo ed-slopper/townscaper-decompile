@@ -145,8 +145,7 @@ impl Ctx {
         (self.api.il2cpp_format_stack_trace)(exc, st.as_mut_ptr(), st.len() as i32);
         let st = cstr(st.as_ptr());
         if !st.trim().is_empty() {
-            text.push_str("
-");
+            text.push_str("\n");
             text.push_str(st.trim_end());
         }
         // the native return addresses il2cpp keeps (`Exception.trace_ips`), as GameAssembly.dll RVAs
