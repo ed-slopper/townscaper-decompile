@@ -29,8 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E6a | `WaveFunctionCollapse` queue and per-qube work: `Propagation` / `LastRemovedStruct`, `CompareTo` 0x4FC880 (sorted-list queues), `.ctor`, `QubeUpdated`, `QubeRemoved`, `IteratePropagationCount`, `ResetPropagationCounter`, `MaybeQueueQubeForRebuilding`, `FillQubePossibilities` 0x3D6DD0, `RemovePossibleModule` 0x3DA190 (`LastRemoved` has no caller) | unowned | E5d | ed-slopper/wren (2026-10-16) | Split of E6; order of the queue decides the result: port exactly |
-| E6b | `WaveFunctionCollapse` loops: `Iterate0` 0x3D7A00, `Iterate1` 0x3D7F50, `IterateApplyModules` 0x3D8750, `LaterUpdate` 0x3D93C0; a whole town collapsed and compared with the game | unowned | E6a | | Split of E6 |
+| E6b | `WaveFunctionCollapse` loops: `Iterate0` 0x3D7A00, `Iterate1` 0x3D7F50, `IterateApplyModules` 0x3D8750, `LaterUpdate` 0x3D93C0; a whole town collapsed and compared with the game | unowned | E6a | ed-slopper/wren (2026-10-16) | Split of E6 |
 | E6c | `WaveFunctionCollapse` decor: `FillDecorPossibilities` 0x3D6240, `RemovePossibleDecor` 0x3D9F90, `IterateDecor` 0x3D88D0 | unowned | E6b | | Split of E6 |
 | E7 | Mesh building: `ModuleBuilder` (16, `Iterate` 0x32FF90), `WorldMeshes` (11), `BigMesh`/`BigMeshGroup`/`BigMeshMaster`/`BigMeshPart`/`BigMeshList`, `BitMeshQuadChange`, `MaterialMaster`, `Palette`/`PaletteHolder` | unowned | E6c | | |
 | E8 | Boot and the main loop as Bevy systems in the game's order: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7 | | Who ticks whom each frame (Unity's Awake/Start/Update/LateUpdate order, script execution order from `globalgamemanagers`); scene `level0..2` wiring from F8f |
@@ -134,6 +133,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E5c | `ModuleMath` (every `.cctor` table equal to the game byte for byte: corners, side matrices, orientations with corner / side transforms, mul / inverse lookups, corner links, bary vectors) and its helpers, `Orientation`; 23 rows `checked` (400 random rounds); native `Quaternion.Euler` ported; notes/modules.md | P1 | ed-slopper/wren | 2026-10-16 | a9ee548 |
 | E5d | Module data: `BaseModule` / `Module` / `DecorModule`, `PropPlacement` (record), `ModuleMesh`, `CornerLookup`, `ModuleLibrary` (`Setup` / `OnEnable` → `cornerDict`, `GetDecorOverlap`) and `ts_data::modules` (the asset); the whole library equal to the game's loaded one field by field; 3 rows `checked`, 6 ctors `ported` | P1 | ed-slopper/wren | 2026-10-16 | 46f9916 |
 | E5a | `Placemaker.Modules.Processing`: the editor-time module import; its 8 surviving functions `read` (no MonoBehaviour of the build uses the scripts, no caller outside the namespace), not ported. With E5b–E5d the module section is complete: every module row `checked`, `ported` or `read` with a reason (`PropPlacement` methods stay with E10) | P1 | ed-slopper/wren | 2026-10-16 | ff1c868 |
+| E6a | `WaveFunctionCollapse` queue and per-qube work in `placemaker::wfc`: `Propagation.CompareTo`, sorted-list queues, `QubeUpdated` / `QubeRemoved`, the propagation counter, `MaybeQueueQubeForRebuilding`, `FillQubePossibilities`, `RemovePossibleModule` (its `lastRemovals` branch waits for E6b); 7 rows `checked` (3 rounds of actions and fills of every qube, up to 270), `RemovePossibleModule` and `.ctor` `ported`, `LastRemoved` and gizmos `read`; notes/wfc.md | P1 | ed-slopper/wren | 2026-10-16 | 7d692dc |
 
 ## Changes to the board
 
@@ -192,3 +192,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: E5d done; claim E5a.
 - 2026-10-16 ed-slopper/wren: E5a done; the module section E5 (E5a–E5d) is complete.
 - 2026-10-16 ed-slopper/wren: split E6 into E6a–E6c; claim E6a.
+- 2026-10-16 ed-slopper/wren: E6a done; claim E6b.
