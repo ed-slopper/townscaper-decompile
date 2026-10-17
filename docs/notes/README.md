@@ -15,4 +15,5 @@ Names, signatures, addresses and constants only: no pasted decompiler output.
 | [meshes.md](meshes.md) | Mesh building (E7): module geometry, big meshes, the module builder |
 | [main_loop.md](main_loop.md) | Boot and the main loop (E8): frame budget, time, the world master's iterate order |
 | [bakes.md](bakes.md) | Lighting and ground bakes (E9): the sun and its shadow camera, AO, sandbanks, the draw plane and border |
+| [props.md](props.md) | Props (E10): placements, prop nodes and their relations, placing props on modules |
 | [graph.md](graph.md) | The voxel graph (E4): objects and containers, editing, the update loop, saving and loading, sampling, the flow field |

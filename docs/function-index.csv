@@ -616,10 +616,10 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker,PaletteHolder.<>c,<.ctor>b__7_0,internal void <.ctor>b__7_0(int <p0>),ported,placemaker::materials (empty; onNewColor starts as a no-op)
 0x1E73E0,0x101E73E0,Placemaker,PaletteHolder.<>c,.ctor,public void .ctor(),ported,placemaker::materials (empty; onNewColor starts as a no-op)
 0x507730,0x10507730,Placemaker,PaletteHolder.<>c,.cctor,private static void .cctor(),ported,placemaker::materials (empty; onNewColor starts as a no-op)
-0x70FAE0,0x1070FAE0,Placemaker,Prop,.ctor,public void .ctor(),dumped,
-0x707990,0x10707990,Placemaker,PropPlacement,GetMatrix,public Matrix4x4 GetMatrix(),dumped,
-0x707B00,0x10707B00,Placemaker,PropPlacement,get_rotation,public Vector3 get_rotation(),dumped,
-0x707B50,0x10707B50,Placemaker,PropPlacement,set_rotation,public void set_rotation(Vector3 value),dumped,
+0x70FAE0,0x1070FAE0,Placemaker,Prop,.ctor,public void .ctor(),ported,placemaker::props (voxelTypeMask = 0xFF)
+0x707990,0x10707990,Placemaker,PropPlacement,GetMatrix,public Matrix4x4 GetMatrix(),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
+0x707B00,0x10707B00,Placemaker,PropPlacement,get_rotation,public Vector3 get_rotation(),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
+0x707B50,0x10707B50,Placemaker,PropPlacement,set_rotation,public void set_rotation(Vector3 value),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707C40,0x10707C40,Placemaker,PropPlacer,AddColliderToDict,private void AddColliderToDict(PropNode node0),dumped,
 0x708B00,0x10708B00,Placemaker,PropPlacer,AddSmoothTangentsToMesh,private void AddSmoothTangentsToMesh(Mesh mesh),dumped,
 0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",dumped,
@@ -1210,25 +1210,25 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F53D0,0x101F53D0,Placemaker.Props,PropNgonScaler,.ctor,public void .ctor(),dumped,
 0x706FC0,0x10706FC0,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
 0x707380,0x10707380,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x222F90,0x10222F90,Placemaker.Props,PropNode,get_parentIndex,public int get_parentIndex(),dumped,
-0x707450,0x10707450,Placemaker.Props,PropNode,AddAnchor,public void AddAnchor(PropNode node),dumped,
-0x7074C0,0x107074C0,Placemaker.Props,PropNode,AddChild,public void AddChild(PropNode node),dumped,
-0x707520,0x10707520,Placemaker.Props,PropNode,AddMotevee,public void AddMotevee(PropNode node),dumped,
-0x707580,0x10707580,Placemaker.Props,PropNode,AddOverlap,public void AddOverlap(PropNode node),dumped,
-0x7075E0,0x107075E0,Placemaker.Props,PropNode,AddParent,public void AddParent(PropNode node),dumped,
-0x707630,0x10707630,Placemaker.Props,PropNode,InserOverlap,public void InserOverlap(PropNode node),dumped,
-0x7076C0,0x107076C0,Placemaker.Props,PropNode,RemoveAnchor,public void RemoveAnchor(PropNode node),dumped,
-0x707710,0x10707710,Placemaker.Props,PropNode,RemoveChild,public void RemoveChild(PropNode node),dumped,
-0x707760,0x10707760,Placemaker.Props,PropNode,RemoveMotevee,public void RemoveMotevee(PropNode node),dumped,
-0x7077B0,0x107077B0,Placemaker.Props,PropNode,RemoveOverlap,public void RemoveOverlap(PropNode node),dumped,
-0x707800,0x10707800,Placemaker.Props,PropNode,RemoveParent,public void RemoveParent(PropNode node),dumped,
-0x707850,0x10707850,Placemaker.Props,PropNode,System.Collections.Generic.IComparer<Placemaker.Props.PropNode>.Compare,"private int System.Collections.Generic.IComparer<Placemaker.Props.PropNode>.Compare(PropNode x, PropNode y)",dumped,
-0x707890,0x10707890,Placemaker.Props,PropNode,System.IComparable<Placemaker.Props.PropNode>.CompareTo,private int System.IComparable<Placemaker.Props.PropNode>.CompareTo(PropNode other),dumped,
-0x7078C0,0x107078C0,Placemaker.Props,PropNode,.ctor,public void .ctor(),dumped,
-0x707920,0x10707920,Placemaker.Props,PropNode,get_anchorIndex,public int get_anchorIndex(),dumped,
-0x707940,0x10707940,Placemaker.Props,PropNode,get_childIndex,public int get_childIndex(),dumped,
-0x707950,0x10707950,Placemaker.Props,PropNode,get_moteveeIndex,public int get_moteveeIndex(),dumped,
-0x707970,0x10707970,Placemaker.Props,PropNode,get_overlapIndex,public int get_overlapIndex(),dumped,
+0x222F90,0x10222F90,Placemaker.Props,PropNode,get_parentIndex,public int get_parentIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707450,0x10707450,Placemaker.Props,PropNode,AddAnchor,public void AddAnchor(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x7074C0,0x107074C0,Placemaker.Props,PropNode,AddChild,public void AddChild(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707520,0x10707520,Placemaker.Props,PropNode,AddMotevee,public void AddMotevee(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707580,0x10707580,Placemaker.Props,PropNode,AddOverlap,public void AddOverlap(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x7075E0,0x107075E0,Placemaker.Props,PropNode,AddParent,public void AddParent(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707630,0x10707630,Placemaker.Props,PropNode,InserOverlap,public void InserOverlap(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x7076C0,0x107076C0,Placemaker.Props,PropNode,RemoveAnchor,public void RemoveAnchor(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707710,0x10707710,Placemaker.Props,PropNode,RemoveChild,public void RemoveChild(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707760,0x10707760,Placemaker.Props,PropNode,RemoveMotevee,public void RemoveMotevee(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x7077B0,0x107077B0,Placemaker.Props,PropNode,RemoveOverlap,public void RemoveOverlap(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707800,0x10707800,Placemaker.Props,PropNode,RemoveParent,public void RemoveParent(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707850,0x10707850,Placemaker.Props,PropNode,System.Collections.Generic.IComparer<Placemaker.Props.PropNode>.Compare,"private int System.Collections.Generic.IComparer<Placemaker.Props.PropNode>.Compare(PropNode x, PropNode y)",checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707890,0x10707890,Placemaker.Props,PropNode,System.IComparable<Placemaker.Props.PropNode>.CompareTo,private int System.IComparable<Placemaker.Props.PropNode>.CompareTo(PropNode other),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x7078C0,0x107078C0,Placemaker.Props,PropNode,.ctor,public void .ctor(),ported,"placemaker::props (motivations = 1, empty relations)"
+0x707920,0x10707920,Placemaker.Props,PropNode,get_anchorIndex,public int get_anchorIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707940,0x10707940,Placemaker.Props,PropNode,get_childIndex,public int get_childIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707950,0x10707950,Placemaker.Props,PropNode,get_moteveeIndex,public int get_moteveeIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
+0x707970,0x10707970,Placemaker.Props,PropNode,get_overlapIndex,public int get_overlapIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
 0x1D4430,0x101D4430,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropPropeller,.ctor,public void .ctor(),dumped,
 0x83E900,0x1083E900,Placemaker.Props,PropPropeller,OnValidate,private void OnValidate(),dumped,

@@ -12,6 +12,7 @@ pub mod maker;
 pub mod materials;
 pub mod module_builder;
 pub mod modules;
+pub mod props;
 pub mod quads;
 pub mod sandbanker;
 pub mod save_data;
