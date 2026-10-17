@@ -124,6 +124,72 @@ integration = `playEffect`, then `ClickEffect.Click(true, ...)`); otherwise a mi
 corner at ...`, to a type paints, to `Empty` clicks (`false`) and removes. `QubeUpdated` queues a qube once
 (`awaitingGraphUpdate`).
 
+## The loop (proven, E4d)
+
+### `Iterate` 0xE89CF0
+
+One kind of work per call, each while `WorldMaster.KeepGoing` (the frame's time budget) allows:
+
+1. **Corners.** `cornerIntegrationQueue` from the last: a corner without a collider mesh and with voxels is
+   integrated; one that cannot be yet (`IntegrateCorner` false) ends the call and stays queued; the others are
+   dropped from the queue. Returns true even when the queue empties.
+2. **Qubes.** `qubeUpdateQueue` from the last: a qube under a square in `squares` goes to
+   `WaveFunctionCollapse.QubeUpdated`; `awaitingGraphUpdate = false`. A qube above the ground (`localPosition.y
+   > 0.1`) with any lower corner value not `Empty` gets a **shadow quad**: its marching-squares cell is
+   `2 · (powers.x·v0 + powers.y·v1 + powers.z·v2 + powers.w·v3)` (`Empty` counts 16), row / column of
+   `marchingSquaresTex` by its width; UVs `(fx, fy)` = `texel / 2 + (col, 2·row) · texel`, corners
+   `(fx, fy)`, `(fx + tx + 1, fy)`, `(fx + tx + 1, fy + ty + 1)`, `(fx, fy + ty + 1)` (the `+ 1` is in the
+   asm: constant 1.0f at 0x111F1A60). A qube with a quad only gets new UVs; one without takes a freed index
+   (`shadowMeshIndexes`, last) and writes its four vertices — the square's corners at `y - 0.5` — and UVs, or
+   the next new index (`shadowMeshIndexIterator++`) and appends two triangles, vertices and UVs. A qube that no
+   longer needs its quad returns the index, zeroes the four vertices, `shadowIndex = -1`. Then `AoBaker.BakeAo`.
+3. **Flow.** The last corner of `cornerFlowQueue` leaves it; a pooled corner's `flowDatas` are cleared, else
+   trimmed to the tallest column of its squares.
+
+False when all three queues are empty. `AoBaker.GetShadowMesh` 0x7B3500: mesh `4·i / 65532`, vertex
+`4·i % 65532` (16,383 quads per mesh); past the last mesh one new mesh is made, whatever the index.
+
+### `IterateFocus` 0xE87940
+
+Recalculations first, one call each: `recalculateHexBounds` (the hex bounds of every corner with voxels, from
+the last; `ExtraMath.Center` of the old bounds when there are no corners; `boundsUpdated` if they changed),
+then `recalculateHeightBounds` (`CeilToInt` of the highest top voxel's `localPosition.y`). Otherwise, when
+`boundsUpdated`:
+
+- `border`: `(e, maxHeight) = GetMaxExtents(bounds, boundsHeight)`; `border.min = bounds.max - 2e`,
+  `border.max = bounds.min + 2e` (how far every part of the town may reach); with no corners 1024 instead of 2e, and
+  `maxHeight = 256`;
+- `genBounds` = bounds ± 96, clamped to the border ± 2; `viewBounds` = genBounds clamped to the border;
+  `_GridViewMin/Max`, `_GridBorderMin/Max` set as global shader vectors;
+- `shadowMeshBounds`: a zero-size box at `PlaneToWorld(HexToPlane(bounds.min), boundsHeight)` grown by the
+  eight corners of the hex box (min/max per axis, in the order x-major) at height 0, then extents + (2, 0, 2);
+- `groundCollider.size = (size.x + 50, 2, size.z + 50)`, `center = (center.x, -1, center.z)`;
+- `onBoundsUpdated()` (called unchecked), `BakeAo`, `grid.focusUpdated = true`, `boundsUpdated = false`; at
+  `boundsHeight == 256` the `MaxHeight` achievement.
+
+### Loading and saving: `Save` 0xE8F920, `BeginLoad` 0xE83440, `IterateLoad` 0xE88FF0
+
+`Save` writes `SaveData.corners` (hexPos and voxel count of each corner with voxels, in `corners` order) and
+`SaveData.voxels` (type, height, in sibling order); an empty town saves its bounds' centre as one corner of no
+voxels (and logs it). Loading goes through `Maker`'s action list, one step per call (`loadState`):
+
+0. `Maker.ClearUndoQueue`.
+1. A removal action (`Ground` for height 0) for every voxel, corners and voxels from the last.
+2. Every qube of every square queued (`QubeUpdated`, its module containers to `ModuleBuilder`), square by square
+   while the budget lasts (`Maker.actionIndex` is the cursor).
+3. The save: no corners → `SetEmptyBoundsCenter(0)` and `onEmptyBoundsLoaded()`; corners but no voxels → the
+   same at the only corner (if there is just one). Else the saved hex bounds and **the height of the last voxel
+   read** (one value passed to `Mathf.Max(params int[])`) give `GetMaxExtents`; corners outside centre ± e and
+   voxels at or above `maxHeight` are dropped (`Some voxels fell outside the border and was not loaded`). Each
+   kept voxel (`Ground` at height 0) meets the action list (only the actions there before this step): an action
+   at its place that removes the same type is cancelled (removed, `actionIndex--`), one of another type becomes
+   a repaint; else a new add action.
+4. `WaveFunctionCollapse.IteratePropagationCount`, then the actions applied in order (`ApplyAction`, no effect)
+   while the budget lasts; when all are applied, `ClearUndoQueue` and done.
+
+`OnStart` 0xE8B180 makes the seven containers (pools inactive) and bakes once. `Test` 0xE8FD10 is an editor
+context-menu helper (scales every qube to 0.9): read, not ported.
+
 ## The other systems
 
 The graph reaches the rest of the game through `master` (`WorldMaster`): its grid, `WorldMeshes`,
@@ -131,6 +197,14 @@ The graph reaches the rest of the game through `master` (`WorldMaster`): its gri
 calls them through the `GraphHost` trait; the rows that port those systems implement it.
 
 ## How it was checked
+
+`game/tests/placemaker_graph_loop.rs` (E4d) adds the scene's `AoBaker` (the test graph's shadow quads start past
+the scene's meshes), a fresh `Maker`, a fresh `BoxCollider` and `Action` delegates for the bounds events, and
+runs 40 actions each followed by `Iterate` and `IterateFocus` to the end on both sides, `Save`, more actions,
+then loads the save (and an empty one) through `IterateLoad`; graph, shadow meshes (`dirty` aside: the scene's
+baker clears it every frame) and the action list are compared. The ground collider is read through the
+engine's internal calls (`get_size_Injected`): the managed getters are stripped from the build.
+
 
 `game/tests/placemaker_graph_editing.rs` runs random actions on a fresh game `Graph` whose `master` is a
 stand-in `WorldMaster` (made with `new`) holding a fresh grid grown like ours, the test graph, and a fresh

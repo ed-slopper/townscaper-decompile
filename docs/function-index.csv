@@ -284,7 +284,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x7B2D70,0x107B2D70,Placemaker,AmbientSound,Update,private void Update(),dumped,
 0x7B2E50,0x107B2E50,Placemaker,AoBaker,ApplyMaterialColors,public void ApplyMaterialColors(),dumped,
 0x7B2F60,0x107B2F60,Placemaker,AoBaker,BakeAo,public void BakeAo(),dumped,
-0x7B3500,0x107B3500,Placemaker,AoBaker,GetShadowMesh,"public ValueTuple<ShadowMesh, int> GetShadowMesh(int shadowIndex)",dumped,
+0x7B3500,0x107B3500,Placemaker,AoBaker,GetShadowMesh,"public ValueTuple<ShadowMesh, int> GetShadowMesh(int shadowIndex)",checked,tests/placemaker_graph_loop.rs
 0x7B3800,0x107B3800,Placemaker,AoBaker,OnEnable,private void OnEnable(),dumped,
 0x7B3870,0x107B3870,Placemaker,AoBaker,OnPostRender,private void OnPostRender(),dumped,
 0x7B3980,0x107B3980,Placemaker,AoBaker,OnStart,public void OnStart(),dumped,
@@ -520,15 +520,15 @@ rva,va,namespace,type,method,signature,status,notes
 0x3E34F0,0x103E34F0,Placemaker,HoverHightlight,.cctor,private static void .cctor(),dumped,
 0x478690,0x10478690,Placemaker,LayerMaster,.cctor,private static void .cctor(),dumped,
 0x1D4430,0x101D4430,Placemaker,Maker,OnEnable,public void OnEnable(),dumped,
-0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),dumped,
-0x328D60,0x10328D60,Placemaker,Maker,AddAction,"public Action AddAction(int2 hexPos, byte height, VoxelType inType, VoxelType outType)",dumped,
+0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),checked,tests/placemaker_graph_loop.rs
+0x328D60,0x10328D60,Placemaker,Maker,AddAction,"public Action AddAction(int2 hexPos, byte height, VoxelType inType, VoxelType outType)",checked,tests/placemaker_graph_loop.rs
 0x328DE0,0x10328DE0,Placemaker,Maker,AddClick,"public Voxel AddClick(HoverData hover, VoxelType voxelType)",dumped,
 0x328F90,0x10328F90,Placemaker,Maker,BeginNewAction,public void BeginNewAction(),dumped,
 0x329140,0x10329140,Placemaker,Maker,CanClear,public bool CanClear(),dumped,
 0x329170,0x10329170,Placemaker,Maker,CanRedo,public bool CanRedo(),dumped,
 0x3291B0,0x103291B0,Placemaker,Maker,CanUndo,public bool CanUndo(),dumped,
 0x3291C0,0x103291C0,Placemaker,Maker,ClearCommand,public void ClearCommand(),dumped,
-0x3291D0,0x103291D0,Placemaker,Maker,ClearUndoQueue,public void ClearUndoQueue(),dumped,
+0x3291D0,0x103291D0,Placemaker,Maker,ClearUndoQueue,public void ClearUndoQueue(),checked,tests/placemaker_graph_loop.rs
 0x329270,0x10329270,Placemaker,Maker,Clear,public bool Clear(),dumped,
 0x329480,0x10329480,Placemaker,Maker,EndAction,public void EndAction(),dumped,
 0x3294B0,0x103294B0,Placemaker,Maker,HoldRedo,public bool HoldRedo(),dumped,
@@ -1033,7 +1033,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F53D0,0x101F53D0,Placemaker.Graphs,FlowTarget,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0xE829E0,0x10E829E0,Placemaker.Graphs,Graph,AddVoxel,"public Voxel AddVoxel(int2 hexPos, byte height, VoxelType voxelType, bool instantIntegration)",checked,tests/placemaker_graph_editing.rs
 0xE83110,0x10E83110,Placemaker.Graphs,Graph,ApplyAction,"public void ApplyAction(Action action, bool playEffect)",checked,tests/placemaker_graph_editing.rs
-0xE83440,0x10E83440,Placemaker.Graphs,Graph,BeginLoad,public void BeginLoad(SaveData saveData),dumped,
+0xE83440,0x10E83440,Placemaker.Graphs,Graph,BeginLoad,public void BeginLoad(SaveData saveData),checked,tests/placemaker_graph_loop.rs
 0xE83460,0x10E83460,Placemaker.Graphs,Graph,BinaryTreeSearchCorner,public int BinaryTreeSearchCorner(int2 hexPos0),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE83540,0x10E83540,Placemaker.Graphs,Graph,BinaryTreeSearchSquare,public int BinaryTreeSearchSquare(Vector3 pos),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE83620,0x10E83620,Placemaker.Graphs,Graph,BinaryTreeSearchVoxel,"public int BinaryTreeSearchVoxel(Transform cornerTransform, int height)",checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
@@ -1050,13 +1050,13 @@ rva,va,namespace,type,method,signature,status,notes
 0xE84F60,0x10E84F60,Placemaker.Graphs,Graph,IntegrateCorner,private bool IntegrateCorner(Corner voxelCorner),checked,tests/placemaker_graph_editing.rs
 0xE86B70,0x10E86B70,Placemaker.Graphs,Graph,IntegrateVoxel,"private void IntegrateVoxel(Voxel voxel, Corner corner)",checked,tests/placemaker_graph_editing.rs
 0xE875C0,0x10E875C0,Placemaker.Graphs,Graph,IsCoordinateAllowed,"public bool IsCoordinateAllowed(int2 hexPos, int height)",checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0xE87940,0x10E87940,Placemaker.Graphs,Graph,IterateFocus,public bool IterateFocus(),dumped,
-0xE88FF0,0x10E88FF0,Placemaker.Graphs,Graph,IterateLoad,public bool IterateLoad(SaveData saveData),dumped,
+0xE87940,0x10E87940,Placemaker.Graphs,Graph,IterateFocus,public bool IterateFocus(),checked,tests/placemaker_graph_loop.rs
+0xE88FF0,0x10E88FF0,Placemaker.Graphs,Graph,IterateLoad,public bool IterateLoad(SaveData saveData),checked,tests/placemaker_graph_loop.rs
 0xE89B70,0x10E89B70,Placemaker.Graphs,Graph,IterateRefillPools,public bool IterateRefillPools(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0xE89CF0,0x10E89CF0,Placemaker.Graphs,Graph,Iterate,public bool Iterate(),dumped,
+0xE89CF0,0x10E89CF0,Placemaker.Graphs,Graph,Iterate,public bool Iterate(),checked,tests/placemaker_graph_loop.rs
 0xE8AD40,0x10E8AD40,Placemaker.Graphs,Graph,OnDrawGizmos,private void OnDrawGizmos(),dumped,
 0xE8AE10,0x10E8AE10,Placemaker.Graphs,Graph,OnEnable,private void OnEnable(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0xE8B180,0x10E8B180,Placemaker.Graphs,Graph,OnStart,public void OnStart(),dumped,
+0xE8B180,0x10E8B180,Placemaker.Graphs,Graph,OnStart,public void OnStart(),ported,placemaker::graphs (container setup; not called on the harness)
 0xE8B3E0,0x10E8B3E0,Placemaker.Graphs,Graph,PaintVoxel,"public void PaintVoxel(Voxel voxel, VoxelType newType, Corner corner)",checked,tests/placemaker_graph_editing.rs
 0xE8B6C0,0x10E8B6C0,Placemaker.Graphs,Graph,QubeUpdated,public void QubeUpdated(Qube qube),checked,tests/placemaker_graph_editing.rs
 0xE8B720,0x10E8B720,Placemaker.Graphs,Graph,RemoveVoxel,public void RemoveVoxel(Voxel voxel),checked,tests/placemaker_graph_editing.rs
@@ -1066,9 +1066,9 @@ rva,va,namespace,type,method,signature,status,notes
 0xE8D380,0x10E8D380,Placemaker.Graphs,Graph,SampleNormalDistance2,"public ValueTuple<Vector3, float> SampleNormalDistance2(Vector3 worldPos)",dumped,
 0xE8E060,0x10E8E060,Placemaker.Graphs,Graph,SampleNormalDistance,"public ValueTuple<Vector3, float> SampleNormalDistance(Vector3 worldPos)",dumped,
 0xE8F8B0,0x10E8F8B0,Placemaker.Graphs,Graph,SampleNormal,public Vector3 SampleNormal(Vector3 worldPos),dumped,
-0xE8F920,0x10E8F920,Placemaker.Graphs,Graph,Save,public void Save(SaveData saveData),dumped,
+0xE8F920,0x10E8F920,Placemaker.Graphs,Graph,Save,public void Save(SaveData saveData),checked,tests/placemaker_graph_loop.rs
 0xE8FC80,0x10E8FC80,Placemaker.Graphs,Graph,SetEmptyBoundsCenter,public void SetEmptyBoundsCenter(int2 centerPos),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0xE8FD10,0x10E8FD10,Placemaker.Graphs,Graph,Test,public void Test(),dumped,
+0xE8FD10,0x10E8FD10,Placemaker.Graphs,Graph,Test,public void Test(),read,editor ContextMenu: scales every qube transform to 0.9 (no game state)
 0xE8FE50,0x10E8FE50,Placemaker.Graphs,Graph,<OnDrawGizmos>g__DrawBoundsGizmo|86_0,"internal static void <OnDrawGizmos>g__DrawBoundsGizmo|86_0(int3x2 bounds, int boundsHeight)",dumped,
 0xE917C0,0x10E917C0,Placemaker.Graphs,Graph,.cctor,private static void .cctor(),read,Shader.PropertyToID of the grid view / border shader globals (Bevy side)
 0xE91870,0x10E91870,Placemaker.Graphs,Graph,.ctor,public void .ctor(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs

@@ -35,6 +35,8 @@
 //! writes) an instance field: value types as `raw`, references as a kept `handle`.
 //! `static_field` with `"keep": true` also returns a reference field's object as a `handle`; `{"array_raw": n}`
 //! returns the element bytes of a value-type array held by handle `n`.
+//! `{"icall": "Ns.Class::method(Args)", "args": [...], "main": true}` calls an engine internal call by name
+//! (for getters the build strips from the managed side; see `icall`).
 //! `{"addr": n}` returns the address of the object held by handle `n` (to match references in raw values).
 //! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
 //! the field's value as `{"type", "raw"}` (value types by value, references as the 4-byte pointer).
@@ -199,6 +201,37 @@ impl Ctx {
         Ok(json!({"eax": eax, "bufs_after": bufs.iter().map(|b| hex(b)).collect::<Vec<_>>()}))
     }
 
+    /// `{"icall": "UnityEngine.BoxCollider::get_size_Injected(UnityEngine.Vector3&)", "args": [{"handle": n},
+    /// {"buf": hex}]}`: an engine internal call by its registered name (`il2cpp_resolve_icall`), for getters the
+    /// build strips from the managed side. Arguments: objects by handle (the managed pointer), `u32`s, or buffers
+    /// (pointers to a copy, returned in `bufs_after`); `eax` is the 32-bit return value.
+    unsafe fn icall(&self, req: &Value) -> Result<Value, String> {
+        let name = req["icall"].as_str().ok_or("icall: name")?;
+        let f = (self.api.il2cpp_resolve_icall)(c(name).as_ptr());
+        if f.is_null() {
+            return Err(format!("icall {name} not registered"));
+        }
+        let mut bufs: Vec<Vec<u8>> = Vec::new();
+        let mut words: Vec<u32> = Vec::new();
+        for a in req["args"].as_array().cloned().unwrap_or_default() {
+            if let Some(n) = a.get("u32").and_then(Value::as_u64) {
+                words.push(n as u32);
+            } else if let Some(h) = a.get("handle").and_then(Value::as_u64) {
+                words.push((self.api.il2cpp_gchandle_get_target)(h as u32) as usize as u32);
+            } else if let Some(h) = a.get("buf").and_then(Value::as_str) {
+                bufs.push(unhex(h)?);
+                words.push(bufs.last_mut().unwrap().as_mut_ptr() as usize as u32);
+            } else {
+                return Err(format!("bad icall arg {a}"));
+            }
+        }
+        let w = |i: usize| words.get(i).copied().unwrap_or(0);
+        type F6 = unsafe extern "C" fn(u32, u32, u32, u32, u32, u32) -> u32;
+        let fp: F6 = std::mem::transmute(f);
+        let eax = fp(w(0), w(1), w(2), w(3), w(4), w(5));
+        Ok(json!({"eax": eax, "bufs_after": bufs.iter().map(|b| hex(b)).collect::<Vec<_>>()}))
+    }
+
     /// `{"static_field": "Os.Hex.HexMath.hexAxisX"}`: the class is initialised (its static constructor runs),
     /// then the field's bytes (a value type's data, or the 4-byte object pointer).
     unsafe fn static_field(&self, req: &Value) -> Result<Value, String> {
@@ -340,6 +373,15 @@ impl Ctx {
                 Ok(json!({"handle": handle, "ctor": v}))
             })();
             return match made {
+                Ok(mut v) => {
+                    v["ok"] = json!(true);
+                    v
+                }
+                Err(e) => json!({"ok": false, "error": e}),
+            };
+        }
+        if req.get("icall").is_some() {
+            return match self.icall(req) {
                 Ok(mut v) => {
                     v["ok"] = json!(true);
                     v

@@ -74,6 +74,7 @@ api! {
     il2cpp_runtime_class_init: fn(Ptr) -> ();
     il2cpp_field_get_value: fn(Ptr, Ptr, Ptr) -> ();
     il2cpp_field_set_value: fn(Ptr, Ptr, Ptr) -> ();
+    il2cpp_resolve_icall: fn(*const c_char) -> Ptr;
 }
 
 /// A C string from il2cpp (borrowed).

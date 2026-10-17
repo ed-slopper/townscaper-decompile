@@ -6,12 +6,16 @@
 use std::collections::HashMap;
 
 use crate::os::{hex, utils};
+use crate::placemaker::ao_baker::AoBaker;
 use crate::placemaker::grid_generator::{self, GridGenerator};
+use crate::placemaker::maker::Maker;
 use crate::placemaker::quads::Quad;
+use crate::placemaker::save_data::{SaveCorner, SaveData, SaveVoxel};
+use crate::unity::geometry::Bounds;
 use crate::unity::mathematics::{f3, Float2, Float3, Int2, Int3, Int3x2};
 use crate::unity::mathf;
 use crate::unity::quaternion::Matrix4x4;
-use crate::unity::vector::{v4, Vector2, Vector3};
+use crate::unity::vector::{v4, Vector2, Vector3, Vector4};
 
 /// `Placemaker.VoxelType` (an `sbyte`): the 15 house colours, then the special kinds.
 #[repr(i8)]
@@ -411,12 +415,16 @@ impl Qube {
     }
 }
 
-/// `Graph.LoadState` (row E4d).
+/// `Graph.LoadState`: the steps of `IterateLoad` (`Graph.loadState` counts on past the last: done).
 #[repr(i32)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum LoadState {
     #[default]
-    None = 0,
+    Begin = 0,
+    RemoveExistingVoxels = 1,
+    ClearQubes = 2,
+    LoadNewVoxels = 3,
+    ApplyActions = 4,
 }
 
 /// `Placemaker.Graphs.Graph`: the town's voxel graph. The object arenas hold every `Corner` / `Square` /
@@ -461,7 +469,10 @@ pub struct Graph {
     pub bounds_updated: bool,
     pub recalculate_hex_bounds: bool,
     pub recalculate_height_bounds: bool,
-    pub load_state: LoadState,
+    /// A `LoadState`, or past the last once loading is done.
+    pub load_state: i32,
+    pub shadow_mesh_bounds: Bounds,
+    pub ground_collider: GroundCollider,
 }
 
 impl Default for Graph {
@@ -501,7 +512,9 @@ impl Default for Graph {
             bounds_updated: true,
             recalculate_hex_bounds: false,
             recalculate_height_bounds: false,
-            load_state: LoadState::None,
+            load_state: LoadState::Begin as i32,
+            shadow_mesh_bounds: Bounds { center: Vector3 { x: 0.0, y: 0.0, z: 0.0 }, extents: Vector3 { x: 0.0, y: 0.0, z: 0.0 } },
+            ground_collider: GroundCollider::default(),
         }
     }
 }
@@ -850,9 +863,26 @@ pub trait GraphHost {
     fn return_mesh(&mut self) {}
     /// `Placemaker.WaveFunctionCollapse.QubeRemoved` 0x3D9D10 (row E6).
     fn qube_removed(&mut self, _graph: &mut Graph, _qube: QubeId, _side_mask: u8) {}
-    /// `Placemaker.AoBaker.GetShadowMesh` 0x7B3500, and what `RemoveVoxel` does with it: the four shadow
-    /// vertices at the index set to zero, the shadow mesh marked dirty.
-    fn clear_shadow(&mut self, _shadow_index: i32) {}
+    /// `WorldMaster.aoBaker`: the shadow meshes the graph writes (`None`: the original throws).
+    fn ao_baker(&mut self) -> Option<&mut AoBaker> {
+        None
+    }
+    /// `Placemaker.AoBaker.BakeAo` 0x7B2F60 (row E9).
+    fn bake_ao(&mut self) {}
+    /// `WorldMaster.maker`: the action list loading fills (`None`: the original throws).
+    fn maker(&mut self) -> Option<&mut Maker> {
+        None
+    }
+    /// `Placemaker.WaveFunctionCollapse.QubeUpdated` 0x3D9ED0 (row E6).
+    fn wfc_qube_updated(&mut self, _graph: &mut Graph, _qube: QubeId) {}
+    /// `Placemaker.WaveFunctionCollapse.IteratePropagationCount` 0x3D9160 (row E6).
+    fn wfc_iterate_propagation_count(&mut self) {}
+    /// `UnityEngine.Shader.SetGlobalVector` (the shader property by name).
+    fn set_global_vector(&mut self, _name: &str, _value: Vector4) {}
+    /// `Graph.onBoundsUpdated` (the original calls it unchecked: it is always set).
+    fn on_bounds_updated(&mut self) {}
+    /// `Graph.onEmptyBoundsLoaded` (likewise).
+    fn on_empty_bounds_loaded(&mut self) {}
     /// The module containers half of `Placemaker.ModuleBuilder.MarkQubeForDeconstruction` 0x330190 (each child
     /// container to `MarkModuleContainerForDeconstruction`); the graph does the rest (`Graph::deconstruct_qube`).
     fn mark_module_containers_for_deconstruction(&mut self, _qube: QubeId) {}
@@ -1346,7 +1376,7 @@ impl Graph {
                     let shadow = self.qube(qube).shadow_index;
                     if shadow >= 0 {
                         self.shadow_mesh_indexes.push(shadow);
-                        host.clear_shadow(shadow);
+                        Graph::clear_shadow_quad(Graph::ao(host), shadow);
                         self.qube_mut(qube).shadow_index = -1;
                     }
                     self.deconstruct_qube(host, qube);
@@ -1430,5 +1460,478 @@ impl Graph {
             self.squares.remove(i);
         }
         self.square_pool.push(s);
+    }
+}
+
+// ---- The loop, loading and saving (row E4d) ----
+
+/// `Graph.groundCollider`: the `BoxCollider` under the town that catches clicks on the ground.
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
+pub struct GroundCollider {
+    pub size: Vector3,
+    pub center: Vector3,
+}
+
+/// `Graph..cctor` 0xE917C0: the shader properties `IterateFocus` sets (`Shader.PropertyToID`).
+pub const GRID_VIEW_MIN: &str = "_GridViewMin";
+pub const GRID_VIEW_MAX: &str = "_GridViewMax";
+pub const GRID_BORDER_MIN: &str = "_GridBorderMin";
+pub const GRID_BORDER_MAX: &str = "_GridBorderMax";
+
+fn v3_of(p: Int3) -> Vector3 {
+    Vector3 { x: p.x as f32, y: p.y as f32, z: p.z as f32 }
+}
+
+impl Graph {
+    fn ao<'h>(host: &'h mut dyn GraphHost) -> &'h mut AoBaker {
+        host.ao_baker().expect("Graph: NullReferenceException (master.aoBaker)")
+    }
+
+    fn maker<'h>(host: &'h mut dyn GraphHost) -> &'h mut Maker {
+        host.maker().expect("Graph.IterateLoad: NullReferenceException (master.maker)")
+    }
+
+    /// `Placemaker.Graphs.Graph.OnStart` 0xE8B180: the containers made (`Corners`, `Squares`, `LooseVoxels`,
+    /// `QubePool`, `CornerPool`, `SquarePool`, `VoxelPool`; the pools inactive: Bevy's side) and a first bake.
+    pub fn on_start(&mut self, host: &mut dyn GraphHost) {
+        self.corners.clear();
+        self.squares.clear();
+        self.loose_voxels.clear();
+        self.qube_pool.clear();
+        self.corner_pool.clear();
+        self.square_pool.clear();
+        self.voxel_pool.clear();
+        host.bake_ao();
+    }
+
+    /// `Placemaker.Graphs.Graph.Iterate` 0xE89CF0: one step of the graph's update, while the frame's budget lasts:
+    /// the queued corners integrated (from the last; one that cannot be yet stops the step), else the queued
+    /// qubes handed to the wave function collapse with their shadow quads kept up to date (then a bake), else
+    /// one corner's flow data trimmed. False when there was nothing to do.
+    pub fn iterate(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost) -> bool {
+        if !self.corner_integration_queue.is_empty() {
+            let mut i = self.corner_integration_queue.len();
+            while i > 0 {
+                i -= 1;
+                if !host.keep_going() {
+                    return true;
+                }
+                let c = self.corner_integration_queue[i];
+                if self.corner(c).collider_mesh.is_none() && !self.corner(c).voxels.is_empty() && !self.integrate_corner(grid, host, c) {
+                    return true;
+                }
+                self.corner_integration_queue.remove(i);
+            }
+            return true;
+        }
+        if self.qube_update_queue.is_empty() {
+            let Some(c) = self.corner_flow_queue.pop() else {
+                return false;
+            };
+            self.corner_mut(c).in_flow_update_queue = false;
+            if self.corner_pool.contains(&c) {
+                self.corner_mut(c).flow_datas.clear();
+                return true;
+            }
+            let mut top = 0;
+            for k in (0..self.corner(c).squares.len()).rev() {
+                let s = self.corner(c).squares[k];
+                top = mathf::max_i32(top, self.square(s).qubes.len() as i32);
+            }
+            let fd = &mut self.corner_mut(c).flow_datas;
+            if (top as usize) < fd.len() {
+                fd.truncate(top as usize);
+            }
+            return true;
+        }
+        let mut i = self.qube_update_queue.len();
+        while i > 0 {
+            i -= 1;
+            if !host.keep_going() {
+                break;
+            }
+            let q = self.qube_update_queue.remove(i);
+            let square = self.qube(q).square;
+            let in_squares = square.is_some_and(|s| self.squares.contains(&s));
+            if in_squares {
+                host.wfc_qube_updated(self, q);
+            }
+            self.qube_mut(q).awaiting_graph_update = false;
+            let cv = self.qube(q).corner_values;
+            let y = self.qube(q).local_position.y;
+            let empty = VoxelType::Empty as u8;
+            let shadowed = in_squares && 0.1 < y && (cv[1] != empty || cv[2] != empty || cv[3] != empty || cv[0] != empty);
+            let has_shadow = self.qube(q).shadow_index >= 0;
+            if shadowed {
+                self.shadow_quad(host, q, square.unwrap(), y, has_shadow);
+            } else if has_shadow {
+                let shadow = self.qube(q).shadow_index;
+                self.shadow_mesh_indexes.push(shadow);
+                Graph::clear_shadow_quad(Graph::ao(host), shadow);
+                self.qube_mut(q).shadow_index = -1;
+            }
+        }
+        host.bake_ao();
+        true
+    }
+
+    /// The four shadow vertices of `shadow_index` set to zero and the mesh marked dirty (`Iterate`,
+    /// `RemoveVoxel`).
+    fn clear_shadow_quad(ao: &mut AoBaker, shadow_index: i32) {
+        let (m, v) = ao.get_shadow_mesh(shadow_index);
+        let mesh = &mut ao.shadow_meshes[m];
+        for k in 0..4 {
+            mesh.shadow_mesh_verts[(v + k) as usize] = Vector3::default();
+        }
+        mesh.dirty = true;
+    }
+
+    /// The shadow part of `Iterate` 0xE89CF0 for a qube above the ground with a voxel corner: its marching-squares
+    /// cell (`powers` · the four lower corner values, `Empty` as 16) picks the UVs; a qube without a shadow quad
+    /// gets one (a freed index first, else the next new one with its two triangles) at its square's corners,
+    /// half a unit below the qube; one with a quad only gets new UVs.
+    fn shadow_quad(&mut self, host: &mut dyn GraphHost, q: QubeId, square: SquareId, y: f32, has_shadow: bool) {
+        let cv = self.qube(q).corner_values;
+        let ao = Graph::ao(host);
+        let p = ao.powers;
+        let val = |c: u8| if c == VoxelType::Empty as u8 { 16 } else { c as i32 };
+        let ab = p.x.wrapping_mul(val(cv[0])).wrapping_add(p.y.wrapping_mul(val(cv[1])));
+        let index = p.z.wrapping_mul(val(cv[2])).wrapping_add(p.w.wrapping_mul(val(cv[3])).wrapping_add(ab)).wrapping_mul(2);
+        let width = ao.marching_squares_tex_size.0;
+        let row = index / width;
+        let texel = ao.marching_squares_texel_size();
+        let col = index % width;
+        let fy = texel.y * 0.5 + (row * 2) as f32 * texel.y;
+        let fx = texel.x * 0.5 + col as f32 * texel.x;
+        let (u0, v0) = (fx + texel.x * 0.0 + 0.0, fy + texel.y * 0.0 + 0.0);
+        let (u1, v1) = (fx + texel.x + 1.0, fy + texel.y + 1.0);
+        let uvs = [Vector2 { x: u0, y: v0 }, Vector2 { x: u1, y: v0 }, Vector2 { x: u1, y: v1 }, Vector2 { x: u0, y: v1 }];
+        if has_shadow {
+            let (m, v) = ao.get_shadow_mesh(self.qube(q).shadow_index);
+            let mesh = &mut ao.shadow_meshes[m];
+            for (k, uv) in uvs.iter().enumerate() {
+                mesh.shadow_mesh_uvs[v as usize + k] = *uv;
+            }
+            mesh.dirty = true;
+            return;
+        }
+        let y = y - 0.5;
+        let verts = self.square_corners(square).map(|c| {
+            let p = self.corner(c).local_position;
+            Vector3 { x: p.x, y, z: p.z }
+        });
+        if let Some(shadow) = self.shadow_mesh_indexes.pop() {
+            self.qube_mut(q).shadow_index = shadow;
+            let (m, v) = ao.get_shadow_mesh(shadow);
+            let mesh = &mut ao.shadow_meshes[m];
+            for k in 0..4 {
+                mesh.shadow_mesh_verts[v as usize + k] = verts[k];
+            }
+            for k in 0..4 {
+                mesh.shadow_mesh_uvs[v as usize + k] = uvs[k];
+            }
+            mesh.dirty = true;
+            return;
+        }
+        let shadow = self.shadow_mesh_index_iterator;
+        self.shadow_mesh_index_iterator = shadow.wrapping_add(1);
+        self.qube_mut(q).shadow_index = shadow;
+        let (m, v) = ao.get_shadow_mesh(shadow);
+        let mesh = &mut ao.shadow_meshes[m];
+        mesh.shadow_mesh_tris.extend([v, v + 1, v + 2, v + 2, v + 3, v]);
+        mesh.shadow_mesh_verts.extend(verts);
+        mesh.shadow_mesh_uvs.extend(uvs);
+        mesh.dirty = true;
+    }
+
+    /// `Placemaker.Graphs.Graph.IterateFocus` 0xE87940: brings the bounds up to date, one kind per call. The hex
+    /// bounds recomputed from the corners with voxels (`recalculateHexBounds`), then the height from each corner's
+    /// top voxel (`recalculateHeightBounds`); else, when the bounds changed: `border` (how far the town may
+    /// spread, from `GetMaxExtents`; 1024 round an empty town), `genBounds` (96 round the bounds, within the
+    /// border + 2) and `viewBounds` (within the border) to the shaders, the shadow-mesh bounds round the bounds'
+    /// corners, the ground collider, `onBoundsUpdated`, a bake and the grid's focus. False when nothing changed.
+    pub fn iterate_focus(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost) -> bool {
+        use crate::os::extra_math::{center, encapsulate, set_y_f3};
+        if !self.recalculate_height_bounds && !self.recalculate_hex_bounds {
+            if !self.bounds_updated {
+                return false;
+            }
+            if !self.corners.is_empty() {
+                let (e, max_height) = Graph::get_max_extents(self.bounds, self.bounds_height);
+                self.max_height = max_height;
+                let e2 = e.wrapping_mul(2);
+                let (b0, b1) = (self.bounds.c0, self.bounds.c1);
+                self.border.c1 = Int3 { x: b0.x.wrapping_add(e2), y: b0.y.wrapping_add(e2), z: e2.wrapping_add(b0.z) };
+                self.border.c0 = Int3 { x: b1.x.wrapping_sub(e2), y: b1.y.wrapping_sub(e2), z: b1.z.wrapping_sub(e2) };
+            } else {
+                self.max_height = 256;
+                let (b0, b1) = (self.bounds.c0, self.bounds.c1);
+                self.border.c1 = Int3 { x: b0.x.wrapping_add(1024), y: b0.y.wrapping_add(1024), z: b0.z.wrapping_add(1024) };
+                self.border.c0 = Int3 { x: b1.x.wrapping_sub(1024), y: b1.y.wrapping_sub(1024), z: b1.z.wrapping_sub(1024) };
+            }
+            let (b0, b1, r0, r1) = (self.bounds.c0, self.bounds.c1, self.border.c0, self.border.c1);
+            let max = |a: i32, b: i32| if a <= b { b } else { a };
+            let min = |a: i32, b: i32| if b <= a { b } else { a };
+            let g0 = Int3 { x: b0.x.wrapping_sub(96), y: b0.y.wrapping_sub(96), z: b0.z.wrapping_sub(96) };
+            let g1 = Int3 { x: b1.x.wrapping_add(96), y: b1.y.wrapping_add(96), z: b1.z.wrapping_add(96) };
+            self.gen_bounds.c0 = Int3 { x: max(g0.x, r0.x.wrapping_sub(2)), y: max(g0.y, r0.y.wrapping_sub(2)), z: max(g0.z, r0.z.wrapping_sub(2)) };
+            self.gen_bounds.c1 = Int3 { x: min(g1.x, r1.x.wrapping_add(2)), y: min(g1.y, r1.y.wrapping_add(2)), z: min(g1.z, r1.z.wrapping_add(2)) };
+            let (g0, g1) = (self.gen_bounds.c0, self.gen_bounds.c1);
+            self.view_bounds.c0 = Int3 { x: max(g0.x, r0.x), y: max(g0.y, r0.y), z: max(g0.z, r0.z) };
+            self.view_bounds.c1 = Int3 { x: min(g1.x, r1.x), y: min(g1.y, r1.y), z: min(g1.z, r1.z) };
+            let v4_of = |p: Int3| Vector4 { x: p.x as f32, y: p.y as f32, z: p.z as f32, w: 0.0 };
+            host.set_global_vector(GRID_VIEW_MIN, v4_of(self.view_bounds.c0));
+            host.set_global_vector(GRID_VIEW_MAX, v4_of(self.view_bounds.c1));
+            host.set_global_vector(GRID_BORDER_MIN, v4_of(self.border.c0));
+            host.set_global_vector(GRID_BORDER_MAX, v4_of(self.border.c1));
+            // the shadow-mesh bounds: the bounds' top corner at boundsHeight, then all eight corners at 0
+            let (a, b) = (v3_of(self.bounds.c0), v3_of(self.bounds.c1));
+            let at = |p: Vector3, y: f32| {
+                let w = hex::plane_to_world(grid_generator::hex_to_plane(f3(p.x, p.y, p.z)), y);
+                Vector3 { x: w.x, y: w.y, z: w.z }
+            };
+            let mut sb = Bounds::new(at(a, self.bounds_height as f32), Vector3::default());
+            let v = |x: f32, y: f32, z: f32| Vector3 { x, y, z };
+            for p in [a, v(a.x, a.y, b.z), v(a.x, b.y, a.z), v(a.x, b.y, b.z), v(b.x, a.y, a.z), v(b.x, a.y, b.z), v(b.x, b.y, a.z), b] {
+                sb.encapsulate(at(p, 0.0));
+            }
+            let e = sb.extents;
+            sb.extents = Vector3 { x: e.x + 2.0, y: e.y + 0.0, z: e.z + 2.0 };
+            self.shadow_mesh_bounds = sb;
+            let size = sb.size();
+            self.ground_collider.size = Vector3 { x: size.x + 50.0, y: 2.0, z: size.z + 50.0 };
+            let c = set_y_f3(f3(sb.center.x, sb.center.y, sb.center.z), -1.0);
+            self.ground_collider.center = Vector3 { x: c.x, y: c.y, z: c.z };
+            host.on_bounds_updated();
+            host.bake_ao();
+            grid.focus_updated = true;
+            self.bounds_updated = false;
+            if self.bounds_height == 256 {
+                host.log("Achevement: MaxHeight");
+                host.achievement("MaxHeight");
+            }
+            return true;
+        }
+        if self.recalculate_hex_bounds {
+            let new = if self.corners.is_empty() {
+                let c = center(self.bounds);
+                Int3x2 { c0: c, c1: c }
+            } else {
+                let mut b = Int3x2 { c0: Int3 { x: i32::MAX, y: i32::MAX, z: i32::MAX }, c1: Int3 { x: i32::MIN, y: i32::MIN, z: i32::MIN } };
+                for k in (0..self.corners.len()).rev() {
+                    let c = self.corner(self.corners[k]);
+                    if !c.voxels.is_empty() {
+                        b = encapsulate(b, hex::get_hex3(c.hex_pos));
+                    }
+                }
+                b
+            };
+            if new != self.bounds {
+                self.bounds = new;
+                self.bounds_updated = true;
+            }
+            self.recalculate_hex_bounds = false;
+        }
+        if !self.recalculate_height_bounds {
+            return true;
+        }
+        let mut top = 0.0f32;
+        for k in (0..self.corners.len()).rev() {
+            let c = self.corner(self.corners[k]);
+            if let Some(&v) = c.voxels.last() {
+                top = mathf::max(top, self.voxel(v).local_position.y);
+            }
+        }
+        let h = mathf::ceil_to_int(top);
+        if h != self.bounds_height {
+            self.bounds_height = h;
+            self.bounds_updated = true;
+        }
+        self.recalculate_height_bounds = false;
+        true
+    }
+
+    /// `Placemaker.Graphs.Graph.BeginLoad` 0xE83440: loading starts over.
+    pub fn begin_load(&mut self) {
+        self.load_state = LoadState::Begin as i32;
+    }
+
+    /// `Placemaker.Graphs.Graph.IterateLoad` 0xE88FF0: one step of loading a town through `Maker`'s action list:
+    /// the undo queue cleared; a removal action for every voxel; the qubes cleared, square by square while the
+    /// budget lasts; the saved voxels inside the border made actions (an action that undoes an existing voxel
+    /// cancels it, one on an existing voxel repaints it; voxels at or above `maxHeight` and corners outside the
+    /// border dropped, with a log); every action applied, while the budget lasts. False once done.
+    pub fn iterate_load(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost, save: &SaveData) -> bool {
+        use crate::os::extra_math::{center, contains, encapsulate};
+        match self.load_state {
+            0 => {
+                Graph::maker(host).clear_undo_queue();
+                self.load_state += 1;
+                true
+            }
+            1 => {
+                let mut i = self.corners.len();
+                while i > 0 {
+                    i -= 1;
+                    if i >= self.corners.len() {
+                        continue;
+                    }
+                    let c = self.corners[i];
+                    for k in (0..self.corner(c).voxels.len()).rev() {
+                        let v = *self.voxel(self.corner(c).voxels[k]);
+                        let t = if v.height == 0 { VoxelType::Ground } else { v.voxel_type };
+                        let hex = self.corner(c).hex_pos;
+                        Graph::maker(host).add_action(hex, v.height, t, VoxelType::Empty);
+                    }
+                }
+                Graph::maker(host).action_index = 0;
+                self.load_state += 1;
+                true
+            }
+            2 => {
+                let n = self.squares.len() as i32;
+                if n <= Graph::maker(host).action_index {
+                    Graph::maker(host).action_index = 0;
+                    self.load_state += 1;
+                    return true;
+                }
+                loop {
+                    if n <= Graph::maker(host).action_index {
+                        return true;
+                    }
+                    if !host.keep_going() {
+                        return true;
+                    }
+                    let k = Graph::maker(host).action_index;
+                    Graph::maker(host).action_index = k + 1;
+                    let s = self.squares[k as usize];
+                    for j in (0..self.square(s).qubes.len()).rev() {
+                        let q = self.square(s).qubes[j];
+                        host.mark_module_containers_for_deconstruction(q);
+                        self.qube_updated(q);
+                    }
+                }
+            }
+            3 => {
+                let n = save.corners.len();
+                if n == 0 {
+                    self.set_empty_bounds_center(Int2 { x: 0, y: 0 });
+                    host.on_empty_bounds_loaded();
+                } else if save.voxels.is_empty() {
+                    if n == 1 {
+                        let c = save.corners[0];
+                        self.set_empty_bounds_center(Int2 { x: c.x, y: c.y });
+                        host.on_empty_bounds_loaded();
+                    }
+                } else {
+                    // the saved bounds and the height of the last voxel read (the original passes one value to
+                    // `Mathf.Max(params int[])`)
+                    let mut b = Int3x2 { c0: Int3 { x: i32::MAX, y: i32::MAX, z: i32::MAX }, c1: Int3 { x: i32::MIN, y: i32::MIN, z: i32::MIN } };
+                    let mut height = 0;
+                    let mut index: i32 = -1;
+                    for k in (0..n).rev() {
+                        let c = save.corners[k];
+                        b = encapsulate(b, Int3 { x: c.x, y: c.y, z: c.y.wrapping_add(c.x).wrapping_neg() });
+                        index = index.wrapping_add(c.count);
+                        height = save.voxels[index as usize].h as i32;
+                    }
+                    let (e, max_height) = Graph::get_max_extents(b, height);
+                    self.max_height = max_height;
+                    let ce = center(b);
+                    let region = Int3x2 {
+                        c0: Int3 { x: ce.x.wrapping_sub(e), y: ce.y.wrapping_sub(e), z: ce.z.wrapping_sub(e) },
+                        c1: Int3 { x: ce.x.wrapping_add(e), y: ce.y.wrapping_add(e), z: ce.z.wrapping_add(e) },
+                    };
+                    let mut count = Graph::maker(host).actions.len();
+                    let mut dropped = false;
+                    let mut vi = 0usize;
+                    for c in &save.corners {
+                        let hex = Int2 { x: c.x, y: c.y };
+                        if !contains(region, hex::get_hex3(hex)) {
+                            dropped = true;
+                            vi = vi.wrapping_add(c.count as usize);
+                            continue;
+                        }
+                        let mut left = c.count - 1;
+                        while left >= 0 {
+                            let v = save.voxels[vi];
+                            vi += 1;
+                            if self.max_height <= v.h as i32 {
+                                dropped = true;
+                                vi = vi.wrapping_add(left as usize);
+                                break;
+                            }
+                            let t = if v.h == 0 { VoxelType::Ground } else { VoxelType::from_i8(v.t as i8) };
+                            let maker = Graph::maker(host);
+                            let actions = &mut maker.actions;
+                            match (0..count).find(|&k| actions[k].hex_pos == hex && actions[k].height == v.h) {
+                                Some(k) if actions[k].in_type == t => {
+                                    actions.remove(k);
+                                    count -= 1;
+                                    maker.action_index -= 1;
+                                }
+                                Some(k) => actions[k].out_type = t,
+                                None => {
+                                    maker.add_action(hex, v.h, VoxelType::Empty, t);
+                                }
+                            }
+                            left -= 1;
+                        }
+                    }
+                    if dropped {
+                        host.log("Some voxels fell outside the border and was not loaded");
+                    }
+                }
+                Graph::maker(host).action_index = 0;
+                self.load_state += 1;
+                true
+            }
+            4 => {
+                let n = Graph::maker(host).actions.len() as i32;
+                host.wfc_iterate_propagation_count();
+                if n <= Graph::maker(host).action_index {
+                    Graph::maker(host).clear_undo_queue();
+                    self.load_state += 1;
+                    return true;
+                }
+                loop {
+                    if n <= Graph::maker(host).action_index {
+                        return true;
+                    }
+                    if !host.keep_going() {
+                        return true;
+                    }
+                    let k = Graph::maker(host).action_index;
+                    Graph::maker(host).action_index = k + 1;
+                    let a = Graph::maker(host).actions[k as usize];
+                    self.apply_action(grid, host, a, false);
+                }
+            }
+            _ => false,
+        }
+    }
+
+    /// `Placemaker.Graphs.Graph.Save` 0xE8F920: every corner with voxels (its position and count) and their
+    /// voxels (type, height) in sibling order; an empty town saves its bounds' centre as one corner of no voxels.
+    pub fn save(&self, host: &mut dyn GraphHost, save: &mut SaveData) {
+        save.voxels.clear();
+        save.corners.clear();
+        if self.corners.is_empty() {
+            let c = crate::os::extra_math::center(self.bounds);
+            save.corners.push(SaveCorner { x: c.x, y: c.y, count: 0 });
+            host.log(&format!("Save int3({}, {}, {})", c.x, c.y, c.z));
+            return;
+        }
+        for &c in &self.corners {
+            let k = self.corner(c);
+            if k.voxels.is_empty() {
+                continue;
+            }
+            save.corners.push(SaveCorner { x: k.hex_pos.x, y: k.hex_pos.y, count: k.voxels.len() as i32 });
+            for &v in &k.voxels {
+                let v = self.voxel(v);
+                save.voxels.push(SaveVoxel { t: v.voxel_type as u8, h: v.height });
+            }
+        }
     }
 }
