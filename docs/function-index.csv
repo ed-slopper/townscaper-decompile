@@ -1046,7 +1046,7 @@ rva,va,namespace,type,method,signature,status,notes
 0xE83B50,0x10E83B50,Placemaker.Graphs,Graph,GetOrCreateCorner,private Corner GetOrCreateCorner(int2 hexPos),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE83D90,0x10E83D90,Placemaker.Graphs,Graph,GetQubeRelation6,"public Qube.Relation6 GetQubeRelation6(Qube qube, byte mask)",checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE841B0,0x10E841B0,Placemaker.Graphs,Graph,GetQubeRelation,"public Qube.Relation GetQubeRelation(Qube qube, sbyte index)",checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0xE84460,0x10E84460,Placemaker.Graphs,Graph,GetQubeWithContext,"public ValueTuple<Qube, Square, Vector2, Vector2, Vector2, Vector2, int> GetQubeWithContext(Vector3 worldPos)",dumped,
+0xE84460,0x10E84460,Placemaker.Graphs,Graph,GetQubeWithContext,"public ValueTuple<Qube, Square, Vector2, Vector2, Vector2, Vector2, int> GetQubeWithContext(Vector3 worldPos)",checked,tests/placemaker_graph_sampling.rs
 0xE84F60,0x10E84F60,Placemaker.Graphs,Graph,IntegrateCorner,private bool IntegrateCorner(Corner voxelCorner),checked,tests/placemaker_graph_editing.rs
 0xE86B70,0x10E86B70,Placemaker.Graphs,Graph,IntegrateVoxel,"private void IntegrateVoxel(Voxel voxel, Corner corner)",checked,tests/placemaker_graph_editing.rs
 0xE875C0,0x10E875C0,Placemaker.Graphs,Graph,IsCoordinateAllowed,"public bool IsCoordinateAllowed(int2 hexPos, int height)",checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
@@ -1054,22 +1054,22 @@ rva,va,namespace,type,method,signature,status,notes
 0xE88FF0,0x10E88FF0,Placemaker.Graphs,Graph,IterateLoad,public bool IterateLoad(SaveData saveData),checked,tests/placemaker_graph_loop.rs
 0xE89B70,0x10E89B70,Placemaker.Graphs,Graph,IterateRefillPools,public bool IterateRefillPools(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE89CF0,0x10E89CF0,Placemaker.Graphs,Graph,Iterate,public bool Iterate(),checked,tests/placemaker_graph_loop.rs
-0xE8AD40,0x10E8AD40,Placemaker.Graphs,Graph,OnDrawGizmos,private void OnDrawGizmos(),dumped,
+0xE8AD40,0x10E8AD40,Placemaker.Graphs,Graph,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos (no game state)
 0xE8AE10,0x10E8AE10,Placemaker.Graphs,Graph,OnEnable,private void OnEnable(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE8B180,0x10E8B180,Placemaker.Graphs,Graph,OnStart,public void OnStart(),ported,placemaker::graphs (container setup; not called on the harness)
 0xE8B3E0,0x10E8B3E0,Placemaker.Graphs,Graph,PaintVoxel,"public void PaintVoxel(Voxel voxel, VoxelType newType, Corner corner)",checked,tests/placemaker_graph_editing.rs
 0xE8B6C0,0x10E8B6C0,Placemaker.Graphs,Graph,QubeUpdated,public void QubeUpdated(Qube qube),checked,tests/placemaker_graph_editing.rs
 0xE8B720,0x10E8B720,Placemaker.Graphs,Graph,RemoveVoxel,public void RemoveVoxel(Voxel voxel),checked,tests/placemaker_graph_editing.rs
-0xE8C970,0x10E8C970,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos, Qube qube)",dumped,
-0xE8CE30,0x10E8CE30,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos)",dumped,
-0xE8D270,0x10E8D270,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos, Transform qubeChild)",dumped,
-0xE8D380,0x10E8D380,Placemaker.Graphs,Graph,SampleNormalDistance2,"public ValueTuple<Vector3, float> SampleNormalDistance2(Vector3 worldPos)",dumped,
-0xE8E060,0x10E8E060,Placemaker.Graphs,Graph,SampleNormalDistance,"public ValueTuple<Vector3, float> SampleNormalDistance(Vector3 worldPos)",dumped,
-0xE8F8B0,0x10E8F8B0,Placemaker.Graphs,Graph,SampleNormal,public Vector3 SampleNormal(Vector3 worldPos),dumped,
+0xE8C970,0x10E8C970,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos, Qube qube)",checked,tests/placemaker_graph_sampling.rs
+0xE8CE30,0x10E8CE30,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos)",checked,tests/placemaker_graph_sampling.rs
+0xE8D270,0x10E8D270,Placemaker.Graphs,Graph,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 worldPos, Transform qubeChild)",ported,placemaker::graphs (sample_normal_coverage_qube: the qube a transform is under)
+0xE8D380,0x10E8D380,Placemaker.Graphs,Graph,SampleNormalDistance2,"public ValueTuple<Vector3, float> SampleNormalDistance2(Vector3 worldPos)",checked,tests/placemaker_graph_sampling.rs
+0xE8E060,0x10E8E060,Placemaker.Graphs,Graph,SampleNormalDistance,"public ValueTuple<Vector3, float> SampleNormalDistance(Vector3 worldPos)",checked,tests/placemaker_graph_sampling.rs
+0xE8F8B0,0x10E8F8B0,Placemaker.Graphs,Graph,SampleNormal,public Vector3 SampleNormal(Vector3 worldPos),checked,tests/placemaker_graph_sampling.rs
 0xE8F920,0x10E8F920,Placemaker.Graphs,Graph,Save,public void Save(SaveData saveData),checked,tests/placemaker_graph_loop.rs
 0xE8FC80,0x10E8FC80,Placemaker.Graphs,Graph,SetEmptyBoundsCenter,public void SetEmptyBoundsCenter(int2 centerPos),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE8FD10,0x10E8FD10,Placemaker.Graphs,Graph,Test,public void Test(),read,editor ContextMenu: scales every qube transform to 0.9 (no game state)
-0xE8FE50,0x10E8FE50,Placemaker.Graphs,Graph,<OnDrawGizmos>g__DrawBoundsGizmo|86_0,"internal static void <OnDrawGizmos>g__DrawBoundsGizmo|86_0(int3x2 bounds, int boundsHeight)",dumped,
+0xE8FE50,0x10E8FE50,Placemaker.Graphs,Graph,<OnDrawGizmos>g__DrawBoundsGizmo|86_0,"internal static void <OnDrawGizmos>g__DrawBoundsGizmo|86_0(int3x2 bounds, int boundsHeight)",read,editor gizmos (no game state)
 0xE917C0,0x10E917C0,Placemaker.Graphs,Graph,.cctor,private static void .cctor(),read,Shader.PropertyToID of the grid view / border shader globals (Bevy side)
 0xE91870,0x10E91870,Placemaker.Graphs,Graph,.ctor,public void .ctor(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE91B20,0x10E91B20,Placemaker.Graphs,Graph,get_anyVoxels,public bool get_anyVoxels(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
@@ -1080,10 +1080,10 @@ rva,va,namespace,type,method,signature,status,notes
 0x330990,0x10330990,Placemaker.Graphs,ModuleContainer,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0x6FC550,0x106FC550,Placemaker.Graphs,OrientedModuleSides,System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo,private int System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo(OrientedModuleSides other),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x1D4430,0x101D4430,Placemaker.Graphs,Qube,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
-0x841200,0x10841200,Placemaker.Graphs,Qube,GetNormal,public Vector3 GetNormal(),dumped,
+0x841200,0x10841200,Placemaker.Graphs,Qube,GetNormal,public Vector3 GetNormal(),checked,tests/placemaker_graph_sampling.rs
 0x841250,0x10841250,Placemaker.Graphs,Qube,OnDrawGizmosSelected,private void OnDrawGizmosSelected(),read,editor gizmos; not ported
-0x842670,0x10842670,Placemaker.Graphs,Qube,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 ts)",dumped,
-0x8434A0,0x108434A0,Placemaker.Graphs,Qube,Test,private void Test(),dumped,
+0x842670,0x10842670,Placemaker.Graphs,Qube,SampleNormalCoverage,"public ValueTuple<Vector3, float> SampleNormalCoverage(Vector3 ts)",checked,tests/placemaker_graph_sampling.rs
+0x8434A0,0x108434A0,Placemaker.Graphs,Qube,Test,private void Test(),read,editor gizmos (no game state)
 0x843780,0x10843780,Placemaker.Graphs,Qube,.ctor,public void .ctor(),checked,tests/placemaker_graph_editing.rs
 0x843810,0x10843810,Placemaker.Graphs,Qube,get_empty,public bool get_empty(),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x843820,0x10843820,Placemaker.Graphs,Qube,get_fullyCovered,public bool get_fullyCovered(),checked,placemaker::graphs; tests/placemaker_graphs.rs

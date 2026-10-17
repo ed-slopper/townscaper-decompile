@@ -12,7 +12,7 @@ use crate::placemaker::maker::Maker;
 use crate::placemaker::quads::Quad;
 use crate::placemaker::save_data::{SaveCorner, SaveData, SaveVoxel};
 use crate::unity::geometry::Bounds;
-use crate::unity::mathematics::{f3, Float2, Float3, Int2, Int3, Int3x2};
+use crate::unity::mathematics::{f2, f3, Float2, Float3, Int2, Int3, Int3x2};
 use crate::unity::mathf;
 use crate::unity::quaternion::Matrix4x4;
 use crate::unity::vector::{v4, Vector2, Vector3, Vector4};
@@ -1933,5 +1933,602 @@ impl Graph {
                 save.voxels.push(SaveVoxel { t: v.voxel_type as u8, h: v.height });
             }
         }
+    }
+}
+
+// ---- Sampling (row E4e) ----
+
+/// `Graph.GetQubeWithContext`'s answer: the qube at a point, its square, the square's four corners on the plane
+/// and the height (`None`, zeros and -1 when there is none).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct QubeContext {
+    pub qube: Option<QubeId>,
+    pub square: Option<SquareId>,
+    pub c0: Float2,
+    pub c1: Float2,
+    pub c2: Float2,
+    pub c3: Float2,
+    pub height: i32,
+}
+
+impl QubeContext {
+    pub const NONE: QubeContext = QubeContext { qube: None, square: None, c0: Float2 { x: 0.0, y: 0.0 }, c1: Float2 { x: 0.0, y: 0.0 }, c2: Float2 { x: 0.0, y: 0.0 }, c3: Float2 { x: 0.0, y: 0.0 }, height: -1 };
+}
+
+fn wtp(v: Vector3) -> Float2 {
+    hex::world_to_plane(f3(v.x, v.y, v.z))
+}
+
+impl Qube {
+    /// `Placemaker.Graphs.Qube.GetNormal` 0x841200: the normal at the qube's centre.
+    pub fn get_normal(&self, m: &[Matrix4x4; 4]) -> Vector3 {
+        self.sample_normal_coverage(m, Vector3 { x: 0.5, y: 0.5, z: 0.5 }).0
+    }
+
+    /// `Placemaker.Graphs.Qube.SampleNormalCoverage` 0x842670: at `ts` (0..1 in the qube, x / z along its
+    /// square's edges, y up), how much of the point is inside voxels (`coverage`, the trilinear weight of the
+    /// filled corners) and which way out is (`normal`, the gradient towards the empty corners: along the square's
+    /// edge directions sideways, up and down). An empty qube is (zero, 0), a full one (zero, 1). `m` are its
+    /// square's corner matrices. (Products grouped as in the asm: the sideways weights multiply a precomputed
+    /// pair, `iz2 * (iy * x)`.)
+    pub fn sample_normal_coverage(&self, m: &[Matrix4x4; 4], ts: Vector3) -> (Vector3, f32) {
+        if self.voxel_count == 0 {
+            return (Vector3::default(), 0.0);
+        }
+        if self.voxel_count == 0xFF {
+            return (Vector3::default(), 1.0);
+        }
+        let (x, y, z) = (ts.x, ts.y, ts.z);
+        let (ix, iy, iz) = (1.0 - x, 1.0 - y, 1.0 - z);
+        let (ix2, iy2, iz2) = (ix * ix, iy * iy, iz * iz);
+        let (x2, y2, z2) = (x * x, y * y, z * z);
+        let (a_ix2, a_iy2, a_iz2) = (1.0 - ix2, 1.0 - iy2, 1.0 - iz2);
+        let (a_x2, a_y2, a_z2) = (1.0 - x2, 1.0 - y2, 1.0 - z2);
+        let neg = |m: &Matrix4x4, c: usize| {
+            let v = m.column(c);
+            (-v.x, -v.y, -v.z)
+        };
+        let na = neg(&m[0], 0);
+        let nb = neg(&m[2], 0);
+        let nc = neg(&m[0], 2);
+        let nd = neg(&m[1], 2);
+        let e = VoxelType::Empty as u8;
+        let v = self.corner_values;
+        let (mut nx, mut ny, mut nz) = (0.0f32, 0.0f32, 0.0f32);
+        let mut cov = 0.0f32;
+        if v[0] != e {
+            if v[1] == e {
+                let w = ix2 * iy * iz - a_x2 * iy * iz;
+                nx = w * na.0 + nx;
+                ny = w * na.1 + ny;
+                nz = w * na.2 + nz;
+            }
+            if v[3] == e {
+                let w = iy * ix * iz2 - iy * ix * a_z2;
+                nx = nx + nc.0 * w;
+                ny = ny + nc.1 * w;
+                nz = nz + nc.2 * w;
+            }
+            if v[4] == e {
+                ny = ny - (iy2 * ix * iz - a_y2 * ix * iz);
+            }
+            cov = iy * ix * iz + 0.0;
+        }
+        let iyix = iy * ix;
+        if v[1] != e {
+            if v[0] == e {
+                let w = a_ix2 * iy * iz - x2 * iy * iz;
+                nx = nx + w * na.0;
+                ny = ny + w * na.1;
+                nz = nz + w * na.2;
+            }
+            if v[2] == e {
+                let t = iy * x;
+                let w = iz2 * t - a_z2 * t;
+                nx = nx + nd.0 * w;
+                ny = ny + nd.1 * w;
+                nz = nz + nd.2 * w;
+            }
+            if v[5] == e {
+                ny = ny - (iy2 * x * iz - a_y2 * x * iz);
+            }
+            cov = cov + iy * x * iz;
+        }
+        if v[2] != e {
+            if v[3] == e {
+                let w = iy * a_ix2 * z - iy * x2 * z;
+                nx = nx + nb.0 * w;
+                ny = ny + nb.1 * w;
+                nz = nz + nb.2 * w;
+            }
+            if v[1] == e {
+                let t = iy * x;
+                let w = a_iz2 * t - z2 * t;
+                nx = nx + nd.0 * w;
+                nz = nz + w * nd.2;
+                ny = ny + w * nd.1;
+            }
+            if v[6] == e {
+                ny = ny - (iy2 * x * z - a_y2 * x * z);
+            }
+            cov = cov + iy * x * z;
+        }
+        if v[3] != e {
+            if v[2] == e {
+                let w = iy * ix2 * z - iy * a_x2 * z;
+                nx = nx + nb.0 * w;
+                ny = ny + w * nb.1;
+                nz = nz + w * nb.2;
+            }
+            if v[0] == e {
+                let w = a_iz2 * iyix - z2 * iyix;
+                nx = nx + w * nc.0;
+                ny = ny + w * nc.1;
+                nz = nz + w * nc.2;
+            }
+            if v[7] == e {
+                ny = ny - (iy2 * ix * z - a_y2 * ix * z);
+            }
+            cov = cov + iyix * z;
+        }
+        if v[4] != e {
+            if v[5] == e {
+                let w = ix2 * y * iz - a_x2 * y * iz;
+                nx = nx + w * na.0;
+                ny = ny + w * na.1;
+                nz = nz + w * na.2;
+            }
+            if v[7] == e {
+                let t = y * ix;
+                let w = iz2 * t - a_z2 * t;
+                nx = nx + w * nc.0;
+                ny = ny + w * nc.1;
+                nz = nz + w * nc.2;
+            }
+            if v[0] == e {
+                ny = ny - (a_iy2 * ix * iz - y2 * ix * iz);
+            }
+            cov = cov + y * ix * iz;
+        }
+        if v[5] != e {
+            if v[4] == e {
+                let w = a_ix2 * y * iz - y * x2 * iz;
+                nx = nx + w * na.0;
+                ny = ny + w * na.1;
+                nz = nz + w * na.2;
+            }
+            if v[6] == e {
+                let t = y * x;
+                let w = iz2 * t - a_z2 * t;
+                nx = nx + w * nd.0;
+                ny = ny + w * nd.1;
+                nz = nz + w * nd.2;
+            }
+            if v[1] == e {
+                ny = ny - (a_iy2 * x * iz - y2 * x * iz);
+            }
+            cov = cov + y * x * iz;
+        }
+        if v[6] != e {
+            if v[7] == e {
+                let w = a_ix2 * y * z - y * x2 * z;
+                nx = nx + nb.0 * w;
+                ny = ny + w * nb.1;
+                nz = nz + w * nb.2;
+            }
+            if v[5] == e {
+                let t = y * x;
+                let w = a_iz2 * t - z2 * t;
+                nx = nx + w * nd.0;
+                ny = ny + w * nd.1;
+                nz = nz + w * nd.2;
+            }
+            if v[2] == e {
+                ny = ny - (a_iy2 * x * z - y2 * x * z);
+            }
+            cov = cov + y * x * z;
+        }
+        if v[7] != e {
+            if v[6] == e {
+                let w = ix2 * y * z - a_x2 * y * z;
+                nx = nx + w * nb.0;
+                ny = ny + w * nb.1;
+                nz = nz + w * nb.2;
+            }
+            if v[4] == e {
+                let t = y * ix;
+                let w = a_iz2 * t - z2 * t;
+                ny = ny + w * nc.1;
+                nz = w * nc.2 + nz;
+                nx = w * nc.0 + nx;
+            }
+            if v[3] == e {
+                ny = ny - (a_iy2 * ix * z - y2 * ix * z);
+            }
+            cov = cov + y * ix * z;
+        }
+        (Vector3 { x: nx, y: ny, z: nz }, cov)
+    }
+}
+
+impl Graph {
+    /// The four corners of a square on the plane.
+    fn square_plane_corners(&self, s: SquareId) -> [Float2; 4] {
+        self.square_corners(s).map(|c| wtp(self.corner(c).local_position))
+    }
+
+    /// `Placemaker.Graphs.Graph.GetQubeWithContext` 0xE84460: the qube under a world point: within the hex bounds
+    /// (+ 18) and the height (`RoundToInt(y)`, 0..=boundsHeight), the squares nearest in x (`squares` is sorted
+    /// by it; alternately one further along and one further back, each side stopping once it is 1.42 away)
+    /// within 2.1 squared of the point, whose four edges all have the point on their inner side.
+    pub fn get_qube_with_context(&self, world_pos: Vector3) -> QubeContext {
+        use crate::os::extra_math::{contains_f, rotate2d_90};
+        let hex = grid_generator::plane_to_hex(f2(world_pos.x, world_pos.z));
+        let b = self.bounds;
+        let wide = Int3x2 {
+            c0: Int3 { x: b.c0.x.wrapping_sub(18), y: b.c0.y.wrapping_sub(18), z: b.c0.z.wrapping_sub(18) },
+            c1: Int3 { x: b.c1.x.wrapping_add(18), y: b.c1.y.wrapping_add(18), z: b.c1.z.wrapping_add(18) },
+        };
+        let h = mathf::round_to_int(world_pos.y);
+        let _ = mathf::clamp01(0.5 - world_pos.y);
+        if !contains_f(wide, hex) || self.bounds_height < h || world_pos.y < 0.0 {
+            return QubeContext::NONE;
+        }
+        let n = self.squares.len() as i32;
+        if n == 0 {
+            return QubeContext::NONE;
+        }
+        let p = wtp(world_pos);
+        let mut up = self.binary_tree_search_square(world_pos);
+        if up < 0 {
+            up = !up;
+        }
+        let mut down = up - 1;
+        let mut forward = true;
+        let (mut has_down, mut has_up) = (down >= 0, up < n);
+        loop {
+            if !has_down && !has_up {
+                return QubeContext::NONE;
+            }
+            let this_forward = forward;
+            forward = !forward;
+            let i;
+            if this_forward {
+                if !has_up {
+                    continue;
+                }
+                i = up;
+                up += 1;
+                has_up = up < n;
+            } else {
+                if !has_down {
+                    continue;
+                }
+                i = down;
+                down -= 1;
+                has_down = down >= 0;
+            }
+            let s = self.squares[i as usize];
+            let sp = wtp(self.square(s).local_position);
+            let d = Float2 { x: sp.x - p.x, y: sp.y - p.y };
+            if this_forward {
+                if 1.42 < d.x {
+                    has_up = false;
+                    continue;
+                }
+            } else if 1.42 < -d.x {
+                has_down = false;
+                continue;
+            }
+            if 2.1 < d.x * d.x + d.y * d.y {
+                continue;
+            }
+            let [a, bb, c, dd] = self.square_plane_corners(s);
+            let inside = |from: Float2, to: Float2| {
+                let r = rotate2d_90(Float2 { x: to.x - from.x, y: to.y - from.y });
+                !(r.x * (p.x - from.x) + r.y * (p.y - from.y) < 0.0)
+            };
+            if !inside(a, bb) || !inside(bb, c) || !inside(c, dd) || !inside(dd, a) {
+                continue;
+            }
+            let qubes = &self.square(s).qubes;
+            if (qubes.len() as i32) <= h {
+                return QubeContext::NONE;
+            }
+            return QubeContext { qube: Some(qubes[h as usize]), square: Some(s), c0: a, c1: bb, c2: c, c3: dd, height: h };
+        }
+    }
+
+    /// `Placemaker.Graphs.Graph.SampleNormalCoverage(Vector3)` 0xE8CE30: `Qube.SampleNormalCoverage` of the qube
+    /// under the point (its position in the qube from `ExtraMath.InvBilinear` on the square's corners); no qube:
+    /// (up, `Clamp01(0.5 - y)`) at or below 0.5, else (zero, 0).
+    pub fn sample_normal_coverage(&self, world_pos: Vector3) -> (Vector3, f32) {
+        use crate::os::extra_math::inv_bilinear;
+        let ctx = self.get_qube_with_context(world_pos);
+        let Some(q) = ctx.qube else {
+            if world_pos.y <= 0.5 {
+                return (Vector3 { x: 0.0, y: 1.0, z: 0.0 }, mathf::clamp01(0.5 - world_pos.y));
+            }
+            return (Vector3::default(), 0.0);
+        };
+        let v2_of = |f: Float2| Vector2 { x: f.x, y: f.y };
+        let uv = inv_bilinear(v2_of(ctx.c0), v2_of(ctx.c1), v2_of(ctx.c2), v2_of(ctx.c3), v2_of(wtp(world_pos)));
+        let ts = Vector3 { x: uv.x, y: (world_pos.y + 0.5) - ctx.height as f32, z: uv.y };
+        let s = ctx.square.unwrap();
+        self.qube(q).sample_normal_coverage(&self.square(s).m, ts)
+    }
+
+    /// `Placemaker.Graphs.Graph.SampleNormalCoverage(Vector3, Qube)` 0xE8C970: as above for a given qube (its
+    /// height from `RoundToInt(y)`); no qube: (zero, 0) above 0.5, else (up, `Clamp01(0.5 - y)`). Also
+    /// `SampleNormalCoverage(Vector3, Transform)` 0xE8D270, which takes the qube a transform is under
+    /// (`GetComponentInParent<Qube>`).
+    pub fn sample_normal_coverage_qube(&self, world_pos: Vector3, qube: Option<QubeId>) -> (Vector3, f32) {
+        use crate::os::extra_math::inv_bilinear;
+        let Some(q) = qube else {
+            if 0.5 < world_pos.y {
+                return (Vector3::default(), 0.0);
+            }
+            return (Vector3 { x: 0.0, y: 1.0, z: 0.0 }, mathf::clamp01(0.5 - world_pos.y));
+        };
+        let s = self.qube(q).square.expect("Graph.SampleNormalCoverage: NullReferenceException (no square)");
+        let [a, b, c, d] = self.square_plane_corners(s);
+        let h = mathf::round_to_int(world_pos.y) as f32;
+        let v2_of = |f: Float2| Vector2 { x: f.x, y: f.y };
+        let uv = inv_bilinear(v2_of(a), v2_of(b), v2_of(c), v2_of(d), v2_of(wtp(world_pos)));
+        let ts = Vector3 { x: uv.x, y: (world_pos.y + 0.5) - h, z: uv.y };
+        self.qube(q).sample_normal_coverage(&self.square(s).m, ts)
+    }
+
+    /// `Placemaker.Graphs.Graph.SampleNormal` 0xE8F8B0: the coverage normal scaled by the coverage.
+    pub fn sample_normal(&self, world_pos: Vector3) -> Vector3 {
+        let (n, c) = self.sample_normal_coverage(world_pos);
+        Vector3 { x: n.x * c, y: n.y * c, z: n.z * c }
+    }
+
+    /// The grid quad under a point of `SampleNormalDistance(2)`, with the point's position in its cell: `None`
+    /// (zero, 2) when it is too high, too far from the bounds (288) or off the grid.
+    fn distance_cell(&self, grid: &GridGenerator, p: Float2, h: i32) -> Option<Quad> {
+        use crate::os::extra_math::contains_f;
+        if self.bounds_height + 1 < h {
+            return None;
+        }
+        let hex = grid_generator::plane_to_hex(p);
+        let b = self.bounds;
+        let wide = Int3x2 {
+            c0: Int3 { x: b.c0.x.wrapping_sub(288), y: b.c0.y.wrapping_sub(288), z: b.c0.z.wrapping_sub(288) },
+            c1: Int3 { x: b.c1.x.wrapping_add(288), y: b.c1.y.wrapping_add(288), z: b.c1.z.wrapping_add(288) },
+        };
+        if !contains_f(wide, hex) {
+            return None;
+        }
+        let q = grid.get_quad(p);
+        q.is_valid().then_some(q)
+    }
+
+    /// `Placemaker.Graphs.Graph.SampleNormalDistance2` 0xE8D380: like `Qube.SampleNormalCoverage` but on the grid
+    /// itself (the quad under the point, its corners' voxels at the two heights round it), so it also works
+    /// outside the squares; far below (h < -1): (zero, 1 - Clamp01(y - 0.5)); above or off the grid: (zero, 2).
+    pub fn sample_normal_distance2(&self, grid: &GridGenerator, world_pos: Vector3) -> (Vector3, f32) {
+        use crate::os::extra_math::inv_bilinear;
+        let p = wtp(world_pos);
+        let yy = world_pos.y - 0.5;
+        let h = mathf::floor_to_int(yy);
+        if h < -1 {
+            return (Vector3::default(), 1.0 - mathf::clamp01(yy));
+        }
+        let Some(q) = self.distance_cell(grid, p, h) else {
+            return (Vector3::default(), 2.0);
+        };
+        let v2_of = |f: Float2| Vector2 { x: f.x, y: f.y };
+        let uv = inv_bilinear(v2_of(q.p0), v2_of(q.p1), v2_of(q.p2), v2_of(q.p3), v2_of(p));
+        let w = hex::plane_to_world(f2(uv.x, uv.y), yy - h as f32);
+        let (x, y, z) = (w.x, w.y, w.z);
+        let (ix, iy, iz) = (1.0 - x, 1.0 - y, 1.0 - z);
+        let y2 = y * y;
+        let ix2 = ix * ix;
+        let a_iy2 = 1.0 - iy * iy;
+        let iz2 = iz * iz;
+        let x2 = x * x;
+        let a_ix2 = 1.0 - ix2;
+        let z2 = z * z;
+        let a_iz2 = 1.0 - iz2;
+        let a_x2 = 1.0 - x2;
+        let a_z2 = 1.0 - z2;
+        let edge = |a: Float2, b: Float2| {
+            let e = hex::plane_to_world(f2(a.x - b.x, a.y - b.y), 0.0);
+            (-e.x, -e.y, -e.z)
+        };
+        let e01 = edge(q.p0, q.p1);
+        let e32 = edge(q.p3, q.p2);
+        let e03 = edge(q.p0, q.p3);
+        let e12 = edge(q.p1, q.p2);
+        let (mut nx, mut ny, mut nz) = (0.0f32, 0.0f32, 0.0f32);
+        let mut cov = 0.0f32;
+        for k in 0..4 {
+            // per corner: (its vert, the x weights, the z weights, the two edge directions)
+            let (vert, wx0, wx1, wx, wz0, wz1, wz, ea, eb) = match k {
+                0 => (q.v0, a_ix2, x2, ix, a_iz2, z2, iz, e01, e03),
+                1 => (q.v1, ix2, a_x2, x, a_iz2, z2, iz, e01, e12),
+                2 => (q.v2, ix2, a_x2, x, iz2, a_z2, z, e32, e12),
+                _ => (q.v3, a_ix2, x2, ix, iz2, a_z2, z, e32, e03),
+            };
+            let Some(&c) = self.corner_dict.get(&vert) else {
+                continue;
+            };
+            let (mut ly, mut ly2, mut liy) = (a_iy2, y2, iy);
+            for j in 0..2 {
+                let f = if self.binary_tree_search_voxel(c, h + j) >= 0 { 1.0f32 } else { 0.0 };
+                let a = liy * wx0 * wz - liy * wx1 * wz;
+                let b = liy * wx * wz0 - liy * wx * wz1;
+                nz = a * ea.2 * f + nz + b * eb.2 * f;
+                let cc = wx * ly;
+                ly = 1.0 - ly;
+                ny = a * ea.1 * f + ny + b * eb.1 * f + (cc * wz - wx * ly2 * wz) * f;
+                nx = a * ea.0 * f + nx + b * eb.0 * f;
+                ly2 = 1.0 - ly2;
+                cov = f * wx * liy * wz + cov;
+                liy = 1.0 - liy;
+            }
+        }
+        (Vector3 { x: nx, y: ny, z: nz }, cov)
+    }
+}
+
+impl Graph {
+    /// The weight of one corner's flow data at a height in `SampleNormalDistance`: 0 under a voxel, 2 where no
+    /// voxel is next to it, else 1.
+    fn flow_weight(f: &FlowData) -> f32 {
+        if f.voxel.is_some() {
+            0.0
+        } else if f.neighbour_count == 0 {
+            2.0
+        } else {
+            1.0
+        }
+    }
+
+    /// `Placemaker.Graphs.Graph.SampleNormalDistance` 0xE8E060: `SampleNormalDistance2` written out by hand for the
+    /// four corners and two heights, weighing each corner by its flow data (`flow_weight`) instead of its voxel;
+    /// the original's operand grouping is kept block by block (read from the asm: the blocks differ, and Ghidra's
+    /// printout regroups them), and so are its use of the first edge for the fourth corner and the weight on one
+    /// side only of each upward term. Far below (h < -1):
+    /// (up, 1 - Clamp01(y - 0.5)); above or off the grid: (zero, 2).
+    pub fn sample_normal_distance(&self, grid: &GridGenerator, world_pos: Vector3) -> (Vector3, f32) {
+        use crate::os::extra_math::inv_bilinear;
+        let p = wtp(world_pos);
+        let yy = world_pos.y - 0.5;
+        let h = mathf::floor_to_int(yy);
+        if h < -1 {
+            return (Vector3 { x: 0.0, y: 1.0, z: 0.0 }, 1.0 - mathf::clamp01(yy));
+        }
+        let Some(q) = self.distance_cell(grid, p, h) else {
+            return (Vector3::default(), 2.0);
+        };
+        let v2_of = |f: Float2| Vector2 { x: f.x, y: f.y };
+        let uv = inv_bilinear(v2_of(q.p0), v2_of(q.p1), v2_of(q.p2), v2_of(q.p3), v2_of(p));
+        let w = hex::plane_to_world(f2(uv.x, uv.y), yy - h as f32);
+        let (x, y, z) = (w.x, w.y, w.z);
+        let (ix, iy, iz) = (1.0 - x, 1.0 - y, 1.0 - z);
+        let ix2 = ix * ix;
+        let iy2 = iy * iy;
+        let a_ix2 = 1.0 - ix2;
+        let iz2 = iz * iz;
+        let x2 = x * x;
+        let a_iy2 = 1.0 - iy2;
+        let y2 = y * y;
+        let a_iz2 = 1.0 - iz2;
+        let z2 = z * z;
+        let a_x2 = 1.0 - x2;
+        let a_y2 = 1.0 - y2;
+        let a_z2 = 1.0 - z2;
+        let edge = |a: Float2, b: Float2| hex::plane_to_world(f2(a.x - b.x, a.y - b.y), 0.0);
+        let e01 = edge(q.p0, q.p1);
+        let e32 = edge(q.p3, q.p2);
+        let e03 = edge(q.p0, q.p3);
+        let e12 = edge(q.p1, q.p2);
+        let (mut nx, mut ny, mut nz) = (0.0f32, 0.0f32, 0.0f32);
+        let mut cov = 0.0f32;
+        let flows = |vert: Int2| self.corner_dict.get(&vert).map(|&c| &self.corner(c).flow_datas);
+        let at = |fd: &Vec<FlowData>, k: i32| Graph::flow_weight(&fd[k as usize]);
+        // (grouping as in the asm: products left to right, each sum as the original pairs it)
+        // v0
+        if let Some(fd) = flows(q.v0) {
+            let n = fd.len() as i32;
+            if h < n && h >= 0 {
+                let f = at(fd, h);
+                let a = iy * ix2 * iz - iy * a_x2 * iz;
+                let t = iy * ix;
+                let b = iz2 * t - a_z2 * t;
+                nx = b * e03.x * f + (a * e01.x * f + nx);
+                ny = (b * e03.y * f + (a * e01.y * f + ny)) - (iy2 * (ix * f) * iz - a_y2 * ix * iz);
+                nz = b * e03.z * f + (a * e01.z * f + nz);
+                cov = iy * (ix * f) * iz + 0.0;
+            }
+            if h + 1 < n {
+                let f = at(fd, h + 1);
+                let a = ix2 * y * iz - a_x2 * y * iz;
+                let t = ix * y;
+                let b = iz2 * t - a_z2 * t;
+                nx = b * e03.x * f + (a * e01.x * f + nx);
+                nz = (a * e01.z * f + nz) + b * e03.z * f;
+                ny = (b * e03.y * f + (a * e01.y * f + ny)) - (a_iy2 * (ix * f) * iz - ix * y2 * iz);
+                cov = ix * f * y * iz + cov;
+            }
+        }
+        // v1
+        if let Some(fd) = flows(q.v1) {
+            let n = fd.len() as i32;
+            if h < n && h >= 0 {
+                let f = at(fd, h);
+                let a = iy * a_ix2 * iz - iy * x2 * iz;
+                let t = iy * x;
+                let b = iz2 * t - a_z2 * t;
+                nx = (nx + e01.x * a * f) + e12.x * b * f;
+                nz = (nz + e01.z * a * f) + e12.z * b * f;
+                ny = (e12.y * b * f + (ny + e01.y * a * f)) - (iy2 * (x * f) * iz - x * a_y2 * iz);
+                cov = iy * (x * f) * iz + cov;
+            }
+            if h + 1 < n {
+                let f = at(fd, h + 1);
+                let a = a_ix2 * y * iz - x2 * y * iz;
+                let t = x * y;
+                let b = t * iz2 - t * a_z2;
+                nx = e12.x * b * f + (e01.x * a * f + nx);
+                nz = e12.z * b * f + (e01.z * a * f + nz);
+                ny = (e12.y * b * f + (e01.y * a * f + ny)) - (a_iy2 * (x * f) * iz - y2 * x * iz);
+                cov = y * (x * f) * iz + cov;
+            }
+        }
+        // v2
+        if let Some(fd) = flows(q.v2) {
+            let n = fd.len() as i32;
+            if h < n && h >= 0 {
+                let f = at(fd, h);
+                let a = iy * a_ix2 * z - iy * x2 * z;
+                let t = iy * x;
+                let b = a_iz2 * t - z2 * t;
+                nx = e12.x * b * f + (e32.x * a * f + nx);
+                nz = e12.z * b * f + (e32.z * a * f + nz);
+                ny = (e12.y * b * f + (ny + e32.y * a * f)) - (iy2 * (x * f) * z - x * a_y2 * z);
+                cov = iy * (x * f) * z + cov;
+            }
+            if h + 1 < n {
+                let f = at(fd, h + 1);
+                let a = a_ix2 * y * z - x2 * y * z;
+                let t = x * y;
+                let b = t * a_iz2 - t * z2;
+                let ty = e32.y * a * f;
+                nx = e12.x * b * f + (e32.x * a * f + nx);
+                nz = e12.z * b * f + (e32.z * a * f + nz);
+                ny = (e12.y * b * f + (ny + ty)) - (a_iy2 * (x * f) * z - y2 * x * z);
+                cov = x * f * y * z + cov;
+            }
+        }
+        // v3 (the original takes the first edge, p0 - p1, here)
+        if let Some(fd) = flows(q.v3) {
+            let n = fd.len() as i32;
+            if h < n && h >= 0 {
+                let f = at(fd, h);
+                let a = iy * ix2 * z - iy * a_x2 * z;
+                let t = ix * iy;
+                let b = a_iz2 * t - z2 * t;
+                nx = b * e03.x * f + (a * e01.x * f + nx);
+                nz = b * e03.z * f + (a * e01.z * f + nz);
+                ny = (b * e03.y * f + (a * e01.y * f + ny)) - (iy2 * (ix * f) * z - ix * a_y2 * z);
+                cov = iy * (ix * f) * z + cov;
+            }
+            if h + 1 < n {
+                let f = at(fd, h + 1);
+                let a = ix2 * y * z - a_x2 * y * z;
+                let tz = a * e01.z * f;
+                let t = ix * y;
+                let b = t * a_iz2 - t * z2;
+                nx = b * e03.x * f + (nx + a * e01.x * f);
+                nz = b * e03.z * f + (tz + nz);
+                ny = (b * e03.y * f + (a * e01.y * f + ny)) - (a_iy2 * (ix * f) * z - ix * y2 * z);
+                cov = y * (ix * f) * z + cov;
+            }
+        }
+        (Vector3 { x: nx, y: ny, z: nz }, cov)
     }
 }

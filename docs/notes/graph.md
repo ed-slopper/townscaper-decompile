@@ -190,6 +190,36 @@ voxels (and logs it). Loading goes through `Maker`'s action list, one step per c
 `OnStart` 0xE8B180 makes the seven containers (pools inactive) and bakes once. `Test` 0xE8FD10 is an editor
 context-menu helper (scales every qube to 0.9): read, not ported.
 
+## Sampling (proven, E4e)
+
+What the town looks like as a field, for the props, birds and effects that sit on it.
+
+- `GetQubeWithContext` 0xE84460: the qube under a world point. Inside the hex bounds + 18 and `0 <= y`,
+  `RoundToInt(y) <= boundsHeight`, the squares nearest in x are tried (from `BinaryTreeSearchSquare`,
+  alternately the next one up and the next one down `squares`; a side stops once a square is 1.42 past the
+  point in x), skipping any farther than 2.1 squared, until one has the point on the inner side of all four
+  edges (`dot(Rotate2D90(edge), p - from) >= 0`). Returns the qube at that height (or nothing if the column is
+  lower), the square, its corners on the plane and the height.
+- `Qube.SampleNormalCoverage` 0x842670 at `ts` in the qube: `coverage` is the trilinear weight of its filled
+  corners (lower four, then upper four), `normal` the gradient towards empty neighbours: sideways along the
+  square's corner-matrix directions (`-m0` column 0, `-m2` column 0, `-m0` column 2, `-m1` column 2), up and
+  down as `y`. Empty qube (zero, 0), full qube (zero, 1). `GetNormal` 0x841200 is the normal at the centre.
+- `SampleNormalCoverage(point)` 0xE8CE30: the qube's sampler at its `ExtraMath.InvBilinear` position; no qube:
+  (up, `Clamp01(0.5 - y)`) at or below 0.5. `SampleNormalCoverage(point, qube)` 0xE8C970 (and the transform
+  overload 0xE8D270) does the same for a given qube with `RoundToInt(y)` as its height. `SampleNormal` 0xE8F8B0
+  is normal × coverage.
+- `SampleNormalDistance2` 0xE8D380: the same gradient on the **grid** (the quad under the point from
+  `GridGenerator.GetQuad`, its corners' voxels at the two heights round `y - 0.5`, edges from the quad's
+  corners), so it works outside the squares; below -1: (zero, `1 - Clamp01(y - 0.5)`); above the town + 1, more
+  than 288 from the bounds or off the grid: (zero, 2). `SampleNormalDistance` 0xE8E060 is the same written out by
+  hand for the four corners and two heights, weighing each corner by its **flow data** instead of its voxel (0
+  under a voxel, 2 with no voxel next to it, else 1); it keeps two slips of the original: the fourth corner
+  uses the first edge (p0 - p1), and the weight multiplies only one side of each upward term. Below -1 it
+  returns up rather than zero.
+
+The operand grouping of these float sums matters (results are compared bit for bit): Ghidra's printout regroups
+products (`a * b * c` for the compiled `a * (b * c)`) and sums, so both samplers were transcribed from the asm.
+
 ## The other systems
 
 The graph reaches the rest of the game through `master` (`WorldMaster`): its grid, `WorldMeshes`,
@@ -197,6 +227,9 @@ The graph reaches the rest of the game through `master` (`WorldMaster`): its gri
 calls them through the `GraphHost` trait; the rows that port those systems implement it.
 
 ## How it was checked
+
+`game/tests/placemaker_graph_sampling.rs` (E4e) builds a 60-voxel town with the full update and compares every
+sampler bit for bit at 600 random points round it, and the qube sampler at 400 points in random qubes.
 
 `game/tests/placemaker_graph_loop.rs` (E4d) adds the scene's `AoBaker` (the test graph's shadow quads start past
 the scene's meshes), a fresh `Maker`, a fresh `BoxCollider` and `Action` delegates for the bounds events, and
