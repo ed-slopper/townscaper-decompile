@@ -48,3 +48,27 @@ throw) and every pair through `CompareTo`.
 Blocked here: from this point the placement reads Unity's native transform math back (`worldToLocalMatrix`,
 `localToWorldMatrix`, `lossyScale`, and the rotation / scale round trips on prop instances it has just moved), so
 an exact port needs row E11 (`unity::transform`) first.
+
+## Prefabs and pools (E10b1, proven)
+
+`ts_data::props` (+ `scene::subtree`): the 71 prop prefabs the module library places, read from the player's
+files: each a tree (root first, depth first) with local poses as stored, mesh, the renderer's `m_Enabled` and
+materials (Unity 2020.3 `Renderer`: nine flag bytes, then aligned), and the fields of `Prop`, `PropNode`
+(relations resolved to nodes of the prefab), `PropCollider` (a node can have two), `PropTransformer`,
+`PropWireAnchor`. Checked against the game's own prefab objects node by node (`placemaker_prop_prefabs.rs`).
+
+`placemaker::prop_placer` (`PropScene`: the engine transforms of row E11 and each prop object's state):
+
+- `GetProp(src, parent)` 0x709EE0: the prefab's pool (made on first use by `UnityFunctions.GetNewGameObject`,
+  which ignores its name: a `New Game Object` put under the pool container with `SetParent(.., false)`; the
+  prefab appended to `srcProps`). An empty pool instantiates (`Instantiate(prefab, parent, false)`: local poses
+  as stored, the root `<name>(Clone)`, relations inside the prefab pointing at the clones), sets `srcProp` and
+  runs `RecursivePropNodeSetup`; otherwise the pool's last child is moved under `parent` keeping its local pose.
+- `RecursivePropNodeSetup` 0x70E500: a node is reset (`inDict`, `hasBeenTurnedOn`, `hideCount`, the parent,
+  child, overlap and motevee counts — not `anchorCount`, not the relations the prefab carries) and becomes the
+  child of the nearest node above (`AddChild` / `AddParent`); each mesh filter with a mesh gives that node's
+  `PropMeshReference` (added disabled when missing, `worldMaster` set) an item: batched (a new `BigMeshPart`,
+  the renderer turned off) unless on the no-shadows layer (18) or drawn with the door material
+  (`ShouldBeBatched`). Children the last first.
+- `OnEnable`: `srcProps[i]`'s pool is the container's child `i`. `ChangeHideCount`: a byte up or down, 255 logs
+  an error. `GetChunkMatrix(c)`: translation `2c + 1`.

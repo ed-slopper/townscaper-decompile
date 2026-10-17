@@ -62,6 +62,8 @@ pub struct Component {
     pub fields: Option<Value>,
     /// A `MeshFilter`'s mesh.
     pub mesh: Option<PPtr>,
+    /// A `MeshRenderer`'s `m_Enabled` and materials.
+    pub renderer: Option<(bool, Vec<PPtr>)>,
 }
 
 #[derive(Debug, Clone)]
@@ -126,6 +128,24 @@ fn component_kind(a: &AssetSet, f: &LoadedFile, class: i32, bytes: &[u8]) -> (St
     (class_name(class).map(str::to_string).unwrap_or_else(|| format!("class {class}")), None, None)
 }
 
+/// A `MeshRenderer`'s `m_Enabled` and `m_Materials` (Unity 2020.3's `Renderer`: `m_GameObject`, nine flag
+/// bytes from `m_Enabled`, `m_RenderingLayerMask`, `m_RendererPriority`, two lightmap indices, two lightmap
+/// tiling offsets, then the materials).
+fn renderer_of(bytes: &[u8]) -> Option<(bool, Vec<PPtr>)> {
+    let mut r = Reader::new(bytes);
+    r.pptr().ok()?;
+    let enabled = r.u8().ok()? != 0;
+    r.take(8).ok()?;
+    r.align4();
+    r.take(4 + 4 + 2 + 2 + 16 + 16).ok()?;
+    let n = r.i32().ok()?;
+    if !(0..=64).contains(&n) {
+        return None;
+    }
+    let mats = (0..n).map(|_| r.pptr()).collect::<Result<Vec<_>, _>>().ok()?;
+    Some((enabled, mats))
+}
+
 /// A `MeshFilter`'s mesh (`m_GameObject`, then `m_Mesh`).
 fn mesh_of(bytes: &[u8]) -> Option<PPtr> {
     let mut r = Reader::new(bytes);
@@ -148,7 +168,8 @@ fn build(a: &AssetSet, f: &LoadedFile, t_ptr: PPtr, seen: &mut HashSet<i64>) -> 
         let class = cf.class_id(co);
         let (kind, enabled, fields) = component_kind(a, cf, class, cf.bytes_of(co));
         let mesh = (class == 33).then(|| mesh_of(cf.bytes_of(co))).flatten();
-        components.push(Component { path_id: co.path_id, class_id: class, kind, enabled, fields, mesh });
+        let renderer = (class == 23).then(|| renderer_of(cf.bytes_of(co))).flatten();
+        components.push(Component { path_id: co.path_id, class_id: class, kind, enabled, fields, mesh, renderer });
     }
     let mut children = Vec::with_capacity(transform.children.len());
     for c in &transform.children {

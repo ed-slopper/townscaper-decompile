@@ -93,6 +93,24 @@ fn check_prefab(h: &mut Harness, prop: u64, ours: &PropPrefab, comp_type: u64, t
 
 struct Types {
     mesh_filter: u64,
+    /// The install's materials by id, with their names.
+    material_names: std::collections::HashMap<ts_data::props::AssetId, String>,
+}
+
+/// Every material of the install with its name (`m_Name` first).
+fn material_names(a: &ts_data::objects::AssetSet) -> std::collections::HashMap<ts_data::props::AssetId, String> {
+    let mut out = std::collections::HashMap::new();
+    for f in &a.files {
+        for o in &f.meta.objects {
+            if f.class_id(o) == 21 {
+                let mut r = ts_data::objects::Reader::new(f.bytes_of(o));
+                if let Ok(n) = r.string() {
+                    out.insert(ts_data::props::AssetId { file: f.name.clone(), path_id: o.path_id }, n);
+                }
+            }
+        }
+    }
+    out
 }
 
 fn class_name(h: &mut Harness, o: u64) -> String {
@@ -120,6 +138,15 @@ fn check_node(h: &mut Harness, t: u64, comps: &[u64], o: &PrefabNode, node_addr:
         assert!(!name(h, mesh).is_empty(), "{what}: mesh");
     }
     let (mut nc, mut nt) = (0, 0);
+    // the renderer: enabled, and its materials by name
+    if let Some((en, mats)) = &o.renderer {
+        let r = comps.iter().copied().find(|&c| class_name(h, c) == "UnityEngine.MeshRenderer").expect("a renderer");
+        assert_eq!(ret::bytes(&call(h, r, "UnityEngine.Renderer", "get_enabled", vec![]))[0] != 0, *en, "{what}: renderer enabled");
+        // (only `sharedMaterial`, the first, is left in the build; it is what `ShouldBeBatched` reads)
+        let g = call_keep(h, r, "UnityEngine.Renderer", "get_sharedMaterial", vec![]);
+        let want = mats.first().cloned().flatten().and_then(|m| types.material_names.get(&m).cloned());
+        assert_eq!(Some(name(h, g)), want, "{what}: sharedMaterial");
+    }
     for &c in comps {
         match class_name(h, c).as_str() {
             "Placemaker.Prop" => {
@@ -225,7 +252,7 @@ fn prop_prefabs_match_the_game() {
     }
     assert_eq!(game_prefab.len(), prefabs.len(), "prefab count");
     let comp_type = ty(h, "UnityEngine.Component, UnityEngine.CoreModule");
-    let types = Types { mesh_filter: ty(h, "UnityEngine.MeshFilter, UnityEngine.CoreModule") };
+    let types = Types { mesh_filter: ty(h, "UnityEngine.MeshFilter, UnityEngine.CoreModule"), material_names: material_names(&a) };
     for (i, pf) in prefabs.iter().enumerate() {
         let p = *by_addr.get(&game_prefab[i]).expect("the prefab's Prop object");
         check_prefab(h, p, pf, comp_type, &types);

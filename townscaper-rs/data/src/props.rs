@@ -90,6 +90,8 @@ pub struct PrefabNode {
     /// Every component's kind in order (`MeshFilter`, `Placemaker.Props.Window`, ...), the Transform left out.
     pub kinds: Vec<String>,
     pub mesh: Option<AssetId>,
+    /// The `MeshRenderer`'s `m_Enabled` and materials.
+    pub renderer: Option<(bool, Vec<Option<AssetId>>)>,
     pub prop: Option<PropData>,
     pub node: Option<PropNodeData>,
     /// In component order (a node can have several).
@@ -206,6 +208,7 @@ pub fn prop_prefab(a: &AssetSet, file: &str, prop: PPtr) -> Option<PropPrefab> {
             local_scale: n.transform.local_scale,
             kinds: n.components.iter().filter(|c| c.class_id != 4).map(|c| c.kind.clone()).collect(),
             mesh: None,
+            renderer: None,
             prop: None,
             node: None,
             colliders: Vec::new(),
@@ -215,6 +218,9 @@ pub fn prop_prefab(a: &AssetSet, file: &str, prop: PPtr) -> Option<PropPrefab> {
         for c in &n.components {
             if let Some(m) = c.mesh {
                 pn.mesh = resolve(a, &n.file, m);
+            }
+            if let Some((en, mats)) = &c.renderer {
+                pn.renderer = Some((*en, mats.iter().map(|&m| resolve(a, &n.file, m)).collect()));
             }
             let Some(v) = &c.fields else { continue };
             match c.kind.as_str() {

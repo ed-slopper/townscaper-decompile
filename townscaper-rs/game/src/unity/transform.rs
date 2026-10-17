@@ -99,10 +99,12 @@ impl Default for Node {
     }
 }
 
-/// The transforms (a forest: each root a hierarchy of its own in the engine).
+/// The transforms (a forest: each root a hierarchy of its own in the engine), with each one's children in
+/// sibling order (`GetChild`; a transform given a new parent goes last).
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct Transforms {
     pub nodes: Vec<Node>,
+    pub children: Vec<Vec<TransformId>>,
 }
 
 fn v3x(v: Vector3) -> X {
@@ -177,8 +179,32 @@ fn mirror(s: X, v: X) -> X {
 
 impl Transforms {
     pub fn add(&mut self, n: Node) -> TransformId {
+        let id = self.nodes.len();
+        if let Some(p) = n.parent {
+            self.children[p].push(id);
+        }
         self.nodes.push(n);
-        self.nodes.len() - 1
+        self.children.push(Vec::new());
+        id
+    }
+
+    /// `Transform.childCount`.
+    pub fn child_count(&self, id: TransformId) -> usize {
+        self.children[id].len()
+    }
+    /// `Transform.GetChild`.
+    pub fn child(&self, id: TransformId, i: usize) -> TransformId {
+        self.children[id][i]
+    }
+
+    fn reparent(&mut self, id: TransformId, parent: Option<TransformId>) {
+        if let Some(old) = self.nodes[id].parent {
+            self.children[old].retain(|&c| c != id);
+        }
+        if let Some(p) = parent {
+            self.children[p].push(id);
+        }
+        self.nodes[id].parent = parent;
     }
 
     /// `CalculateGlobalPosition` (UnityPlayer 0x10099250, `Transform.position`): the local position through each
@@ -286,7 +312,7 @@ impl Transforms {
             a = self.nodes[n].parent;
         }
         if !world_position_stays {
-            self.nodes[id].parent = parent;
+            self.reparent(id, parent);
             return true;
         }
         let pos = self.point_up(self.nodes[id].parent, self.nodes[id].t);
@@ -298,7 +324,7 @@ impl Transforms {
             [col(m[0]), col(m[1]), col(m[2])]
         };
         let diag = |c: [X; 3]| X([c[0].0[0], c[1].0[1], c[2].0[2], c[2].0[3]]);
-        self.nodes[id].parent = parent;
+        self.reparent(id, parent);
         let (mut p, mut q) = (pos, rot);
         if let Some(pp) = parent {
             p = self.inverse_transform_position(pp, p);

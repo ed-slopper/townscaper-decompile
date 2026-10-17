@@ -622,26 +622,26 @@ rva,va,namespace,type,method,signature,status,notes
 0x707B50,0x10707B50,Placemaker,PropPlacement,set_rotation,public void set_rotation(Vector3 value),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707C40,0x10707C40,Placemaker,PropPlacer,AddColliderToDict,private void AddColliderToDict(PropNode node0),dumped,
 0x708B00,0x10708B00,Placemaker,PropPlacer,AddSmoothTangentsToMesh,private void AddSmoothTangentsToMesh(Mesh mesh),dumped,
-0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",dumped,
-0x709A50,0x10709A50,Placemaker,PropPlacer,FirstTurnOn,private void FirstTurnOn(PropNode node),dumped,
-0x709A70,0x10709A70,Placemaker,PropPlacer,GetChunkMatrix,private Matrix4x4 GetChunkMatrix(int3 coordinate),dumped,
+0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",ported,placemaker::prop_placer
+0x709A50,0x10709A50,Placemaker,PropPlacer,FirstTurnOn,private void FirstTurnOn(PropNode node),ported,placemaker::prop_placer
+0x709A70,0x10709A70,Placemaker,PropPlacer,GetChunkMatrix,private Matrix4x4 GetChunkMatrix(int3 coordinate),ported,placemaker::prop_placer
 0x709BE0,0x10709BE0,Placemaker,PropPlacer,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType)",dumped,
-0x709EE0,0x10709EE0,Placemaker,PropPlacer,GetProp,"private Prop GetProp(Prop srcProp, Transform parent)",dumped,
-0x70A0C0,0x1070A0C0,Placemaker,PropPlacer,HideCountMinus,private void HideCountMinus(PropNode node),dumped,
-0x70A0E0,0x1070A0E0,Placemaker,PropPlacer,HideCountPlus,private void HideCountPlus(PropNode node),dumped,
+0x709EE0,0x10709EE0,Placemaker,PropPlacer,GetProp,"private Prop GetProp(Prop srcProp, Transform parent)",checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
+0x70A0C0,0x1070A0C0,Placemaker,PropPlacer,HideCountMinus,private void HideCountMinus(PropNode node),ported,placemaker::prop_placer
+0x70A0E0,0x1070A0E0,Placemaker,PropPlacer,HideCountPlus,private void HideCountPlus(PropNode node),ported,placemaker::prop_placer
 0x70A100,0x1070A100,Placemaker,PropPlacer,IterateDeconstructProps,public bool IterateDeconstructProps(),dumped,
 0x70A1A0,0x1070A1A0,Placemaker,PropPlacer,OnDoneResetting,public void OnDoneResetting(),dumped,
 0x70A1D0,0x1070A1D0,Placemaker,PropPlacer,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x70A5C0,0x1070A5C0,Placemaker,PropPlacer,OnEnable,private void OnEnable(),dumped,
+0x70A5C0,0x1070A5C0,Placemaker,PropPlacer,OnEnable,private void OnEnable(),ported,placemaker::prop_placer (the pools part checked through GetProp; the colliders re-added are row E10b4)
 0x70A7D0,0x1070A7D0,Placemaker,PropPlacer,OnReset,public void OnReset(),dumped,
 0x70A800,0x1070A800,Placemaker,PropPlacer,PlacePropsInQube,public void PlacePropsInQube(Qube qube),dumped,
 0x70DC20,0x1070DC20,Placemaker,PropPlacer,RecursiveCheck,"private bool RecursiveCheck(PropNode node0, PropNode inNode)",dumped,
-0x70E500,0x1070E500,Placemaker,PropPlacer,RecursivePropNodeSetup,"private void RecursivePropNodeSetup(PropNode parentNode, Transform srcT, Transform dstT)",dumped,
+0x70E500,0x1070E500,Placemaker,PropPlacer,RecursivePropNodeSetup,"private void RecursivePropNodeSetup(PropNode parentNode, Transform srcT, Transform dstT)",checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
 0x70E920,0x1070E920,Placemaker,PropPlacer,RemoveColliderFromDict,private void RemoveColliderFromDict(PropNode node0),dumped,
 0x70F1C0,0x1070F1C0,Placemaker,PropPlacer,RemovePropsFromContainer,public void RemovePropsFromContainer(ModuleContainer moduleContainer),dumped,
 0x70F2B0,0x1070F2B0,Placemaker,PropPlacer,ReturnProp,public void ReturnProp(Prop prop),dumped,
-0x70F910,0x1070F910,Placemaker,PropPlacer,<RecursivePropNodeSetup>g__ShouldBeBatched|24_0,private bool <RecursivePropNodeSetup>g__ShouldBeBatched|24_0(MeshFilter mf),dumped,
-0x70FA20,0x1070FA20,Placemaker,PropPlacer,.ctor,public void .ctor(),dumped,
+0x70F910,0x1070F910,Placemaker,PropPlacer,<RecursivePropNodeSetup>g__ShouldBeBatched|24_0,private bool <RecursivePropNodeSetup>g__ShouldBeBatched|24_0(MeshFilter mf),checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
+0x70FA20,0x1070FA20,Placemaker,PropPlacer,.ctor,public void .ctor(),ported,placemaker::prop_placer
 0x846A20,0x10846A20,Placemaker,RapidButton,Press,public bool Press(float intensity = 1),dumped,
 0x846AF0,0x10846AF0,Placemaker,RapidButton,.cctor,private static void .cctor(),dumped,
 0x846BE0,0x10846BE0,Placemaker,RapidButton,.ctor,"public void .ctor(float slowSpeed, float fastSpeed, int countThreshold)",dumped,
