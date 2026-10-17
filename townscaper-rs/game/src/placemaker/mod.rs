@@ -9,3 +9,4 @@ pub mod maker;
 pub mod modules;
 pub mod quads;
 pub mod save_data;
+pub mod wfc;

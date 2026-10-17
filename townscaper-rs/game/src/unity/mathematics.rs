@@ -117,6 +117,11 @@ pub fn sqrt(x: f32) -> f32 {
     (x as f64).sqrt() as f32
 }
 
+/// `Unity.Mathematics.math.sin(float)` (inlined): `(float)Math.Sin((double)x)`.
+pub fn sin(x: f32) -> f32 {
+    (x as f64).sin() as f32
+}
+
 /// `Unity.Mathematics.math.atan2(float, float)` (inlined): `(float)Math.Atan2((double)y, (double)x)` (the CRT's
 /// `_CIatan2`).
 pub fn atan2(y: f32, x: f32) -> f32 {

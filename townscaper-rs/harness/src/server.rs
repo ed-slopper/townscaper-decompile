@@ -427,7 +427,7 @@ impl Ctx {
             }
             (Some(t), _) => self.find_object(t)?,
             (None, Some(v)) if v.is_object() => {
-                let k = self.find_class(v["class"].as_str().ok_or("this_raw.class")?)?;
+                let k = self.resolve_class(v["class"].as_str().ok_or("this_raw.class")?)?;
                 let raw = unhex(v["raw"].as_str().ok_or("this_raw.raw")?)?;
                 this_size = raw.len();
                 // value-type instance methods take the unboxed data as `this`

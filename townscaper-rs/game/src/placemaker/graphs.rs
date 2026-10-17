@@ -733,6 +733,19 @@ impl Graph {
         height < 256
     }
 
+    /// The sibling index of a qube (its height in its square; in the pool, its place there).
+    pub fn qube_sibling_index(&self, qube: QubeId) -> i32 {
+        self.qube_index(qube).1
+    }
+
+    /// The world position of a qube (`transform.position`): its square's position plus its local position (the
+    /// graph and its `squares` container sit at the origin).
+    pub fn qube_position(&self, qube: QubeId) -> Vector3 {
+        let q = self.qube(qube);
+        let s = q.square.map(|s| self.square(s).local_position).unwrap_or_default();
+        Vector3 { x: s.x + q.local_position.x, y: s.y + q.local_position.y, z: s.z + q.local_position.z }
+    }
+
     /// The index of a qube among its square's qubes (its sibling index).
     fn qube_index(&self, qube: QubeId) -> (Option<SquareId>, i32) {
         match self.qube(qube).square {

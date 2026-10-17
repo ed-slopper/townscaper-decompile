@@ -954,25 +954,25 @@ rva,va,namespace,type,method,signature,status,notes
 0x3D5970,0x103D5970,Placemaker,VoxelBounceEffect,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker,WaterSound,.ctor,public void .ctor(),dumped,
 0x3D5A60,0x103D5A60,Placemaker,WaterSound,Update,public void Update(),dumped,
-0x3D5C50,0x103D5C50,Placemaker,WaveFunctionCollapse,DrawPropagationGizmo,private void DrawPropagationGizmo(WaveFunctionCollapse.Propagation propagation),dumped,
+0x3D5C50,0x103D5C50,Placemaker,WaveFunctionCollapse,DrawPropagationGizmo,private void DrawPropagationGizmo(WaveFunctionCollapse.Propagation propagation),read,editor gizmos (not in a player build's frame)
 0x3D6240,0x103D6240,Placemaker,WaveFunctionCollapse,FillDecorPossibilities,private byte FillDecorPossibilities(Qube qube),dumped,
-0x3D6DD0,0x103D6DD0,Placemaker,WaveFunctionCollapse,FillQubePossibilities,private byte FillQubePossibilities(Qube qube),dumped,
+0x3D6DD0,0x103D6DD0,Placemaker,WaveFunctionCollapse,FillQubePossibilities,private byte FillQubePossibilities(Qube qube),checked,tests/placemaker_wfc.rs
 0x3D7A00,0x103D7A00,Placemaker,WaveFunctionCollapse,Iterate0,public bool Iterate0(),dumped,
 0x3D7F50,0x103D7F50,Placemaker,WaveFunctionCollapse,Iterate1,public bool Iterate1(),dumped,
 0x3D8750,0x103D8750,Placemaker,WaveFunctionCollapse,IterateApplyModules,public bool IterateApplyModules(),dumped,
 0x3D88D0,0x103D88D0,Placemaker,WaveFunctionCollapse,IterateDecor,public bool IterateDecor(),dumped,
-0x3D9160,0x103D9160,Placemaker,WaveFunctionCollapse,IteratePropagationCount,public void IteratePropagationCount(),dumped,
-0x3D9180,0x103D9180,Placemaker,WaveFunctionCollapse,LastRemoved,"private void LastRemoved(Qube qube, ushort side, sbyte sideIndex)",dumped,
+0x3D9160,0x103D9160,Placemaker,WaveFunctionCollapse,IteratePropagationCount,public void IteratePropagationCount(),checked,tests/placemaker_wfc.rs
+0x3D9180,0x103D9180,Placemaker,WaveFunctionCollapse,LastRemoved,"private void LastRemoved(Qube qube, ushort side, sbyte sideIndex)",read,called only by itself: dead code (docs/notes/wfc.md)
 0x3D93C0,0x103D93C0,Placemaker,WaveFunctionCollapse,LaterUpdate,public void LaterUpdate(),dumped,
-0x3D98A0,0x103D98A0,Placemaker,WaveFunctionCollapse,MaybeQueueQubeForRebuilding,private bool MaybeQueueQubeForRebuilding(Qube qube),dumped,
-0x3D9970,0x103D9970,Placemaker,WaveFunctionCollapse,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x3D9D10,0x103D9D10,Placemaker,WaveFunctionCollapse,QubeRemoved,"public void QubeRemoved(Qube qube, byte sideMask)",dumped,
-0x3D9ED0,0x103D9ED0,Placemaker,WaveFunctionCollapse,QubeUpdated,public void QubeUpdated(Qube qube),dumped,
+0x3D98A0,0x103D98A0,Placemaker,WaveFunctionCollapse,MaybeQueueQubeForRebuilding,private bool MaybeQueueQubeForRebuilding(Qube qube),checked,tests/placemaker_wfc.rs
+0x3D9970,0x103D9970,Placemaker,WaveFunctionCollapse,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos (not in a player build's frame)
+0x3D9D10,0x103D9D10,Placemaker,WaveFunctionCollapse,QubeRemoved,"public void QubeRemoved(Qube qube, byte sideMask)",checked,tests/placemaker_wfc.rs
+0x3D9ED0,0x103D9ED0,Placemaker,WaveFunctionCollapse,QubeUpdated,public void QubeUpdated(Qube qube),checked,tests/placemaker_wfc.rs
 0x3D9F90,0x103D9F90,Placemaker,WaveFunctionCollapse,RemovePossibleDecor,"private void RemovePossibleDecor(Qube qube, OrientedModuleSides possibleModule, int index, Qube.Relation6 relations)",dumped,
-0x3DA190,0x103DA190,Placemaker,WaveFunctionCollapse,RemovePossibleModule,"private bool RemovePossibleModule(Qube qube, OrientedModuleSides possibleModule, int index, Qube.Relation6 relations)",dumped,
-0x3DA690,0x103DA690,Placemaker,WaveFunctionCollapse,ResetPropagationCounter,public void ResetPropagationCounter(),dumped,
-0x3DA780,0x103DA780,Placemaker,WaveFunctionCollapse,.ctor,public void .ctor(),dumped,
-0x4FC880,0x104FC880,Placemaker,WaveFunctionCollapse.Propagation,System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo,private int System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo(WaveFunctionCollapse.Propagation p1),dumped,
+0x3DA190,0x103DA190,Placemaker,WaveFunctionCollapse,RemovePossibleModule,"private bool RemovePossibleModule(Qube qube, OrientedModuleSides possibleModule, int index, Qube.Relation6 relations)",ported,"placemaker::wfc; checked with the fills of tests/placemaker_wfc.rs, but its lastRemovals branch was not reached yet (E6b)"
+0x3DA690,0x103DA690,Placemaker,WaveFunctionCollapse,ResetPropagationCounter,public void ResetPropagationCounter(),checked,tests/placemaker_wfc.rs
+0x3DA780,0x103DA780,Placemaker,WaveFunctionCollapse,.ctor,public void .ctor(),ported,placemaker::wfc (empty lists: Default)
+0x4FC880,0x104FC880,Placemaker,WaveFunctionCollapse.Propagation,System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo,private int System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo(WaveFunctionCollapse.Propagation p1),checked,tests/placemaker_wfc.rs
 0x1F8B60,0x101F8B60,Placemaker,WorldMaster,GetSaveString,public string GetSaveString(),dumped,
 0x1F8C00,0x101F8C00,Placemaker,WorldMaster,Iterate,private bool Iterate(),dumped,
 0x1F9160,0x101F9160,Placemaker,WorldMaster,get_keeepGoing,public bool get_keeepGoing(),dumped,
