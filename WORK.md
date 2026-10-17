@@ -29,7 +29,11 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | GPU passes: need the shaders (C3) to check |
+| E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | Split: E9a–E9d; GPU passes need the shaders (C3) to check |
+| E9a | `ShadowBaker` (17: `OnStart`, `MaybeUpdateFraming` 0x974B30, `MaybeUpdateAngle`, `LateUpdate`, `UpdateLamps`, angle setters, `Load`/`Save`) and `ShadowBakerCamera`: framing and sun angle on the CPU, the bake as a render-pass description | unowned | E8b | ed-slopper/wren (2026-10-17) | Split of E9 |
+| E9b | `AoBaker` (9: `OnStart`, `BakeAo`, `OnPostRender`, `Restore`, `ApplyMaterialColors`): the AO pass set-up and colours, passes as render-pass descriptions | unowned | E9a | | Split of E9 |
+| E9c | `Sandbanker` (9, `Iterate` 0x84FBA0, `UpdateShadeUvs`, `Clear`, `Reset`): the sandbank mesh iteration | unowned | E9a | | Split of E9 |
+| E9d | `DrawPlane` (`IterateUpdate`, `AllowedQuad`, `SetToHoverData`, `Update`) and `BorderDrawer` (`Draw`, `SetupBlock`, `BoundsUpdated`) | unowned | E9a | | Split of E9 |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | |
 | E11 | `ts_game::unity::transform`: Unity's `Transform` hierarchy math the game reads back (`position`/`rotation`/`lossyScale` from the parent chain, `TransformPoint`, `InverseTransformPoint`, `TransformDirection`, `localToWorldMatrix`, `SetParent` keeping world pose), exact (native code in UnityPlayer.dll), checked with the harness on real scene transforms | unowned | F11b | | Gap of F11f |
 | E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
@@ -211,3 +215,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: E8b done; claim E8c.
 - 2026-10-17 ed-slopper/wren: E8c done; claim E8d.
 - 2026-10-17 ed-slopper/wren: E8d done; E8 complete.
+- 2026-10-17 ed-slopper/wren: split E9 into E9a–E9d; claim E9a.
