@@ -29,8 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E7b | Big meshes: `BigMesh`, `BigMeshGroup`, `BigMeshList`, `BigMeshMaster` (`AddMesh`, `GetBigMesh`, `MaybeApply`, `ReturnMesh`, `OnLateUpdate`, `OnStart`), `BigMeshPart`: the pooled vertex ranges the modules are written into, as plain data for Bevy | unowned | E7a | ed-slopper/wren (2026-10-16) | Split of E7 |
-| E7c | `ModuleBuilder`: `ApplyModule` 0x32E5F0, `ApplyDecor` 0x32D340 and their `GetNewBigMeshPart`, module containers (`GetModuleContainer`, `MarkModuleContainerForDeconstruction`, `DeconstructModuleContainer`, `MarkQubeForDeconstruction`, `IterateDeconstructQubes`), the grass queue, `Iterate`, `OnStart`; behind `WfcHost` | unowned | E7b | | Split of E7 |
+| E7c | `ModuleBuilder`: `ApplyModule` 0x32E5F0, `ApplyDecor` 0x32D340 and their `GetNewBigMeshPart`, module containers (`GetModuleContainer`, `MarkModuleContainerForDeconstruction`, `DeconstructModuleContainer`, `MarkQubeForDeconstruction`, `IterateDeconstructQubes`), the grass queue, `Iterate`, `OnStart`; behind `WfcHost` | unowned | E7b | ed-slopper/wren (2026-10-16) | Split of E7 |
 | E7d | `WorldMeshes` (11: mesh / mesh filter pools), `MaterialMaster` (palette texture, voxel materials), `Palette` / `PaletteHolder`, `BitMeshQuadChange.CompareTo` | unowned | E7c | | Split of E7 |
 | E8 | Boot and the main loop as Bevy systems in the game's order: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7d | | Who ticks whom each frame (Unity's Awake/Start/Update/LateUpdate order, script execution order from `globalgamemanagers`); scene `level0..2` wiring from F8f |
 | E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | GPU passes: need the shaders (C3) to check |
@@ -137,6 +136,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E6b | `WaveFunctionCollapse` loops: `Iterate0`, `Iterate1`, `IterateApplyModules`, `LaterUpdate`; the module builder behind `WfcHost`; 4 rows `checked`, `RemovePossibleModule` now `checked` (12 actions with the world master's loop order on the game's WFC and a working `ModuleBuilder`: all queues, qubes and shown modules equal, up to 88 qubes / 2,133 `Iterate1` rounds) | P1 | ed-slopper/wren | 2026-10-16 | b81e62f |
 | E6c | `WaveFunctionCollapse` decor: `FillDecorPossibilities`, `RemovePossibleDecor`, `IterateDecor`; 3 rows `checked` in the same test (2,469 `IterateDecor` rounds, 357 decor built). With E6a and E6b the wave function collapse is complete: every row `checked`, `ported` (`.ctor`) or `read` (`LastRemoved`, gizmos) | P1 | ed-slopper/wren | 2026-10-16 | b81e62f |
 | E7a | Module geometry in `placemaker::module_builder`: `GetTs`, `MultiplyPoint`, `MultiplyVector`; 3 rows `checked` (12,000 results on random corner matrices, bit for bit); notes/meshes.md | P1 | ed-slopper/wren | 2026-10-16 | 70a2eee |
+| E7b | Big meshes in `placemaker::big_mesh` (plain data): `BigMesh`, `BigMeshGroup`, `BigMeshPart`, `BigMeshList`, `BigMeshMaster` (`GetBigMesh`, `AddMesh`, `ReturnMesh`, `MaybeApply`, `OnLateUpdate`); 7 rows `checked` (300 random add / return steps on the scene's master, all lists equal), 11 `ported` (ctors, `Populate`, list pool) | P1 | ed-slopper/wren | 2026-10-16 | be55274 |
 
 ## Changes to the board
 
@@ -200,3 +200,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: E6b and E6c done; the wave function collapse E6 (E6a–E6c) is complete.
 - 2026-10-16 ed-slopper/wren: split E7 into E7a–E7d; claim E7a.
 - 2026-10-16 ed-slopper/wren: E7a done; claim E7b.
+- 2026-10-16 ed-slopper/wren: E7b done; claim E7c.
