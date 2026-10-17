@@ -31,8 +31,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | Split: E10a–E10d |
 | E10b | `PropPlacer` placement (22): `PlacePropsInQube` 0x70A800, `RecursivePropNodeSetup`, `RecursiveCheck`, `GetProp` / `ReturnProp`, colliders, hide counts, deconstruction, `GetChunkMatrix`; the prop prefabs read from the player's files | unowned | E10a, E11 | | Split: E10b1–E10b4 (PlacePropsInQube is ~4,500 decompiled lines with its finally path) |
-| E10b1 | Prop prefabs and pools: the prop prefabs read from the player's files (hierarchy, local poses, `Prop` / `PropNode` / `PropReference` / `PropCollider` / modifier fields), `PropPlacer.GetProp` / `ReturnProp` / `RecursivePropNodeSetup` (+ `ShouldBeBatched`), `OnEnable` pools | unowned | E10a, E11 | ed-slopper/wren (2026-10-17) | Split of E10b |
-| E10b2 | `PlacePropsInQube` 0x70A800 placement: the random draw, side checks across squares, the prop's pose through the square, coloured meshes, `PropTransformer` refit, modifiers | unowned | E10b1 | | Split of E10b |
+| E10b2 | `PlacePropsInQube` 0x70A800 placement: the random draw, side checks across squares, the prop's pose through the square, coloured meshes, `PropTransformer` refit, modifiers | unowned | E10b1 | ed-slopper/wren (2026-10-17) | Split of E10b |
 | E10b3 | `PlacePropsInQube`'s node part (its `finally` path 0x70D3E7): node priorities from parents, overlaps, motevees, anchors and wires, `RecursiveCheck` | unowned | E10b2 | | Split of E10b |
 | E10b4 | Prop colliders and removal: `AddColliderToDict` / `RemoveColliderFromDict` (2-unit chunks, `GetChunkMatrix`), hide counts, `RemovePropsFromContainer`, `IterateDeconstructProps` | unowned | E10b3 | | Split of E10b |
 | E10c | Prop modifiers and meshes: `PropTransformer`, `PropNgonScaler`, `PropReference`, `PropMeshReference`, `PropColoredMesh`, `PropMeshOutline`, `ShiftingMesh`, `PropMeshAnimator`, `GetMeshWithVoxelType`, `AddSmoothTangentsToMesh` | unowned | E10b, E11 | | Split of E10 |
@@ -151,6 +150,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E9d | `BorderDrawer` in `placemaker::border_drawer` (6 rows `ported`, over the checked `PopulateBorderMesh`); `DrawPlane` `read` (a development aid in none of the game's scenes); E9 complete | P1 | ed-slopper/wren | 2026-10-17 | f36d843 |
 | E10a | Prop data in `placemaker::props`: `PropPlacement` (rotation, matrix) and `PropNode` (relation runs, ordering, the game's exceptions) `checked` (22 rows), `Prop` / `PropNode..ctor` `ported`; the prefab reader moved to E10b; notes/props.md | P1 | ed-slopper/wren | 2026-10-17 | 55be482 |
 | E11 | Transform math in `unity::transform` (+ `unity::sse`): the engine's hand-vectorised routines transcribed (global position / rotation / matrices / `lossyScale`, `TransformPoint` / `Direction` and inverses, the setters, `SetParent` keeping the world pose), bit-exact on random hierarchies and the scene's transforms; `rcpps` is the CPU's own; notes/unity.md | P1 | ed-slopper/wren | 2026-10-17 | 79969e6 |
+| E10b1 | Prop prefabs and pools: `ts_data::props` (71 prefabs, checked node by node against the game's), `placemaker::prop_placer` `GetProp` / `RecursivePropNodeSetup` / `ShouldBeBatched` `checked` (every prefab and random ones, from pools too), `OnEnable` pools, hide counts, `GetChunkMatrix` `ported` | P1 | ed-slopper/wren | 2026-10-17 | ae01bc2 |
 
 ## Changes to the board
 
@@ -233,3 +233,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: claim E11 (needed by E10b).
 - 2026-10-17 ed-slopper/wren: E11 done; claim E10b again.
 - 2026-10-17 ed-slopper/wren: split E10b into E10b1–E10b4; claim E10b1.
+- 2026-10-17 ed-slopper/wren: E10b1 done; claim E10b2.
