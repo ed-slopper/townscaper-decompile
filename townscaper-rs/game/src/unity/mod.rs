@@ -10,4 +10,6 @@ pub mod mathematics;
 pub mod mathf;
 pub mod quaternion;
 pub mod random;
+pub mod sse;
+pub mod transform;
 pub mod vector;

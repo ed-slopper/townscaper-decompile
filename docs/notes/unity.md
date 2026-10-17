@@ -146,3 +146,45 @@ The game never passes such angles; if a port ever needs them, port Intel's argum
 
 Also from E1b: `ExtraMath.Cross2` (arguments `in`, by reference) computes on the x87 stack and rounds once;
 plain `f32` arithmetic is 1 ulp off there (`conv::x87_mul_add` pattern).
+
+## Transforms (E11, proven)
+
+`unity::transform` (+ `unity::sse`, a 4-lane SSE register). The engine stores each transform's local position,
+rotation and scale as three SSE vectors in its `TransformHierarchy` (0x30 bytes a node; `w` = 0 for position
+and scale; a parent index per node). Everything the game reads back is computed from them by hand-vectorised
+native code in UnityPlayer.dll; each routine is transcribed instruction by instruction, so the results are the
+engine's to the bit:
+
+- `CalculateGlobalPosition` 0x10099250 / `TransformPoint` 0x10113FB0: per ancestor `rotate(r, s * v) + t`,
+  `rotate` the quaternion expanded with the `(±2, ±2, ±2, 0)` tables; `TransformDirection` 0x1065FAF0: the node's
+  rotation, then per ancestor a mirror (lanes where its scale is negative flip) and its rotation.
+- `CalculateGlobalRotation` 0x100995D0: per ancestor the mirror folded into the running quaternion (sign of the
+  product of the other two scale signs), then the ancestor's rotation times it (shuffle form).
+- `SetLocalR` 0x1008EC10 (both rotation setters, `SetLocalTR`): normalised with a horizontal sum whose addition
+  order differs per lane (lanes 0 and 2: `(w²+z²)+(y²+x²)`, lanes 1 and 3: `(x²+w²)+(z²+y²)`), `q / sqrt(sum)`,
+  the identity below 1e-30. This is why a rotation read back is an ulp or two off the one set (seen in E9).
+  `Transform.rotation =` goes through `InverseTransformRotation` (root first: conjugate times, then the mirror).
+- `CalculateGlobalMatrix` 0x1013FB80 (`localToWorldMatrix`, and `CalculateGlobalRS`, the same three columns):
+  the node's rotation columns times its scale, its position, then each ancestor's applied; the getter sets the
+  `w` row to 0, 0, 0, 1. `CalculateGlobalMatrixInverse` 0x10659450 (`worldToLocalMatrix`): each node's inverse
+  (conjugate rotation's columns times the inverse scale, `-t` through them), the node's first, times each
+  ancestor's.
+- The inverse scale (also in `InverseTransformPosition` 0x10113590 and `SetGlobalMatrixLossy`): `rcpps` refined
+  by two Newton steps (`r(2.0000005 - rs)`, `r(2 - rs)`), the raw estimate if that is NaN, 0 where `|s| < 1e-9`.
+  `rcpps`'s bits are the processor's own (Intel and AMD differ), so the port runs the instruction itself: it
+  matches the engine on the same machine, as the engine matches itself.
+- `lossyScale` (`GetWorldScaleLossy` 0x1065BC10): the diagonal of `inverse(globalRotation) * globalRS`
+  (`CalculateGlobalSM`).
+- `SetParent(parent, worldPositionStays)` (0x1065E740): no change when the parent is the same (true) or inside the
+  node's subtree (false). Keeping the world pose: global position, rotation and `SM` taken first; after the move
+  `SetGlobalMatrixLossy` 0x1009B880 brings position and rotation into the parent's space
+  (`InverseTransformPositionAndRotation`), stores them (`SetLocalTR`, the rotation normalised) and sets the scale
+  to `SM`'s diagonal times the inverse of the diagonal of `inverse(globalRotation) * parentRS * localRotation`.
+- `position =` (`SetPosition` 0x1065EF80): `InverseTransformPosition` through the parent; `localPosition =` /
+  `localScale =` store as given (`w` = 0).
+
+Checked (`tests/unity_transform.rs`): 6 random hierarchies of 24 fresh objects (random local poses, mirrored and
+tiny scales): `localRotation` after both setters, `position`, `rotation`, both matrices, `lossyScale`,
+`TransformPoint` / `Direction` and their inverses, `position =`, and random `SetParent`s with and without
+keeping the world pose; and up to 1,500 of the scene's own transforms under the world master (the animated
+flocks left out), all bit-exact.
