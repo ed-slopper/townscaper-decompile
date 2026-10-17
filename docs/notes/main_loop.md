@@ -95,3 +95,41 @@ its save timing on a fake world (the game's own `Update` would drive and save th
 - `MaybeUpdateGameVersionInSettingsData`: a new `Application.version` is logged ("Updating
   settingsData.lastRunVersion to …"), stored and the settings marked dirty. `shouldBeLoading` = state < 19.
 - The text format and the rest of `SaveData` are G3 / G3a (behind `WorldSaves`).
+
+## Boot (E8d, ported)
+
+`placemaker::boot`. The boot scene's `BootMaster.Start` runs `FirstBootWrapper` as a fast coroutine (6 ms a
+frame); every routine is an `IEnumerator<bool>` (a `true` lets the coroutine go on in the same frame, a `false`
+waits for the next one).
+
+- `GameBootRoutine`: `BootMaster.instance`, yield false; load "Placemaker" (the town) and "FlatscreenUi"
+  additively unless loaded; one false a frame until each load is done; the `UiMaster` from the UI scene's roots
+  (the last root first, the first `GetComponentInChildren` hit); a false a frame until the town scene is loaded;
+  the `WorldMaster` the same way; the two linked (`worldMaster.uiMaster`, `uiMaster.worldMaster`), yield true;
+  UI object on, the boot scene's audio listener off, `UiMaster.MaybeSetup`, true; world master disabled, object
+  on, `OnOnEnable`, true; `OnStart` (all systems, E8b's order), true; `enabled = true`, true; end.
+- `UserBootRoutine`: `SaveSystem.ResetBoot`, then `IterateBoot` once a frame while it says more; vsync,
+  antialiasing, `onSettingsLoaded`, the version check (inlined `MaybeUpdateGameVersionInSettingsData`, a new
+  version also `TexturePngMaster.ResetColorAndMaterial`), `SaveMenu.ResetSaveCardOrder`; then by
+  `SaveSystem.bootState`: 8 loads `currentMetaSave` (inlined `Load`), `awaitingDim = false`,
+  `StartFinishLoading(false)`; 10 only `StartFinishLoading(false)`; 9 clears the save, makes a new town (inlined
+  `New`, `UnityEngine.Random`), `Load`, `LoadingUi.StopLoadingNow`, `SaveMenu.OpenWithoutRefresh`,
+  `awaitingDim = false`; anything else nothing.
+- `FirstBootWrapper`: `LoadingUi.StartLoading`, the game boot passed through, and the user boot started in the
+  step the game boot ends. `SignedOutBootWrapper` (`OnSignedOut`): `CloseEverything`, `ResetUsersUIChoises`,
+  `BootGameCore.StartNewSignIn`, `ShowLogo`, `Dim.SetState(2)`, then a false a frame until the core is signed in
+  (state 2), `StartLoading` and the user boot.
+- `OnEnable`: the instance, `UiMaster.MaybeSetup`, `QualitySettings.antiAliasing =
+  UiScaler.GetDefaultAntiAliasing()`, `_AaLineBoth = (1, s, s, s)` with `s = Clamp(GetScale() * 0.7f, 1, 2)`
+  (float multiply), `WorldMaster.OnOnEnable`. `DoFullscreen`: on `WindowsPlayer` (2) `SetResolution(int.Max,
+  int.Max, true)`, else the last listed resolution, or `fullScreen = true`.
+- `BootGameCore` (console sign-in, FurySDK + Rewired): `StartNewSignIn` → state 1 with the prompt on. In state 1
+  with an SDK and no player, the first player with `GetAnyButtonDown` is asked to sign in, mode 3 the first time
+  (a static flag, `.cctor` true) unless a sign-in failed, else 2. `OnComplete`: status 2 stores the SDK user's id
+  in `PlatformManager` and signs in (state 2, prompt off); status 4 remembers the failure; the request is
+  cleared either way. In state 2 a different or missing user logs "Signed Out!", state 3, and starts
+  `SignedOutBootWrapper`.
+
+Checked: the boot has already run in the game the harness talks to, so the routines are checked for their step
+order on a recording host (`tests/placemaker_boot.rs`); `_AaLineBoth` against the running game's
+`UiScaler.GetScale`.
