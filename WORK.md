@@ -29,9 +29,9 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E4d | Graph loop: `Iterate` 0xE89CF0, `IterateFocus` (bounds, `genBounds`, `viewBounds`, ground collider), `OnStart`, `BeginLoad` / `IterateLoad`, `Save` 0xE8F920 (the `SaveData` voxel list, G3), `Test` | unowned | E4c | ed-slopper/wren (2026-10-16) | Split of E4 |
-| E4e | Graph sampling and flow: `GetQubeWithContext`, `SampleNormal` / `SampleNormalCoverage` (3) / `SampleNormalDistance` (2), `Qube.SampleNormalCoverage`, `Flow` (`Update`, `AddFlowTarget`, `SampleFlow`, `SetupFlowData`, `FlowTwoFlows`), `FlowData..cctor` | unowned | E4d | | Split of E4 |
-| E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4e | | |
+| E4e | Graph sampling: `GetQubeWithContext` 0xE84460, `SampleNormal` / `SampleNormalCoverage` (3) / `SampleNormalDistance` (2), `Qube.SampleNormalCoverage` / `GetNormal` / `Test`; `OnDrawGizmos` read | unowned | E4d | ed-slopper/wren (2026-10-16) | Split of E4 |
+| E4f | Graph flow: `Flow` (`Update` 0x6D2BA0, `AddFlowTarget`, `SampleFlow`, `SetupFlowData`, `FlowTwoFlows`, gizmos), `FlowTarget` | unowned | E4e | | Split of E4e |
+| E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4f | | |
 | E5a | `Placemaker.Modules.Processing` (`ModuleImporter`, `ProtoModule`, `DecorProfile`, `MaterialCluster`, ...): the editor-time import of module meshes; port only what the shipped game runs | unowned | E5 | | Mostly editor code [est] |
 | E6 | `WaveFunctionCollapse` (18 methods incl. `IterateDecor` 0x3D88D0, `FillQubePossibilities` 0x3D6DD0, `RemovePossibleModule` 0x3DA190, the `Propagation` queue and its `CompareTo` 0x4FC880) | unowned | E5 | | Order of the propagation queue decides the result: port exactly |
 | E7 | Mesh building: `ModuleBuilder` (16, `Iterate` 0x32FF90), `WorldMeshes` (11), `BigMesh`/`BigMeshGroup`/`BigMeshMaster`/`BigMeshPart`/`BigMeshList`, `BitMeshQuadChange`, `MaterialMaster`, `Palette`/`PaletteHolder` | unowned | E6 | | |
@@ -129,6 +129,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E4a | `placemaker::graphs` records: `VoxelType`, `MaterialType`, `Action`, `Voxel` / `OrientedModuleSides` comparers, `Square` / `Qube` relations, `Corner.AddSquare`, `Square` accessors, `Qube` getters (objects in arenas by id); 11 rows `checked`, 15 `ported`, `Action.ToString` waits on E13, `GetNormal` moves to E4e | P1 | ed-slopper/wren | 2026-10-16 | e42429e |
 | E4b | `Graph` structure: arenas + container transforms as sibling-ordered lists, pools, `GetOrCreateCorner`, binary searches, `CheckVoxel`, bounds (`SetEmptyBoundsCenter`, `GetMaxExtents`, `IsCoordinateAllowed`), `GetQubeRelation(6)`, `OnEnable`; 18 rows `checked`, `.cctor` read (shader ids) | P1 | ed-slopper/wren | 2026-10-16 | 657f21e |
 | E4c | `Graph` editing: `AddVoxel`, `IntegrateCorner` (squares from the grid vert: corner matrices, `edgeDict` links, corner angles, collider prism, blit verts), `IntegrateVoxel`, `PaintVoxel`, `RemoveVoxel` (column take-down, square and corner release), `QubeUpdated`, `ApplyAction`; the other systems behind a `GraphHost` trait; `Qube..ctor` and `FlowData.empty` added; 9 rows `checked` (160 random actions, the whole graph compared by address); notes/graph.md | P1 | ed-slopper/wren | 2026-10-16 | fa7ff86 |
+| E4d | `Graph` loop: `Iterate` (corner integration, qube updates with their shadow quads, flow trimming), `IterateFocus` (hex / height bounds, border, genBounds, viewBounds, shadow-mesh bounds, ground collider), `OnStart`, `Save`, `BeginLoad` / `IterateLoad` (through `Maker`); minimal `ao_baker`, `maker`, `save_data` pieces; 9 rows `checked` (40 actions with the full update, save, load back), `OnStart` ported, `Test` read; harness `icall` | P1 | ed-slopper/wren | 2026-10-16 | 8cdba6a |
 
 ## Changes to the board
 
@@ -178,3 +179,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: claim E4b.
 - 2026-10-16 ed-slopper/wren: E4b done; claim E4c.
 - 2026-10-16 ed-slopper/wren: E4c done; claim E4d.
+- 2026-10-16 ed-slopper/wren: E4d done; split E4e into E4e (sampling) and E4f (flow); claim E4e.
