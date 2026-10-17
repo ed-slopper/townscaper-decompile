@@ -29,7 +29,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E8d | Boot: `BootMaster` (`Start`, `OnEnable`, the boot routines `FirstBootWrapper` / `GameBootRoutine` / `UserBootRoutine` / `SignedOutBootWrapper`, `DoFullscreen`, `OnSignedOut`), `BootGameCore` (`Update` 0x7C1FA0, `OnEnable`, sign-in) | unowned | E8c | ed-slopper/wren (2026-10-17) | Split of E8 |
 | E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | GPU passes: need the shaders (C3) to check |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | |
 | E11 | `ts_game::unity::transform`: Unity's `Transform` hierarchy math the game reads back (`position`/`rotation`/`lossyScale` from the parent chain, `TransformPoint`, `InverseTransformPoint`, `TransformDirection`, `localToWorldMatrix`, `SetParent` keeping world pose), exact (native code in UnityPlayer.dll), checked with the harness on real scene transforms | unowned | F11b | | Gap of F11f |
@@ -140,6 +139,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E8a | Timing and statics in `placemaker::timing`: `UniversalStopwatch` (8 ms budget), `TimeManager`, `FastCoroutines`, `LayerMaster`, `ShaderIds`, `MiscReferences`; 11 rows `checked`, the wall-clock parts `ported` (unit-tested on a fake clock); notes/main_loop.md | P1 | ed-slopper/wren | 2026-10-17 | 81374a0 |
 | E8b | `WorldMaster` loop in `placemaker::world_master`: `Iterate` state machine (all 43 states traced on the game), `Update` / `LateUpdate` / `OnStart` / `ResetState` / `SetDirty`; systems behind `WorldSystems`; 3 rows `checked`, `Update` and the rest `ported` (fake-world tests) | P1 | ed-slopper/wren | 2026-10-17 | 62521ed |
 | E8c | `WorldMaster` save / load / new in `placemaker::world_master`: `New`, `Load` (2), `shouldBeLoading` `checked`; `GetSaveString`, `PopulateSaveData`, `NothingToLoadAtStartup`, version check `ported` (text save system behind `WorldSaves`, G3); `OnScenePostProcess` `read` | P1 | ed-slopper/wren | 2026-10-17 | 5cfa95d |
+| E8d | Boot in `placemaker::boot`: `BootMaster` (`OnEnable`, `Start`, `OnSignedOut`, `DoFullscreen`, the four boot routines as step machines behind `BootHost`) and `BootGameCore` sign-in behind `Platform`; 40 rows `ported` (step order on a recording host, `_AaLineBoth` on the harness); E8 complete | P1 | ed-slopper/wren | 2026-10-17 | 2f6b604 |
 
 ## Changes to the board
 
@@ -210,3 +210,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: E8a done; claim E8b.
 - 2026-10-17 ed-slopper/wren: E8b done; claim E8c.
 - 2026-10-17 ed-slopper/wren: E8c done; claim E8d.
+- 2026-10-17 ed-slopper/wren: E8d done; E8 complete.
