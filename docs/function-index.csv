@@ -974,32 +974,32 @@ rva,va,namespace,type,method,signature,status,notes
 0x3DA780,0x103DA780,Placemaker,WaveFunctionCollapse,.ctor,public void .ctor(),ported,placemaker::wfc (empty lists: Default)
 0x4FC880,0x104FC880,Placemaker,WaveFunctionCollapse.Propagation,System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo,private int System.IComparable<Placemaker.WaveFunctionCollapse.Propagation>.CompareTo(WaveFunctionCollapse.Propagation p1),checked,tests/placemaker_wfc.rs
 0x1F8B60,0x101F8B60,Placemaker,WorldMaster,GetSaveString,public string GetSaveString(),dumped,
-0x1F8C00,0x101F8C00,Placemaker,WorldMaster,Iterate,private bool Iterate(),dumped,
-0x1F9160,0x101F9160,Placemaker,WorldMaster,get_keeepGoing,public bool get_keeepGoing(),dumped,
-0x1F9160,0x101F9160,Placemaker,WorldMaster,KeepGoing,public bool KeepGoing(),dumped,
-0x1F91B0,0x101F91B0,Placemaker,WorldMaster,LateUpdate,private void LateUpdate(),dumped,
+0x1F8C00,0x101F8C00,Placemaker,WorldMaster,Iterate,private bool Iterate(),checked,tests/placemaker_world_master.rs
+0x1F9160,0x101F9160,Placemaker,WorldMaster,get_keeepGoing,public bool get_keeepGoing(),ported,placemaker::timing UniversalStopwatch (same function)
+0x1F9160,0x101F9160,Placemaker,WorldMaster,KeepGoing,public bool KeepGoing(),ported,placemaker::timing UniversalStopwatch (same function)
+0x1F91B0,0x101F91B0,Placemaker,WorldMaster,LateUpdate,private void LateUpdate(),ported,placemaker::world_master (unit-tested on a fake world: the game's Update would save and drive the scene)
 0x1F91F0,0x101F91F0,Placemaker,WorldMaster,Load,public void Load(SaveData saveData),dumped,
 0x1F9240,0x101F9240,Placemaker,WorldMaster,Load,public bool Load(string saveString),dumped,
 0x1F92F0,0x101F92F0,Placemaker,WorldMaster,MaybeUpdateGameVersionInSettingsData,public bool MaybeUpdateGameVersionInSettingsData(),dumped,
 0x1F93E0,0x101F93E0,Placemaker,WorldMaster,New,public void New(),dumped,
 0x1F94C0,0x101F94C0,Placemaker,WorldMaster,New,public void New(SaveData saveData),dumped,
 0x1F95A0,0x101F95A0,Placemaker,WorldMaster,NothingToLoadAtStartup,public void NothingToLoadAtStartup(),dumped,
-0x1F9620,0x101F9620,Placemaker,WorldMaster,OnOnEnable,public void OnOnEnable(),dumped,
-0x1F97F0,0x101F97F0,Placemaker,WorldMaster,OnStart,public void OnStart(),dumped,
+0x1F9620,0x101F9620,Placemaker,WorldMaster,OnOnEnable,public void OnOnEnable(),ported,placemaker::world_master (unit-tested on a fake world: the game's Update would save and drive the scene)
+0x1F97F0,0x101F97F0,Placemaker,WorldMaster,OnStart,public void OnStart(),ported,placemaker::world_master (unit-tested on a fake world: the game's Update would save and drive the scene)
 0x1F98D0,0x101F98D0,Placemaker,WorldMaster,Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess,"private void Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess(bool isBuild, TargetPlatformFlags platform)",dumped,
 0x1F9900,0x101F9900,Placemaker,WorldMaster,PopulateSaveData,"public void PopulateSaveData(SaveData saveData, MetaSave metaSave)",dumped,
-0x1F9A30,0x101F9A30,Placemaker,WorldMaster,ResetSaveCurrentTimer,public void ResetSaveCurrentTimer(),dumped,
-0x1F9A50,0x101F9A50,Placemaker,WorldMaster,ResetState,public void ResetState(),dumped,
-0x1F9A60,0x101F9A60,Placemaker,WorldMaster,SetDirty,public void SetDirty(),dumped,
-0x1F9AA0,0x101F9AA0,Placemaker,WorldMaster,StartCounting,public void StartCounting(),dumped,
-0x1F9AF0,0x101F9AF0,Placemaker,WorldMaster,Update,private void Update(),dumped,
-0x1F9EF0,0x101F9EF0,Placemaker,WorldMaster,.ctor,public void .ctor(),dumped,
+0x1F9A30,0x101F9A30,Placemaker,WorldMaster,ResetSaveCurrentTimer,public void ResetSaveCurrentTimer(),ported,placemaker::world_master (unit-tested on a fake world: the game's Update would save and drive the scene)
+0x1F9A50,0x101F9A50,Placemaker,WorldMaster,ResetState,public void ResetState(),checked,tests/placemaker_world_master.rs
+0x1F9A60,0x101F9A60,Placemaker,WorldMaster,SetDirty,public void SetDirty(),checked,tests/placemaker_world_master.rs
+0x1F9AA0,0x101F9AA0,Placemaker,WorldMaster,StartCounting,public void StartCounting(),ported,placemaker::timing UniversalStopwatch (same function)
+0x1F9AF0,0x101F9AF0,Placemaker,WorldMaster,Update,private void Update(),ported,placemaker::world_master (unit-tested on a fake world: the game's Update would save and drive the scene)
+0x1F9EF0,0x101F9EF0,Placemaker,WorldMaster,.ctor,public void .ctor(),ported,placemaker::world_master (Default; the two camera delegates are no-ops)
 0x1FA0F0,0x101FA0F0,Placemaker,WorldMaster,get_settingsData,public SettingsData get_settingsData(),dumped,
 0x1FA110,0x101FA110,Placemaker,WorldMaster,get_shouldBeLoading,public bool get_shouldBeLoading(),dumped,
-0x1D4430,0x101D4430,Placemaker,WorldMaster.<>c,<.ctor>b__87_0,internal void <.ctor>b__87_0(SaveData <p0>),dumped,
-0x1D4430,0x101D4430,Placemaker,WorldMaster.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(SaveData <p0>),dumped,
-0x1E73E0,0x101E73E0,Placemaker,WorldMaster.<>c,.ctor,public void .ctor(),dumped,
-0x5075F0,0x105075F0,Placemaker,WorldMaster.<>c,.cctor,private static void .cctor(),dumped,
+0x1D4430,0x101D4430,Placemaker,WorldMaster.<>c,<.ctor>b__87_0,internal void <.ctor>b__87_0(SaveData <p0>),ported,placemaker::world_master (Default; the two camera delegates are no-ops)
+0x1D4430,0x101D4430,Placemaker,WorldMaster.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(SaveData <p0>),ported,placemaker::world_master (Default; the two camera delegates are no-ops)
+0x1E73E0,0x101E73E0,Placemaker,WorldMaster.<>c,.ctor,public void .ctor(),ported,placemaker::world_master (Default; the two camera delegates are no-ops)
+0x5075F0,0x105075F0,Placemaker,WorldMaster.<>c,.cctor,private static void .cctor(),ported,placemaker::world_master (Default; the two camera delegates are no-ops)
 0x1FA130,0x101FA130,Placemaker,WorldMeshes,GetMeshFilterOnly,public MeshFilter GetMeshFilterOnly(Transform parent),checked,tests/placemaker_materials.rs
 0x1FA280,0x101FA280,Placemaker,WorldMeshes,GetMeshFilter,public MeshFilter GetMeshFilter(Transform parent),checked,tests/placemaker_materials.rs
 0x1FA480,0x101FA480,Placemaker,WorldMeshes,GetMesh,public Mesh GetMesh(),checked,tests/placemaker_materials.rs

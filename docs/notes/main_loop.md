@@ -23,3 +23,59 @@ Port: `townscaper-rs/game/src/placemaker/timing.rs`; wall-clock time comes from 
 Checked (`tests/placemaker_timing.rs`): the layer statics, the shader ids against `Shader.PropertyToID`, 200
 `TimeManager` changes against `Time.timeScale` (restored after), `StartCounting` twice per frame for 20 frames;
 `FastCoroutines` on a fake clock.
+
+## The world master's loop (E8b, proven)
+
+Port: `placemaker::world_master`; every system, ported or not, is reached through `WorldSystems`.
+
+`Update` 0x1F9AF0 each frame: `UniversalStopwatch.StartCounting`; the smoothing factors `expTSlow / Mid / Fast /
+Faster = (float)exp(-unscaledDeltaTime × 5 / 11 / 17 / 21)`; from `NormalStart` on, the collapse's `LaterUpdate`,
+the town saved when quiet (`lastChangeTime > 0` and 2 s past it and 10 s past the first change, or 15 s past the
+first change; `SaveSystem.MaybeSaveCurrent`) and the settings every 10 s; then **`while (KeepGoing) if
+(!Iterate()) break;`** (the 8 ms budget, each step inside a profiler marker named after the state); then, from
+`NormalStart` on, `LaterUpdate` again, and the bird and butterfly flocks and the sounds update. `LateUpdate`
+0x1F91B0: the prop mesh animator, then the big meshes (`BigMeshMaster.OnLateUpdate`).
+
+`Iterate` 0x1F8C00 (`WorldMaster.State`, a byte; the jump table at 0x101F90AC): a loop state calls its system
+and stays while it reports work (true), else moves to the next state; a one-shot state acts and moves on; every
+step returns true except `Done`.
+
+| State | Does |
+|---|---|
+| 0 DoNothing | stays |
+| 1 StartLoad, 40 SaveToUrl | next |
+| 2 PreLoad | sandbanker `Clear`, flocks `OnReset`, prop placer `OnReset`, shadow baker `Load(saveData)`, maker `ClearUndoQueue` |
+| 3, 11, 36 | module builder `IterateDeconstructQubes` (loop) |
+| 4, 12, 37 | prop placer `IterateDeconstructProps` (loop) |
+| 5 | prop mesh animator `OnReset` |
+| 6 AwaitDim | stays while `awaitingDim` |
+| 7 / 8 | graph `BeginLoad(saveData)` / `IterateLoad(saveData)` (loop) |
+| 9, 20 | graph `IterateFocus` (loop) |
+| 10 LoadOthers | `onCameraLoad(saveData)` |
+| 13, 21 | grid `IterateFocus` (loop) |
+| 14, 22 | graph `Iterate` (loop) |
+| 15 | grid `IterateGenerateCenter` (loop) |
+| 16, 24 / 17 | collapse `Iterate0` / `IterateApplyModules` (loops) |
+| 18 LoadBakeShadows0 | shadow `SetFramingDirty` + `BakeShadow`, then **jumps to 25** (skips the normal start) |
+| 19 NormalStart | shadow `OnBuilt` |
+| 23 | shadow `SetFramingDirty` + `BakeShadow` |
+| 26, 28, 34 | shadow `BakeShadow` |
+| 25 / 27 / 29 | collapse `Iterate1` / `IterateDecor` (loops) / `ResetPropagationCounter` |
+| 30 / 31 / 32 | sandbanker `Iterate` / graph `IterateRefillPools` / module builder `Iterate` (props) (loops) |
+| 33 | prop achievements `TriggerAchievements` (if any) |
+| 35 | bird flock `IterateBirdCreation` (loop) |
+| 38 | prop placer `OnDoneResetting` |
+| 39 | world meshes `IterateRefillPools` (loop) |
+| 41 / 42 | grid `IterateBits(KeepGoing)` / save system `IterateRefresh(KeepGoing)` (loops) |
+| 43 Done | returns false |
+| > 43 | stays |
+
+`ResetState` (after any change) goes back to 19; `OnOnEnable` restarts a finished master at 19 (it also names
+the states and calls `IOnOnEnable.OnOnEnable` on every component under the master). `SetDirty`: the first change
+since the last save sets `lastStartChangeTime`, every change `lastChangeTime` (unscaled time).
+
+Checked (`tests/placemaker_world_master.rs`): the graph tests' stand-in master, with the scene's shadow baker,
+flocks, props, save system and sounds, walked by the game's `Iterate` from `StartLoad` (an empty save) and from
+`NormalStart` to `Done` (86 steps, every state 1–43 visited); our machine replayed each step to the same state
+and result. Also `DoNothing`, `Done`, states past the table, `AwaitDim`, `ResetState`, `SetDirty`. `Update` and
+its save timing on a fake world (the game's own `Update` would drive and save the scene).

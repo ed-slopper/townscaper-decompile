@@ -14,4 +14,5 @@ pub mod quads;
 pub mod save_data;
 pub mod timing;
 pub mod wfc;
+pub mod world_master;
 pub mod world_meshes;
