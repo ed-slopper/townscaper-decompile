@@ -291,30 +291,7 @@ impl Square {
     }
 }
 
-/// `Placemaker.SideProfile` (row E5 ports its methods): the profile of a module's sides.
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
-pub struct SideProfile {
-    pub v00: u16,
-    pub v01: u16,
-    pub v10: u16,
-    pub v11: u16,
-    pub v20: u16,
-    pub v21: u16,
-    pub v30: u16,
-    pub v31: u16,
-    pub v4: u16,
-    pub v5: u16,
-}
-
-/// `Placemaker.Modules.OrientedModule` (row E5 ports its methods): a module index and its orientation flags.
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
-pub struct OrientedModule {
-    pub module_index: u16,
-    pub flags: u8,
-    pub pad: u8,
-}
+pub use crate::placemaker::modules::{OrientedModule, SideProfile};
 
 /// `Placemaker.Graphs.OrientedModuleSides`: a module that fits a qube, with its sides and cost.
 #[repr(C)]

@@ -369,22 +369,22 @@ rva,va,namespace,type,method,signature,status,notes
 0x7C2B50,0x107C2B50,Placemaker,BorderDrawer,OnEnable,private void OnEnable(),dumped,
 0x7C2BD0,0x107C2BD0,Placemaker,BorderDrawer,OnStart,public void OnStart(),dumped,
 0x7C2C20,0x107C2C20,Placemaker,BorderDrawer,SetupBlock,private void SetupBlock(),dumped,
-0x1FCAC0,0x101FCAC0,Placemaker,ByteQube,Equals,public override bool Equals(object obj),dumped,
-0x1FCB60,0x101FCB60,Placemaker,ByteQube,get_cost,public int get_cost(),dumped,
-0x1FCB60,0x101FCB60,Placemaker,ByteQube,GetHashCode,public override int GetHashCode(),dumped,
-0x1FCBC0,0x101FCBC0,Placemaker,ByteQube,GetOptimalOrientation,"public void GetOptimalOrientation(out ByteQube optimalByteQube, out byte optimalOrientation)",dumped,
-0x1FCDA0,0x101FCDA0,Placemaker,ByteQube,GetOrientedBackward,public ByteQube GetOrientedBackward(byte orientation),dumped,
-0x1FCF90,0x101FCF90,Placemaker,ByteQube,GetOrientedForward,public ByteQube GetOrientedForward(byte orientation),dumped,
-0x1FD180,0x101FD180,Placemaker,ByteQube,GetOriented,public ByteQube GetOriented(ByteQube orientation),dumped,
-0x1FD260,0x101FD260,Placemaker,ByteQube,GetWrappedIndex,"public static int GetWrappedIndex(int corner, int height)",dumped,
-0x1FD280,0x101FD280,Placemaker,ByteQube,ToString,public override string ToString(),dumped,
-0x1FD5D0,0x101FD5D0,Placemaker,ByteQube,.cctor,private static void .cctor(),dumped,
-0x1FD6F0,0x101FD6F0,Placemaker,ByteQube,.ctor,public void .ctor(byte value),dumped,
-0x1FD720,0x101FD720,Placemaker,ByteQube,.ctor,"public void .ctor(byte v0, byte v1, byte v2, byte v3, byte v4, byte v5, byte v6, byte v7)",dumped,
-0x1FD760,0x101FD760,Placemaker,ByteQube,get_Item,public byte get_Item(int key),dumped,
-0x1FD810,0x101FD810,Placemaker,ByteQube,op_Equality,"public static bool op_Equality(ByteQube a, ByteQube b)",dumped,
-0x1FD8A0,0x101FD8A0,Placemaker,ByteQube,op_Inequality,"public static bool op_Inequality(ByteQube a, ByteQube b)",dumped,
-0x1FD900,0x101FD900,Placemaker,ByteQube,set_Item,"public void set_Item(int key, byte value)",dumped,
+0x1FCAC0,0x101FCAC0,Placemaker,ByteQube,Equals,public override bool Equals(object obj),ported,placemaker::modules (boxed Equals(object): op_Equality / eq_cs)
+0x1FCB60,0x101FCB60,Placemaker,ByteQube,get_cost,public int get_cost(),checked,tests/placemaker_modules.rs
+0x1FCB60,0x101FCB60,Placemaker,ByteQube,GetHashCode,public override int GetHashCode(),checked,tests/placemaker_modules.rs
+0x1FCBC0,0x101FCBC0,Placemaker,ByteQube,GetOptimalOrientation,"public void GetOptimalOrientation(out ByteQube optimalByteQube, out byte optimalOrientation)",checked,tests/placemaker_modules.rs
+0x1FCDA0,0x101FCDA0,Placemaker,ByteQube,GetOrientedBackward,public ByteQube GetOrientedBackward(byte orientation),checked,tests/placemaker_modules.rs
+0x1FCF90,0x101FCF90,Placemaker,ByteQube,GetOrientedForward,public ByteQube GetOrientedForward(byte orientation),checked,tests/placemaker_modules.rs
+0x1FD180,0x101FD180,Placemaker,ByteQube,GetOriented,public ByteQube GetOriented(ByteQube orientation),checked,tests/placemaker_modules.rs
+0x1FD260,0x101FD260,Placemaker,ByteQube,GetWrappedIndex,"public static int GetWrappedIndex(int corner, int height)",checked,tests/placemaker_modules.rs
+0x1FD280,0x101FD280,Placemaker,ByteQube,ToString,public override string ToString(),checked,tests/placemaker_modules.rs
+0x1FD5D0,0x101FD5D0,Placemaker,ByteQube,.cctor,private static void .cctor(),checked,tests/placemaker_modules.rs
+0x1FD6F0,0x101FD6F0,Placemaker,ByteQube,.ctor,public void .ctor(byte value),checked,tests/placemaker_modules.rs
+0x1FD720,0x101FD720,Placemaker,ByteQube,.ctor,"public void .ctor(byte v0, byte v1, byte v2, byte v3, byte v4, byte v5, byte v6, byte v7)",checked,tests/placemaker_modules.rs
+0x1FD760,0x101FD760,Placemaker,ByteQube,get_Item,public byte get_Item(int key),checked,tests/placemaker_modules.rs
+0x1FD810,0x101FD810,Placemaker,ByteQube,op_Equality,"public static bool op_Equality(ByteQube a, ByteQube b)",checked,tests/placemaker_modules.rs
+0x1FD8A0,0x101FD8A0,Placemaker,ByteQube,op_Inequality,"public static bool op_Inequality(ByteQube a, ByteQube b)",checked,tests/placemaker_modules.rs
+0x1FD900,0x101FD900,Placemaker,ByteQube,set_Item,"public void set_Item(int key, byte value)",checked,tests/placemaker_modules.rs
 0x2002C0,0x102002C0,Placemaker,ClickEffect,ClickBig,public void ClickBig(VoxelType voxelType),dumped,
 0x2008A0,0x102008A0,Placemaker,ClickEffect,Click,"public void Click(bool add, Vector2 planePos, int height, VoxelType voxelType)",dumped,
 0x201070,0x10201070,Placemaker,ClickEffect,Click,"public void Click(HoverData hover, bool add, Voxel voxel)",dumped,
@@ -791,13 +791,13 @@ rva,va,namespace,type,method,signature,status,notes
 0x507550,0x10507550,Placemaker,ShadowBaker.<>c,.cctor,private static void .cctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker,ShadowBakerCamera,.ctor,public void .ctor(),dumped,
 0x9744D0,0x109744D0,Placemaker,ShadowBakerCamera,OnPostRender,private void OnPostRender(),dumped,
-0x310D70,0x10310D70,Placemaker,SideProfile,Add,public void Add(SideProfile s),dumped,
-0x310DC0,0x10310DC0,Placemaker,SideProfile,Get0,public ushort Get0(int index),dumped,
-0x310E60,0x10310E60,Placemaker,SideProfile,Get1,public ushort Get1(int index),dumped,
-0x310F00,0x10310F00,Placemaker,SideProfile,GetHashCode,public override int GetHashCode(),dumped,
-0x310F80,0x10310F80,Placemaker,SideProfile,IsEmtpy,public bool IsEmtpy(),dumped,
-0x310FC0,0x10310FC0,Placemaker,SideProfile,Set,"public void Set(int index, ushort value0, ushort value1)",dumped,
-0x311090,0x10311090,Placemaker,SideProfile,ToString,public override string ToString(),dumped,
+0x310D70,0x10310D70,Placemaker,SideProfile,Add,public void Add(SideProfile s),checked,tests/placemaker_modules.rs
+0x310DC0,0x10310DC0,Placemaker,SideProfile,Get0,public ushort Get0(int index),checked,tests/placemaker_modules.rs
+0x310E60,0x10310E60,Placemaker,SideProfile,Get1,public ushort Get1(int index),checked,tests/placemaker_modules.rs
+0x310F00,0x10310F00,Placemaker,SideProfile,GetHashCode,public override int GetHashCode(),checked,tests/placemaker_modules.rs
+0x310F80,0x10310F80,Placemaker,SideProfile,IsEmtpy,public bool IsEmtpy(),checked,tests/placemaker_modules.rs
+0x310FC0,0x10310FC0,Placemaker,SideProfile,Set,"public void Set(int index, ushort value0, ushort value1)",checked,tests/placemaker_modules.rs
+0x311090,0x10311090,Placemaker,SideProfile,ToString,public override string ToString(),checked,tests/placemaker_modules.rs
 0x1D8290,0x101D8290,Placemaker,StorageUtils,GetSettingsFilePath,private string GetSettingsFilePath(string fileName),dumped,
 0x318C60,0x10318C60,Placemaker,StorageUtils,CreateAndSaveSettingsData,public IEnumerator CreateAndSaveSettingsData(Action callback),dumped,
 0x318CC0,0x10318CC0,Placemaker,StorageUtils,DeleteCard,public IEnumerator DeleteCard(SaveCard card),dumped,
@@ -1156,25 +1156,25 @@ rva,va,namespace,type,method,signature,status,notes
 0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,OnEnable,private void OnEnable(),dumped,
 0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,Setup,public void Setup(),dumped,
 0x330D00,0x10330D00,Placemaker.Modules,ModuleLibrary,.ctor,public void .ctor(),dumped,
-0x6FC580,0x106FC580,Placemaker.Modules,OrientedModule,Equals,public override bool Equals(object obj),dumped,
-0x6FC630,0x106FC630,Placemaker.Modules,OrientedModule,GetHashCode,public override int GetHashCode(),dumped,
-0x6FC650,0x106FC650,Placemaker.Modules,OrientedModule,ToString,public override string ToString(),dumped,
-0x6FC700,0x106FC700,Placemaker.Modules,OrientedModule,.cctor,private static void .cctor(),dumped,
-0x6FC740,0x106FC740,Placemaker.Modules,OrientedModule,get_isDecor,public bool get_isDecor(),dumped,
-0x6FC760,0x106FC760,Placemaker.Modules,OrientedModule,get_isEmpty,public bool get_isEmpty(),dumped,
-0x6FC780,0x106FC780,Placemaker.Modules,OrientedModule,get_orientation,public int get_orientation(),dumped,
-0x6FC790,0x106FC790,Placemaker.Modules,OrientedModule,op_Equality,"public static bool op_Equality(OrientedModule a, OrientedModule b)",dumped,
-0x6FC7B0,0x106FC7B0,Placemaker.Modules,OrientedModule,op_Inequality,"public static bool op_Inequality(OrientedModule a, OrientedModule b)",dumped,
-0x6FC820,0x106FC820,Placemaker.Modules,OrientedModule,set_isDecor,public void set_isDecor(bool value),dumped,
-0x6FC840,0x106FC840,Placemaker.Modules,OrientedModule,set_isEmpty,public void set_isEmpty(bool value),dumped,
-0x6FC860,0x106FC860,Placemaker.Modules,OrientedModule,set_orientation,public void set_orientation(int value),dumped,
-0x1E73E0,0x101E73E0,Placemaker.Modules,OutlineUv,.ctor,public void .ctor(),dumped,
-0x6FC880,0x106FC880,Placemaker.Modules,OutlineUv,get_border,public bool get_border(),dumped,
-0x6FC890,0x106FC890,Placemaker.Modules,OutlineUv,get_uv,public Vector2 get_uv(),dumped,
-0x6FC8F0,0x106FC8F0,Placemaker.Modules,OutlineUv,get_x,public int get_x(),dumped,
-0x6FC920,0x106FC920,Placemaker.Modules,OutlineUv,get_y,public int get_y(),dumped,
-0x6FC950,0x106FC950,Placemaker.Modules,OutlineUv,set_x,public void set_x(int value),dumped,
-0x6FC9C0,0x106FC9C0,Placemaker.Modules,OutlineUv,set_y,public void set_y(int value),dumped,
+0x6FC580,0x106FC580,Placemaker.Modules,OrientedModule,Equals,public override bool Equals(object obj),ported,placemaker::modules (boxed Equals(object): op_Equality / eq_cs)
+0x6FC630,0x106FC630,Placemaker.Modules,OrientedModule,GetHashCode,public override int GetHashCode(),checked,tests/placemaker_modules.rs
+0x6FC650,0x106FC650,Placemaker.Modules,OrientedModule,ToString,public override string ToString(),checked,tests/placemaker_modules.rs
+0x6FC700,0x106FC700,Placemaker.Modules,OrientedModule,.cctor,private static void .cctor(),checked,tests/placemaker_modules.rs
+0x6FC740,0x106FC740,Placemaker.Modules,OrientedModule,get_isDecor,public bool get_isDecor(),checked,tests/placemaker_modules.rs
+0x6FC760,0x106FC760,Placemaker.Modules,OrientedModule,get_isEmpty,public bool get_isEmpty(),checked,tests/placemaker_modules.rs
+0x6FC780,0x106FC780,Placemaker.Modules,OrientedModule,get_orientation,public int get_orientation(),checked,tests/placemaker_modules.rs
+0x6FC790,0x106FC790,Placemaker.Modules,OrientedModule,op_Equality,"public static bool op_Equality(OrientedModule a, OrientedModule b)",checked,tests/placemaker_modules.rs
+0x6FC7B0,0x106FC7B0,Placemaker.Modules,OrientedModule,op_Inequality,"public static bool op_Inequality(OrientedModule a, OrientedModule b)",checked,tests/placemaker_modules.rs
+0x6FC820,0x106FC820,Placemaker.Modules,OrientedModule,set_isDecor,public void set_isDecor(bool value),checked,tests/placemaker_modules.rs
+0x6FC840,0x106FC840,Placemaker.Modules,OrientedModule,set_isEmpty,public void set_isEmpty(bool value),checked,tests/placemaker_modules.rs
+0x6FC860,0x106FC860,Placemaker.Modules,OrientedModule,set_orientation,public void set_orientation(int value),checked,tests/placemaker_modules.rs
+0x1E73E0,0x101E73E0,Placemaker.Modules,OutlineUv,.ctor,public void .ctor(),ported,placemaker::modules (empty constructor)
+0x6FC880,0x106FC880,Placemaker.Modules,OutlineUv,get_border,public bool get_border(),checked,tests/placemaker_modules.rs
+0x6FC890,0x106FC890,Placemaker.Modules,OutlineUv,get_uv,public Vector2 get_uv(),checked,tests/placemaker_modules.rs
+0x6FC8F0,0x106FC8F0,Placemaker.Modules,OutlineUv,get_x,public int get_x(),checked,tests/placemaker_modules.rs
+0x6FC920,0x106FC920,Placemaker.Modules,OutlineUv,get_y,public int get_y(),checked,tests/placemaker_modules.rs
+0x6FC950,0x106FC950,Placemaker.Modules,OutlineUv,set_x,public void set_x(int value),checked,tests/placemaker_modules.rs
+0x6FC9C0,0x106FC9C0,Placemaker.Modules,OutlineUv,set_y,public void set_y(int value),checked,tests/placemaker_modules.rs
 0x1E73E0,0x101E73E0,Placemaker.Modules.Processing,DecorProfile,.ctor,public void .ctor(),dumped,
 0x3208C0,0x103208C0,Placemaker.Modules.Processing,MappedMaterialSettings,.ctor,public void .ctor(),dumped,
 0x32C740,0x1032C740,Placemaker.Modules.Processing,MaterialCluster,.ctor,public void .ctor(),dumped,
