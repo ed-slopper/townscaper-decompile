@@ -572,14 +572,14 @@ rva,va,namespace,type,method,signature,status,notes
 0x32E5F0,0x1032E5F0,Placemaker,ModuleBuilder,ApplyModule,"public void ApplyModule(Qube qube, OrientedModuleSides possibleModule)",dumped,
 0x32FB90,0x1032FB90,Placemaker,ModuleBuilder,DeconstructModuleContainer,public void DeconstructModuleContainer(ModuleContainer container),dumped,
 0x32FD80,0x1032FD80,Placemaker,ModuleBuilder,GetModuleContainer,private ModuleContainer GetModuleContainer(),dumped,
-0x32FE30,0x1032FE30,Placemaker,ModuleBuilder,GetTs,public static Vector4 GetTs(Vector3 srcVert),dumped,
+0x32FE30,0x1032FE30,Placemaker,ModuleBuilder,GetTs,public static Vector4 GetTs(Vector3 srcVert),checked,tests/placemaker_module_builder.rs
 0x32FED0,0x1032FED0,Placemaker,ModuleBuilder,IterateDeconstructQubes,public bool IterateDeconstructQubes(),dumped,
 0x32FF90,0x1032FF90,Placemaker,ModuleBuilder,Iterate,public bool Iterate(),dumped,
 0x330090,0x10330090,Placemaker,ModuleBuilder,MarkModuleContainerForDeconstruction,public void MarkModuleContainerForDeconstruction(ModuleContainer container),dumped,
 0x330190,0x10330190,Placemaker,ModuleBuilder,MarkQubeForDeconstruction,public void MarkQubeForDeconstruction(Qube qube),dumped,
 0x330270,0x10330270,Placemaker,ModuleBuilder,MaybeAddToGrassQueue,public void MaybeAddToGrassQueue(Qube qube),dumped,
-0x3302D0,0x103302D0,Placemaker,ModuleBuilder,MultiplyPoint,"public static Vector3 MultiplyPoint(Square square, Vector4 ts, Vector3 vector)",dumped,
-0x3304E0,0x103304E0,Placemaker,ModuleBuilder,MultiplyVector,"public static Vector3 MultiplyVector(Square square, Vector4 ts, Vector3 vector)",dumped,
+0x3302D0,0x103302D0,Placemaker,ModuleBuilder,MultiplyPoint,"public static Vector3 MultiplyPoint(Square square, Vector4 ts, Vector3 vector)",checked,tests/placemaker_module_builder.rs
+0x3304E0,0x103304E0,Placemaker,ModuleBuilder,MultiplyVector,"public static Vector3 MultiplyVector(Square square, Vector4 ts, Vector3 vector)",checked,tests/placemaker_module_builder.rs
 0x3306E0,0x103306E0,Placemaker,ModuleBuilder,OnStart,public void OnStart(),dumped,
 0x3307B0,0x103307B0,Placemaker,ModuleBuilder,<ApplyDecor>g__GetNewBigMeshPart|9_0,internal static BigMeshPart <ApplyDecor>g__GetNewBigMeshPart|9_0(ref ModuleBuilder.<>c__DisplayClass9_0 ),dumped,
 0x330870,0x10330870,Placemaker,ModuleBuilder,<ApplyModule>g__GetNewBigMeshPart|8_0,internal static BigMeshPart <ApplyModule>g__GetNewBigMeshPart|8_0(ref ModuleBuilder.<>c__DisplayClass8_0 ),dumped,

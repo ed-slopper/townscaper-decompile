@@ -6,6 +6,7 @@ pub mod ao_baker;
 pub mod graphs;
 pub mod grid_generator;
 pub mod maker;
+pub mod module_builder;
 pub mod modules;
 pub mod quads;
 pub mod save_data;
