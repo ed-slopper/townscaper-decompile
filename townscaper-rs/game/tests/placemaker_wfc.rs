@@ -19,6 +19,7 @@ use ts_game::placemaker::ao_baker::AoBaker;
 use ts_game::placemaker::graphs::{Action, Graph, GraphHost, OrientedModuleSides, QubeId, VoxelType};
 use ts_game::placemaker::grid_generator::{GridBitState, GridGenerator};
 use ts_game::placemaker::maker::Maker;
+use ts_game::placemaker::modules::OrientedModule;
 use ts_game::placemaker::wfc::{Propagation, WaveFunctionCollapse, WfcHost};
 use ts_game::unity::mathematics::{f2, Int2};
 use ts_game::unity::vector::Vector3;
@@ -26,6 +27,7 @@ use ts_game::unity::vector::Vector3;
 const WFC: &str = "Placemaker.WaveFunctionCollapse";
 const PROP: &str = "Placemaker.WaveFunctionCollapse+Propagation, Assembly-CSharp";
 const LAST: &str = "Placemaker.WaveFunctionCollapse+LastRemovedStruct, Assembly-CSharp";
+const MC: &str = "Placemaker.Graphs.ModuleContainer";
 const OMS: &str = "Placemaker.Graphs.OrientedModuleSides, Assembly-CSharp";
 
 #[derive(Default)]
@@ -33,6 +35,8 @@ struct Host {
     ao: AoBaker,
     maker: Maker,
     wfc: WaveFunctionCollapse,
+    /// Qubes whose module containers the graph took down (`ModuleBuilder`'s, row E7).
+    cleared: Vec<QubeId>,
 }
 impl GraphHost for Host {
     fn ao_baker(&mut self) -> Option<&mut AoBaker> {
@@ -49,6 +53,9 @@ impl GraphHost for Host {
     }
     fn qube_removed(&mut self, graph: &mut Graph, qube: QubeId, side_mask: u8) {
         self.wfc.qube_removed(graph, qube, side_mask);
+    }
+    fn mark_module_containers_for_deconstruction(&mut self, qube: QubeId) {
+        self.cleared.push(qube);
     }
 }
 
@@ -161,16 +168,33 @@ fn game_props(g: &mut Game, qs: &Qubes, wfc: u64, f: &str) -> Vec<Propagation> {
 
 /// The WFC's state and every qube's WFC fields, both sides.
 fn check_state(g: &mut Game, qs: &Qubes, wfc: u64, ours: &Graph, w: &WaveFunctionCollapse, what: &str) {
-    for f in ["updates", "removeNeighbors"] {
-        let ours_list = if f == "updates" { &w.updates } else { &w.remove_neighbors };
+    check_state_with(g, qs, wfc, ours, w, what, true)
+}
+
+/// `grass`: compare `awaitingGrass` too (the module builder sets it, row E7; only the WFC's `QubeRemoved` clears it).
+fn check_state_with(g: &mut Game, qs: &Qubes, wfc: u64, ours: &Graph, w: &WaveFunctionCollapse, what: &str, grass: bool) {
+    for (f, ours_list) in [
+        ("updates", &w.updates),
+        ("removeNeighbors", &w.remove_neighbors),
+        ("propagations", &w.propagations),
+        ("toCollapse", &w.to_collapse),
+        ("decorUpdates", &w.decor_updates),
+        ("decorPropagations", &w.decor_propagations),
+        ("decorToCollapse", &w.decor_to_collapse),
+        ("decorToBuild", &w.decor_to_build),
+    ] {
         assert_eq!(&game_props(g, qs, wfc, f), ours_list, "{what}: {f}");
     }
-    let lr: Vec<(Option<QubeId>, u16, i8, u16)> = wfc_list(g, wfc, "lastRemovals", LAST)
-        .chunks(12)
-        .map(|c| (qube_of(qs, ptr(c)), u16::from_le_bytes([c[4], c[5]]), c[6] as i8, u16::from_le_bytes([c[8], c[9]])))
-        .collect();
-    let lo: Vec<(Option<QubeId>, u16, i8, u16)> = w.last_removals.iter().map(|l| (l.qube, l.side, l.side_index, l.propagation_index)).collect();
-    assert_eq!(lr, lo, "{what}: lastRemovals");
+    let ls = ret::bytes(&ok(g.h.request(Game::field(wfc, "lastStartedPropagation")), "lastStarted"));
+    assert_eq!(u16::from_le_bytes([ls[0], ls[1]]), w.last_started_propagation, "{what}: lastStartedPropagation");
+    for (f, ours_list) in [("lastRemovals", &w.last_removals), ("lastDecorRemovals", &w.last_decor_removals)] {
+        let lr: Vec<(Option<QubeId>, u16, i8, u16)> = wfc_list(g, wfc, f, LAST)
+            .chunks(12)
+            .map(|c| (qube_of(qs, ptr(c)), u16::from_le_bytes([c[4], c[5]]), c[6] as i8, u16::from_le_bytes([c[8], c[9]])))
+            .collect();
+        let lo: Vec<(Option<QubeId>, u16, i8, u16)> = ours_list.iter().map(|l| (l.qube, l.side, l.side_index, l.propagation_index)).collect();
+        assert_eq!(lr, lo, "{what}: {f}");
+    }
     let rb: Vec<Option<QubeId>> = {
         let qc = list("Placemaker.Graphs.Qube, Assembly-CSharp");
         let l = handle(&ok(g.h.request(Game::field(wfc, "qubesToRebuild")), "qubesToRebuild"), "qubesToRebuild");
@@ -181,7 +205,7 @@ fn check_state(g: &mut Game, qs: &Qubes, wfc: u64, ours: &Graph, w: &WaveFunctio
     assert_eq!(rb, w.qubes_to_rebuild.iter().map(|&q| Some(q)).collect::<Vec<_>>(), "{what}: qubesToRebuild");
     let counter = ret::bytes(&ok(g.h.request(Game::field(wfc, "propagationCounter")), "counter"));
     assert_eq!(u16::from_le_bytes([counter[0], counter[1]]), w.propagation_counter, "{what}: propagationCounter");
-    let names = ["lastPropagation", "cost", "sideVariationMask", "awaitingRebuilding", "awaitingGrass", "possibleModules"];
+    let names = ["lastPropagation", "cost", "sideVariationMask", "awaitingRebuilding", "awaitingGrass", "possibleModules", "decorSideVariationMask"];
     let f = g.fields(&qs.handles, &names);
     let lists: Vec<u64> = f.iter().map(|v| handle(&v[5], "possibleModules")).collect();
     let pm = g.batch(lists.iter().map(|&l| Game::call(l, &list(OMS), "ToArray", vec![], false)).collect(), "ToArray");
@@ -192,7 +216,10 @@ fn check_state(g: &mut Game, qs: &Qubes, wfc: u64, ours: &Graph, w: &WaveFunctio
         assert_eq!(u32::from_le_bytes(ret::bytes(&v[1])[..4].try_into().unwrap()), o.cost.to_bits(), "{what}: qube {q:?} cost {}", o.cost);
         assert_eq!(ret::bytes(&v[2])[0], o.side_variation_mask, "{what}: qube {q:?} sideVariationMask");
         assert_eq!(ret::bytes(&v[3])[0] != 0, o.awaiting_rebuilding, "{what}: qube {q:?} awaitingRebuilding");
-        assert_eq!(ret::bytes(&v[4])[0] != 0, o.awaiting_grass, "{what}: qube {q:?} awaitingGrass");
+        if grass {
+            assert_eq!(ret::bytes(&v[4])[0] != 0, o.awaiting_grass, "{what}: qube {q:?} awaitingGrass");
+        }
+        assert_eq!(ret::bytes(&v[6])[0], o.decor_side_variation_mask, "{what}: qube {q:?} decorSideVariationMask");
         let gm = ret::bytes(&pm[k]);
         if gm != oms_bytes(&o.possible_modules) {
             let n = gm.len() / 0x1C;
@@ -334,4 +361,191 @@ fn wave_function_collapse_per_qube_matches_the_game() {
 
 fn hex(b: &[u8]) -> String {
     b.iter().map(|x| format!("{x:02x}")).collect()
+}
+
+/// The module builder as far as the collapse sees it: the module each qube shows (`ApplyModule` replaces it,
+/// clears it for module 0 or a fully covered qube; `Iterate0` clears it for an empty or fully covered qube).
+#[derive(Default)]
+struct Builder {
+    current: HashMap<QubeId, OrientedModule>,
+    applied: usize,
+    decor: usize,
+    errors: usize,
+}
+impl WfcHost for Builder {
+    fn apply_module(&mut self, graph: &mut Graph, qube: QubeId, module: OrientedModuleSides) {
+        self.applied += 1;
+        if module.oriented_module.module_index != 0 && !graph.qube(qube).fully_covered() {
+            self.current.insert(qube, module.oriented_module);
+        } else {
+            self.current.remove(&qube);
+        }
+    }
+    fn mark_module_containers_for_deconstruction(&mut self, _graph: &mut Graph, qube: QubeId) {
+        self.current.remove(&qube);
+    }
+    fn current_module(&mut self, _graph: &Graph, qube: QubeId) -> Option<OrientedModule> {
+        self.current.get(&qube).copied()
+    }
+    fn log_error(&mut self, _message: &str, _qube: QubeId) {
+        self.errors += 1;
+    }
+    fn apply_decor(&mut self, _graph: &mut Graph, _qube: QubeId) {
+        self.decor += 1;
+    }
+}
+
+/// Calls a `bool` method of the game's WFC until it returns false (in batches: once false, the loops stay false).
+fn run_game(g: &mut Game, wfc: u64, m: &str) -> usize {
+    let mut n = 0;
+    loop {
+        let reqs = (0..64).map(|_| Game::call(wfc, WFC, m, vec![], false)).collect();
+        let r = g.batch(reqs, m);
+        for v in &r {
+            if ret::bytes(v)[0] == 0 {
+                return n;
+            }
+            n += 1;
+        }
+        assert!(n < 1_000_000, "{m} never ends");
+    }
+}
+
+/// The module the game shows in each qube: its first child's `ModuleContainer` (decor containers follow it).
+fn check_containers(g: &mut Game, qs: &Qubes, ours: &Graph, b: &Builder, what: &str) {
+    let qube_ts: Vec<u64> = g.batch(qs.handles.iter().map(|&q| Game::call(q, "UnityEngine.Component", "get_transform", vec![], true)).collect(), "transform").iter().map(|r| handle(r, "t")).collect();
+    let kids = g.children(&qube_ts);
+    let firsts: Vec<u64> = kids.iter().filter_map(|k| k.first().copied()).collect();
+    if !g.types.contains_key(MC) {
+        let t = handle(&ok(g.h.request(json!({"call": "System.Type.GetType", "args": [arg::string(&format!("{MC}, Assembly-CSharp"))], "param_types": ["System.String"], "main": true, "keep": true})), MC), MC);
+        g.types.insert(MC, t);
+    }
+    let containers = g.components(&firsts, MC);
+    let mods = g.batch(containers.iter().map(|&c| Game::field(c, "orientedModule")).collect(), "orientedModule");
+    let mut m = mods.iter();
+    for (k, &q) in qs.ids.iter().enumerate() {
+        let game = if kids[k].is_empty() {
+            None
+        } else {
+            let b = ret::bytes(m.next().unwrap());
+            Some((u16::from_le_bytes([b[0], b[1]]), b[2]))
+        };
+        let ours_m = b.current.get(&q).map(|o| (o.module_index, o.flags));
+        assert_eq!(game, ours_m, "{what}: qube {q:?} current module (in square: {})", ours.qube(q).square.is_some());
+    }
+}
+
+#[test]
+fn wave_function_collapse_loops_match_the_game() {
+    let Some(mut h) = harness() else { return };
+    let (mut g, mut grid, ao) = setup(&mut h);
+    let mut lib = module_common::our_module_library();
+    lib.setup();
+    let master = handle(&ok(g.h.request(Game::field(g.graph, "master")), "master"), "master");
+    let wfc = handle(&ok(g.h.request(Game::field(master, "waveFunctionCollapse")), "wfc"), "wfc");
+    // the scene's prop placer, so that replaced module containers leave their qube at once
+    let scene_master = handle(&ok(g.h.request(json!({"field": "master", "on": "Placemaker.GridGenerator", "main": true})), "scene master"), "scene master");
+    // (and its big mesh master, which takes back their meshes)
+    for f in ["propPlacer", "bigMeshMaster", "manySoundsManager"] {
+        let v = handle(&ok(g.h.request(Game::field(scene_master, f)), f), f);
+        ok(g.h.request(json!({"field": f, "handle": master, "set_handle": v, "main": true})), f);
+    }
+    // the fresh module builder's two containers (its `OnStart` needs a transform of its own)
+    let mb = handle(&ok(g.h.request(Game::field(master, "moduleBuilder")), "moduleBuilder"), "moduleBuilder");
+    for f in ["moduleContainerPool", "moduleContainersToDeconstruct"] {
+        let go = handle(&ok(g.h.request(json!({"new": "UnityEngine.GameObject", "args": [arg::string(f)], "param_types": ["System.String"], "main": true})), "go"), "go");
+        ok(g.h.request(json!({"call": "SetActive", "class": "UnityEngine.GameObject", "handle": go, "args": [arg::bool(false)], "main": true})), "SetActive");
+        let t = handle(&ok(g.h.request(json!({"call": "get_transform", "class": "UnityEngine.GameObject", "handle": go, "args": [], "main": true, "keep": true})), "t"), "t");
+        ok(g.h.request(json!({"field": f, "handle": mb, "set_handle": t, "main": true})), f);
+    }
+    let mut ours = Graph { shadow_mesh_index_iterator: (g.ao_skip as i32) * 16383, ..Default::default() };
+    ours.ground_collider.size = Vector3 { x: 1.0, y: 1.0, z: 1.0 };
+    let mut host = Host { ao, ..Default::default() };
+    let mut b = Builder::default();
+    while ret::bytes(&g.g("IterateRefillPools", vec![]))[0] != 0 {}
+    while ours.iterate_refill_pools(&mut || true) {}
+    settle(&mut g, &mut grid, &mut ours, &mut host);
+    let ps: Vec<Vector3> = grid.bits.iter().filter(|b| b.state == GridBitState::Done).map(|b| b.position).collect();
+    let cx = ps.iter().map(|p| p.x).sum::<f32>() / ps.len() as f32;
+    let cz = ps.iter().map(|p| p.z).sum::<f32>() / ps.len() as f32;
+    let mut r = Rng(71);
+    let mut verts: Vec<Int2> = Vec::new();
+    for _ in 0..150 {
+        let q = grid.get_quad(f2(r.f(cx - 2.5, cx + 2.5), r.f(cz - 2.5, cz + 2.5)));
+        if q.is_valid() {
+            for v in [q.v0, q.v1, q.v2, q.v3] {
+                if !verts.contains(&v) {
+                    verts.push(v);
+                }
+            }
+        }
+    }
+    let (mut steps0, mut steps1, mut steps_d) = (0, 0, 0);
+    let (mut removals, mut decor_removals) = (0, 0);
+    for step in 0..12 {
+        let t0 = std::time::Instant::now();
+        let a = random_action(&mut r, &ours, &verts, step);
+        ours.apply_action(&mut grid, &mut host, a, false);
+        g.g("ApplyAction", vec![arg::raw(&bytes(&a)), arg::bool(false)]);
+        settle(&mut g, &mut grid, &mut ours, &mut host);
+        for q in host.cleared.drain(..) {
+            b.current.remove(&q);
+        }
+        // the world master's order: a new step, Iterate0, the queued rebuilds, Iterate1; then LaterUpdate
+        ok(g.h.request(Game::call(wfc, WFC, "IteratePropagationCount", vec![], false)), "IteratePropagationCount");
+        host.wfc.iterate_propagation_count();
+        let ts = t0.elapsed().as_secs_f32();
+        let n0 = run_game(&mut g, wfc, "Iterate0");
+        let mut k = 0;
+        while host.wfc.iterate0(&mut ours, &lib, &mut b) {
+            k += 1;
+        }
+        assert_eq!(n0, k, "step {step}: Iterate0 rounds");
+        let t1 = t0.elapsed().as_secs_f32();
+        // one call per request: past the frame's time budget the game's loop makes no progress within a batch
+        let mut n = 0;
+        while ret::bytes(&ok(g.h.request(Game::call(wfc, WFC, "IterateApplyModules", vec![], false)), "IterateApplyModules"))[0] != 0 {
+            n += 1;
+            assert!(n < 100_000, "IterateApplyModules never ends");
+        }
+        let t2 = t0.elapsed().as_secs_f32();
+        while host.wfc.iterate_apply_modules(&mut ours, &mut b) {}
+        let n1 = run_game(&mut g, wfc, "Iterate1");
+        let mut k = 0;
+        while host.wfc.iterate1(&mut ours, &lib, &mut b) {
+            k += 1;
+            removals += host.wfc.last_removals.len();
+        }
+        assert_eq!(n1, k, "step {step}: Iterate1 rounds");
+        let t3 = t0.elapsed().as_secs_f32();
+        let nd = run_game(&mut g, wfc, "IterateDecor");
+        let t4 = t0.elapsed().as_secs_f32();
+        let mut k = 0;
+        while host.wfc.iterate_decor(&mut ours, &lib, &mut b) {
+            k += 1;
+            decor_removals += host.wfc.last_decor_removals.len();
+        }
+        assert_eq!(nd, k, "step {step}: IterateDecor rounds");
+        steps_d += nd;
+        if step % 3 == 0 {
+            ok(g.h.request(Game::call(wfc, WFC, "LaterUpdate", vec![], false)), "LaterUpdate");
+            host.wfc.later_update(&mut ours, &lib, &mut b);
+        }
+        steps0 += n0;
+        steps1 += n1;
+        eprintln!("step {step}: {:.1} s (settled {ts:.1}, Iterate0 {t1:.1}, apply {t2:.1}, Iterate1 {t3:.1}, decor {t4:.1}; {n0} / {n1} / {nd} rounds)", t0.elapsed().as_secs_f32());
+        if step % 3 == 2 {
+            let qs = qubes(&mut g, &ours);
+            check_state_with(&mut g, &qs, wfc, &ours, &host.wfc, &format!("step {step}"), false);
+            check_containers(&mut g, &qs, &ours, &b, &format!("step {step}"));
+            eprintln!(
+                "step {step}: same ({removals} lastRemovals and {decor_removals} lastDecorRemovals seen; {} qubes, {steps0} Iterate0, {steps1} Iterate1, {steps_d} IterateDecor rounds, {} modules and {} decor applied, {} decor updates, {} errors)",
+                qs.ids.len(),
+                b.applied,
+                b.decor,
+                host.wfc.decor_updates.len(),
+                b.errors
+            );
+        }
+    }
 }

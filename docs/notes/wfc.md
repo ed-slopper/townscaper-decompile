@@ -64,7 +64,71 @@ is noted in `lastRemovals` and the result is true. One module left: built now. T
 Checked (E6a): three rounds of 12 random actions on both graphs (the hooks fill `updates` and
 `removeNeighbors`; all equal), then every qube filled and offered to `MaybeQueueQubeForRebuilding` in a shuffled
 order, the modules, costs, masks and flags of all qubes and the WFC lists compared every few qubes (up to 270
-qubes a round); 600 `CompareTo` pairs; `ResetPropagationCounter` at 0x7FFF and 0x8004. The filling never
-reached `RemovePossibleModule`'s `lastRemovals` branch (no neighbour had the shared side in its mask yet): that
-row stays `ported` until the loops (E6b) run it. The gizmos (`OnDrawGizmos`, `DrawPropagationGizmo`) are
+qubes a round); 600 `CompareTo` pairs; `ResetPropagationCounter` at 0x7FFF and 0x8004. The filling alone never
+reached `RemovePossibleModule`'s `lastRemovals` branch (no neighbour had the shared side in its mask yet); the
+loops below do. The gizmos (`OnDrawGizmos`, `DrawPropagationGizmo`) are
 editor-only: `read`.
+
+## The loops (E6b)
+
+The world master runs, between the graph's update and the shadows: `Iterate0`, `IterateApplyModules`, then
+later `Iterate1`, `IterateDecor` and `ResetPropagationCounter`, each until it returns false or the frame's time
+is up. `LaterUpdate` builds what is left in `qubesToRebuild`.
+
+- `Iterate0` 0x3D7A00: a new step only starts (`lastStartedPropagation = propagationCounter`, true). Then the
+  last of `updates`: if still current (step and existance), the qube's `possibleModuleListIndex` is
+  `cornerDict[GetIndexedMaterials(MarkHiddenCornersAmbigous(cornerValues))]` (-1 if missing, or when the corners
+  are all "any"); an empty or fully covered qube loses its module containers; a fully covered one also its
+  modules (and no propagation). Otherwise it is filled at `counter + 1`, offered to
+  `MaybeQueueQubeForRebuilding`, and its propagation (mask: the fill's; for a qube that had modules, plus its
+  old mask and each side whose first module's profile changed; for a bottom qube that had none, plus the four
+  round sides) goes to `propagations`. Else the last of `removeNeighbors`: still current, it is refilled one
+  step on and its mask narrowed by the fill's.
+- `Iterate1` 0x3D7F50, first non-empty of: `lastRemovals` (on a current, non-empty qube, every module showing
+  the removed profile on that side is removed, relations of all but that side); `propagations` (a current,
+  non-empty qube with an even existance: each neighbour by the mask, not fully covered and behind, moves to the
+  qube's step, is filled and propagated with the fill's mask minus the shared side; the propagation, with the
+  qube's mask, is inserted into `toCollapse` by `CompareTo`); `toCollapse` (its last entry: one module left →
+  built, removed, one step on and passed to `decorUpdates`; more → its dearest modules removed one at a time
+  down to index 1 until a removal reaches a neighbour, then `MaybeQueueQubeForRebuilding`; stale or empty →
+  removed).
+- `IterateApplyModules` 0x3D8750: from the back of `qubesToRebuild`, the qubes still awaiting are built with
+  their first module while `WorldMaster.KeepGoing`; the handled part of the list is removed.
+- `LaterUpdate` 0x3D93C0 (marker "Apply Modules"): every qube left awaiting is built now; one with several
+  modules at a step with `lastPropagation & 3 == 1` that already shows a module (its first child's
+  `ModuleContainer`) keeps that module if still possible, else takes the closest: `|moduleIndex - current|`
+  minus 100 per side profile in common, lowest first. Then the list is cleared.
+
+## The decor (E6c)
+
+After a qube collapses, its `possibleModules` keeps the module at index 0 and lists its possible decor after it.
+
+- `FillDecorPossibilities` 0x3D6240 (marker of the same name): nothing for an empty list (returns 0). Else the
+  module's `decorModules`, each turned by `MulOrientations(module, decor)`, with the decor module's profile and
+  cost (`cost` + the same position jitter as the modules). A repeated non-zero profile index replaces the
+  previous entry when cheaper. A decor fits when it shows profile 0 towards every open side, and towards each
+  neighbour at the same or a later step a profile one of the neighbour's decor (index 1 on) shows (no
+  fully-covered check here). The mask has the sides whose profile differs from the previous decor's (the first
+  against zeros, unlike the modules). Then the module goes back to index 0, and "Validate Opposite Decors"
+  removes each neighbour's decor (index 1 on, non-zero profile) that no decor of the qube matches, with the
+  neighbour's full decor mask as relations.
+- `RemovePossibleDecor` 0x3D9F90: removes the entry; for each non-zero profile side whose neighbour (not fully
+  covered, the side in its decor mask) has no other decor showing it, a `lastDecorRemovals` entry. No step check.
+- `IterateDecor` 0x3D88D0, first non-empty of: `decorUpdates` (one step on; queued in `decorToBuild`; a qube with
+  only its module gets its decor filled and propagated, with its old decor mask added); `lastDecorRemovals`;
+  `decorPropagations` (neighbours in the mask, not fully covered and behind: filled, moved to the step,
+  propagated and queued to build; then into `decorToCollapse`); `decorToCollapse` (from index 1, each decor
+  removes the later ones it overlaps, by `ModuleLibrary.GetDecorOverlap`); `decorToBuild`
+  (`ModuleBuilder.ApplyDecor`). Stale entries are dropped.
+
+Checked (E6b, E6c): 12 random actions on both graphs, each followed by the world master's order on the game's
+fresh WFC and ours (a new step, `Iterate0`, `IterateApplyModules`, `Iterate1`, `IterateDecor`, every third step
+`LaterUpdate`), each loop run until false and its round count compared; every three steps all queues, both
+removal lists, both counters, every qube's modules, costs, masks and flags, and the module each qube shows (the
+game's first module container under the qube against the module our host last built) are compared. Up to 88
+qubes, 2,133 `Iterate1` and 2,469 `IterateDecor` rounds, 796 modules and 357 decor built; the removal branches
+ran (1,899 `lastRemovals`, 47,672 `lastDecorRemovals` entries seen). For the game's real `ModuleBuilder` to run
+on the stand-in, the test gives the fresh builder its two containers and the stand-in master the scene's
+`propPlacer`, `bigMeshMaster` and `manySoundsManager`; `IterateApplyModules` is called one request at a time
+(past the frame's time budget, `WorldMaster.KeepGoing` stops it without progress inside one batch).
+`awaitingGrass` is the module builder's (E7) and is not compared there.

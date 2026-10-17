@@ -140,7 +140,29 @@ impl Ctx {
     unsafe fn exception_text(&self, exc: Ptr) -> String {
         let mut buf = vec![0i8; 4096];
         (self.api.il2cpp_format_exception)(exc, buf.as_mut_ptr(), buf.len() as i32);
-        cstr(buf.as_ptr())
+        let mut text = cstr(buf.as_ptr());
+        let mut st = vec![0i8; 8192];
+        (self.api.il2cpp_format_stack_trace)(exc, st.as_mut_ptr(), st.len() as i32);
+        let st = cstr(st.as_ptr());
+        if !st.trim().is_empty() {
+            text.push_str("
+");
+            text.push_str(st.trim_end());
+        }
+        // the native return addresses il2cpp keeps (`Exception.trace_ips`), as GameAssembly.dll RVAs
+        let f = (self.api.il2cpp_class_get_field_from_name)((self.api.il2cpp_object_get_class)(exc), c("trace_ips").as_ptr());
+        if !f.is_null() {
+            let mut arr: Ptr = std::ptr::null_mut();
+            (self.api.il2cpp_field_get_value)(exc, f, &mut arr as *mut Ptr as Ptr);
+            if !arr.is_null() {
+                let n = (self.api.il2cpp_array_length)(arr) as usize;
+                let base = windows_sys::Win32::System::LibraryLoader::GetModuleHandleA(c"GameAssembly.dll".as_ptr() as *const u8) as usize;
+                let ips = std::slice::from_raw_parts((arr as *const u8).add(16) as *const usize, n);
+                let rvas: Vec<String> = ips.iter().map(|&ip| if ip >= base { format!("{:#x}", ip - base) } else { format!("abs {ip:#x}") }).collect();
+                text.push_str(&format!(" [trace_ips: {}]", rvas.join(" ")));
+            }
+        }
+        text
     }
 
     unsafe fn find_object(&self, type_name: &str) -> Result<Ptr, String> {

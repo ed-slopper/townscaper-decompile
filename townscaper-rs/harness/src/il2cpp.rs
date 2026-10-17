@@ -63,6 +63,7 @@ api! {
     il2cpp_class_get_element_class: fn(Ptr) -> Ptr;
     il2cpp_type_get_object: fn(Ptr) -> Ptr;
     il2cpp_format_exception: fn(Ptr, *mut c_char, i32) -> ();
+    il2cpp_format_stack_trace: fn(Ptr, *mut c_char, i32) -> ();
     il2cpp_value_box: fn(Ptr, Ptr) -> Ptr;
     il2cpp_class_from_system_type: fn(Ptr) -> Ptr;
     il2cpp_object_new: fn(Ptr) -> Ptr;
