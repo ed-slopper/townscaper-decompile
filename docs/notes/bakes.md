@@ -50,3 +50,32 @@ fresh baker and camera on an inactive object with the scene's gradients: 300 ran
 40 `LateUpdate` frames around the scene's town (state, colours, lamps, both matrices, range, sun direction, camera
 position, plane position, rotation and scale), all bit-exact. The camera's size and clip getters are stripped;
 `_WorldToShadow` is built from them.
+
+## Ambient occlusion: `AoBaker` (E9b, proven)
+
+`placemaker::ao_baker`. The graph fills the shadow meshes (E4d, `GetShadowMesh`); the baker turns them into an
+atlas of height slices.
+
+- `.cctor` 0x7B4050: `uncoveredCol` white, `uncoveredCol32` its bytes, `onTextures` an empty lambda, the ids of
+  `_Tex3dUvSize` and `_Tex3dWorldBounds`. Constants: `texSize` 2048, `texelSize` 1/2048,
+  `shadowMeshMaxVertCount` 65532.
+- `OnStart`: `renderTexture0` / `renderTexture1` (2048², 24-bit depth), four materials, and the marching-squares
+  lookup: `n = 17^4 = 83521` cells (four corners, 17 values each: 16 greys `(i + 0.5)/16` with alpha 0 and the
+  uncovered white), each a 2x2 texel block, the texture `2 * NextPowerOfTwo(sqrt n)` by `2 * NextPowerOfTwo(n /
+  that)` = 1024 x 512. Cell `i` is at `(2i mod 1024, 2 * (2i / 1024))`, bottom-left = digit 0 (lowest, base 17),
+  bottom-right = digit 1, top-right = digit 2, top-left = digit 3. `powers = 17^k` (1, 17, 289, 4913). The
+  lookup is blitted through the marching-squares material into `coloredMarchingSquaresTex`; then `Restore`.
+- `Restore`: `_MainTex` of the AO and stack materials = the coloured lookup; `_VoxelTex` = `renderTexture0`,
+  `_AoTex` = `renderTexture1`; the camera targets `renderTexture0`. `OnEnable` restores once a material exists.
+- `BakeAo`: the graph's `shadowMeshBounds` grows 2 in x and z; a slice is (size.x, size.z), there are
+  `boundsHeight + 1` slices, `countX` across and `countY = CeilToInt(total / (float)countX)` down. `countX` goes
+  up from 1 while the atlas's longer side (`max(countY * size.z, countX * size.x)`, x when the other is NaN)
+  strictly shrinks; `size` becomes the slice's share of that side. `_Tex3dUvSize = texParams = (size,
+  size.x / bounds.x, countX)`, `_Tex3dWorldBounds = (min.x, min.z, size.x, size.z)`. Dirty shadow meshes are
+  uploaded (the last first, bounds `float.MaxValue` so they are never culled) and the camera turned on.
+- `OnPostRender`: `renderTexture0` blitted into `renderTexture1` through the spreader; the camera off.
+  `ApplyMaterialColors`: the lookup blitted again, then `BakeAo`.
+
+Checked (`tests/placemaker_ao_baker.rs`): ids, uncovered colours, the scene baker's lookup texture (every texel)
+and `powers`; 300 random bounds and heights through `BakeAo` on a fresh inactive baker (fields, both globals,
+the camera), bit-exact.

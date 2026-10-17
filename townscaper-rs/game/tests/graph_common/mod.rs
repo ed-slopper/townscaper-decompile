@@ -838,6 +838,7 @@ pub fn setup(h: &mut Harness) -> (Game<'_>, GridGenerator, AoBaker) {
         shadow_meshes: vec![Default::default(); ao_skip],
         powers: ts_game::unity::mathematics::Int4 { x: p[0], y: p[1], z: p[2], w: p[3] },
         marching_squares_tex_size: (tw, th),
+        ..Default::default()
     };
     let mut containers = HashMap::new();
     for name in ["corners", "cornerPool", "squares", "squarePool", "voxelPool", "looseVoxels", "qubePool"] {

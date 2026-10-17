@@ -282,18 +282,18 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F53D0,0x101F53D0,Placemaker,AmbientSound,.ctor,public void .ctor(),dumped,
 0x7B2D50,0x107B2D50,Placemaker,AmbientSound,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,
 0x7B2D70,0x107B2D70,Placemaker,AmbientSound,Update,private void Update(),dumped,
-0x7B2E50,0x107B2E50,Placemaker,AoBaker,ApplyMaterialColors,public void ApplyMaterialColors(),dumped,
-0x7B2F60,0x107B2F60,Placemaker,AoBaker,BakeAo,public void BakeAo(),dumped,
+0x7B2E50,0x107B2E50,Placemaker,AoBaker,ApplyMaterialColors,public void ApplyMaterialColors(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x7B2F60,0x107B2F60,Placemaker,AoBaker,BakeAo,public void BakeAo(),checked,"placemaker::ao_baker (tests/placemaker_ao_baker.rs: 300 random atlas layouts and both globals on a fresh inactive baker, bit-exact)"
 0x7B3500,0x107B3500,Placemaker,AoBaker,GetShadowMesh,"public ValueTuple<ShadowMesh, int> GetShadowMesh(int shadowIndex)",checked,tests/placemaker_graph_loop.rs
-0x7B3800,0x107B3800,Placemaker,AoBaker,OnEnable,private void OnEnable(),dumped,
-0x7B3870,0x107B3870,Placemaker,AoBaker,OnPostRender,private void OnPostRender(),dumped,
-0x7B3980,0x107B3980,Placemaker,AoBaker,OnStart,public void OnStart(),dumped,
-0x7B3FA0,0x107B3FA0,Placemaker,AoBaker,Restore,private void Restore(),dumped,
-0x7B4050,0x107B4050,Placemaker,AoBaker,.cctor,private static void .cctor(),dumped,
-0x7B41B0,0x107B41B0,Placemaker,AoBaker,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,AoBaker.<>c,<.cctor>b__37_0,"internal void <.cctor>b__37_0(RenderTexture <p0>, RenderTexture <p1>)",dumped,
-0x1E73E0,0x101E73E0,Placemaker,AoBaker.<>c,.ctor,public void .ctor(),dumped,
-0x1F2E50,0x101F2E50,Placemaker,AoBaker.<>c,.cctor,private static void .cctor(),dumped,
+0x7B3800,0x107B3800,Placemaker,AoBaker,OnEnable,private void OnEnable(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x7B3870,0x107B3870,Placemaker,AoBaker,OnPostRender,private void OnPostRender(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x7B3980,0x107B3980,Placemaker,AoBaker,OnStart,public void OnStart(),ported,"placemaker::ao_baker (lookup texture and powers checked on the scene baker; the textures, materials and blit are AoPasses, needs the shaders (C3))"
+0x7B3FA0,0x107B3FA0,Placemaker,AoBaker,Restore,private void Restore(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x7B4050,0x107B4050,Placemaker,AoBaker,.cctor,private static void .cctor(),checked,"placemaker::ao_baker (tests/placemaker_ao_baker.rs: 300 random atlas layouts and both globals on a fresh inactive baker, bit-exact)"
+0x7B41B0,0x107B41B0,Placemaker,AoBaker,.ctor,public void .ctor(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x1D4430,0x101D4430,Placemaker,AoBaker.<>c,<.cctor>b__37_0,"internal void <.cctor>b__37_0(RenderTexture <p0>, RenderTexture <p1>)",ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x1E73E0,0x101E73E0,Placemaker,AoBaker.<>c,.ctor,public void .ctor(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
+0x1F2E50,0x101F2E50,Placemaker,AoBaker.<>c,.cctor,private static void .cctor(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
 0x1D4430,0x101D4430,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
 0x7B4F80,0x107B4F80,Placemaker,AudioSnapshotManager,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,
 0x7B4FB0,0x107B4FB0,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
