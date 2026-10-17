@@ -79,3 +79,19 @@ flocks, props, save system and sounds, walked by the game's `Iterate` from `Star
 `NormalStart` to `Done` (86 steps, every state 1–43 visited); our machine replayed each step to the same state
 and result. Also `DoNothing`, `Done`, states past the table, `AwaitDim`, `ResetState`, `SetDirty`. `Update` and
 its save timing on a fake world (the game's own `Update` would drive and save the scene).
+
+## Saving, loading, new towns (E8c, proven)
+
+- `New(SaveData)` 0x1F94C0 / `New()` 0x1F93E0: the save cleared, one empty corner at
+  `GridGenerator.GetStartingHex(Random.Range(0, 40))` moved by `Random.Range(-12, 12)` in x, then in y (draws in
+  that order). Checked on 200 seeded engine random states.
+- `Load(SaveData)` 0x1F91F0: the save copied into the master's (`ReadNonImageDataFrom`, unless it is the same),
+  `state = StartLoad`, `anyChange = false`, `lastChangeTime = -1`. `Load(string)` 0x1F9240: the master's save
+  cleared and read with `TextSaveSystem.LoadFromString`; false and nothing else when it fails, else the same
+  start. `NothingToLoadAtStartup`: an empty save to the camera and the shadow baker, then `BeginLoadGraph`.
+- `GetSaveString`: the graph saved into the cleared save, `TextSaveSystem.SaveToString` (also `lastSaveString`).
+  `PopulateSaveData(save, meta)`: camera, shadow baker, save camera and graph into the save, `lastWriteTime =
+  DateTime.UtcNow` ticks, the text (`metaSave` unused).
+- `MaybeUpdateGameVersionInSettingsData`: a new `Application.version` is logged ("Updating
+  settingsData.lastRunVersion to …"), stored and the settings marked dirty. `shouldBeLoading` = state < 19.
+- The text format and the rest of `SaveData` are G3 / G3a (behind `WorldSaves`).

@@ -2,7 +2,12 @@
 //! state machine (`WorldMaster.State`) walked as far as the frame's time budget allows: loading, then the normal
 //! round of grid, graph, wave function collapse, shadows, sandbanker, props, birds and pools, back to the start
 //! whenever something changes (`ResetState`). Every system, ported or not, is reached through [`WorldSystems`].
-//! Checked against the running game by `tests/placemaker_world_master.rs` (`TS_HARNESS=1`).
+//! Row E8c: saving, loading and new towns. Checked against the running game by `tests/placemaker_world_master.rs`
+//! (`TS_HARNESS=1`).
+
+use crate::placemaker::grid_generator;
+use crate::placemaker::save_data::{SaveCorner, SaveData};
+use crate::unity::random::Rand;
 
 /// `WorldMaster.State` (a `byte`).
 #[repr(u8)]
@@ -351,5 +356,141 @@ impl WorldMaster {
     pub fn late_update(&mut self, sys: &mut dyn WorldSystems) {
         sys.prop_mesh_animator_on_late_update();
         sys.big_mesh_master_on_late_update();
+    }
+}
+
+// ---- Saving, loading, new towns (row E8c) ----
+
+/// What the master's save, load and new paths call outside it: the text save system (row G3a), `SaveData`'s
+/// own copying (row G3), the camera, shadow and save-camera parts of a save, the graph's `Save`, the clock and the
+/// log.
+pub trait WorldSaves {
+    /// `TextSaveSystem.SaveToString(corners, voxels)`.
+    fn save_to_string(&mut self, save: &SaveData) -> String;
+    /// `TextSaveSystem.LoadFromString(text, corners, voxels)`: false when the text is no town.
+    fn load_from_string(&mut self, text: &str, save: &mut SaveData) -> bool;
+    /// `SaveData.ReadNonImageDataFrom(other)` into the master's save data.
+    fn read_non_image_data_from(&mut self, into: &mut SaveData, from: &SaveData);
+    /// `graph.Save(saveData)`.
+    fn graph_save(&mut self, save: &mut SaveData);
+    /// `onCameraLoad(saveData)` / `onCameraSave(saveData)`.
+    fn on_camera_load(&mut self, _save: &SaveData) {}
+    fn on_camera_save(&mut self, _save: &mut SaveData) {}
+    /// `shadowBaker.Load(saveData)` / `shadowBaker.Save(saveData)`, `saveCamera.Save(saveData)`.
+    fn shadow_baker_load(&mut self, _save: &SaveData) {}
+    fn shadow_baker_save(&mut self, _save: &mut SaveData) {}
+    fn save_camera_save(&mut self, _save: &mut SaveData) {}
+    /// `DateTime.UtcNow.Ticks`.
+    fn utc_now_ticks(&mut self) -> i64 {
+        0
+    }
+    /// `Debug.Log`.
+    fn log(&mut self, _message: &str) {}
+}
+
+/// What a save keeps beyond the town in this port so far: the text and the write time (`SaveData.saveString`,
+/// `lastWriteTime`; the rest of `SaveData` is row G3).
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct SaveStamp {
+    pub save_string: String,
+    pub last_write_time: i64,
+}
+
+/// `settingsData.lastRunVersion` and the settings' dirty flag (`SaveSystem.SetSettingsDirty`), row G3.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct VersionSettings {
+    pub last_run_version: String,
+    pub dirty: bool,
+}
+
+/// `SaveData.Clear` as far as the town goes (row G3 clears the rest).
+fn clear_town(save: &mut SaveData) {
+    save.corners.clear();
+    save.voxels.clear();
+}
+
+impl WorldMaster {
+    /// `Placemaker.WorldMaster.get_shouldBeLoading` 0x1FA110: before `NormalStart`.
+    pub fn should_be_loading(&self) -> bool {
+        self.state < State::NormalStart as u8
+    }
+
+    /// `Placemaker.WorldMaster.New(SaveData)` 0x1F94C0 (and `New()` 0x1F93E0 on the master's own save data): an
+    /// empty town with one empty corner at a random starting hex (`GridGenerator.GetStartingHex(Random.Range(0,
+    /// 40))`) moved by `Random.Range(-12, 12)` in x, then in y.
+    pub fn new_town(save: &mut SaveData, random: &mut Rand) {
+        clear_town(save);
+        let i = random.range_int(0, 40);
+        let hex = grid_generator::get_starting_hex(i);
+        let dx = random.range_int(-12, 12);
+        let dy = random.range_int(-12, 12);
+        save.corners.push(SaveCorner { x: dx.wrapping_add(hex.x), y: dy.wrapping_add(hex.y), count: 0 });
+    }
+
+    /// `Placemaker.WorldMaster.Load(SaveData)` 0x1F91F0: the save copied into the master's (unless it is the
+    /// same), the load starts (`StartLoad`), no change pending.
+    pub fn load_save(&mut self, saves: &mut dyn WorldSaves, own: &mut SaveData, from: Option<&SaveData>) {
+        if let Some(from) = from {
+            saves.read_non_image_data_from(own, from);
+        }
+        self.state = State::StartLoad as u8;
+        self.any_change = false;
+        self.last_change_time = -1.0;
+    }
+
+    /// `Placemaker.WorldMaster.Load(string)` 0x1F9240: the master's save cleared and read from the text; false
+    /// (and nothing else) when it isn't a town, else the load starts.
+    pub fn load_string(&mut self, saves: &mut dyn WorldSaves, own: &mut SaveData, text: &str) -> bool {
+        clear_town(own);
+        if !saves.load_from_string(text, own) {
+            return false;
+        }
+        self.state = State::StartLoad as u8;
+        self.any_change = false;
+        self.last_change_time = -1.0;
+        true
+    }
+
+    /// `Placemaker.WorldMaster.NothingToLoadAtStartup` 0x1F95A0: an empty save for the camera and the shadows, then
+    /// straight to `BeginLoadGraph`.
+    pub fn nothing_to_load_at_startup(&mut self, saves: &mut dyn WorldSaves, own: &mut SaveData) {
+        clear_town(own);
+        saves.on_camera_load(own);
+        saves.shadow_baker_load(own);
+        self.state = State::BeginLoadGraph as u8;
+    }
+
+    /// `Placemaker.WorldMaster.GetSaveString` 0x1F8B60: the graph saved into the master's (cleared) save data and
+    /// written as text (`lastSaveString`).
+    pub fn get_save_string(&mut self, saves: &mut dyn WorldSaves, own: &mut SaveData) -> String {
+        clear_town(own);
+        saves.graph_save(own);
+        let s = saves.save_to_string(own);
+        self.last_save_string = s.clone();
+        s
+    }
+
+    /// `Placemaker.WorldMaster.PopulateSaveData` 0x1F9900 (`metaSave` unused): camera, shadows, save camera and
+    /// graph into the save, the write time (UTC ticks) and the text.
+    pub fn populate_save_data(&mut self, saves: &mut dyn WorldSaves, save: &mut SaveData, stamp: &mut SaveStamp) {
+        saves.on_camera_save(save);
+        saves.shadow_baker_save(save);
+        saves.save_camera_save(save);
+        saves.graph_save(save);
+        stamp.last_write_time = saves.utc_now_ticks();
+        stamp.save_string = saves.save_to_string(save);
+        self.last_save_string = stamp.save_string.clone();
+    }
+
+    /// `Placemaker.WorldMaster.MaybeUpdateGameVersionInSettingsData` 0x1F92F0: a new `Application.version` is
+    /// logged and stored, the settings marked dirty (true).
+    pub fn maybe_update_game_version_in_settings_data(settings: &mut VersionSettings, version: &str, saves: &mut dyn WorldSaves) -> bool {
+        if settings.last_run_version == version {
+            return false;
+        }
+        saves.log(&format!("Updating settingsData.lastRunVersion to {version}"));
+        settings.last_run_version = version.to_string();
+        settings.dirty = true;
+        true
     }
 }

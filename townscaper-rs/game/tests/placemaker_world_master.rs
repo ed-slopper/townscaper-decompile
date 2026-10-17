@@ -178,3 +178,87 @@ fn world_master_update_follows_the_budget() {
     // the smoothing factors
     assert_eq!(m.exp_t[0], ((-0.016f32 * 5.0) as f64).exp() as f32, "expTSlow");
 }
+
+/// No text system here: the game's answers are fed in.
+struct Saves(bool);
+impl ts_game::placemaker::world_master::WorldSaves for Saves {
+    fn save_to_string(&mut self, _save: &ts_game::placemaker::save_data::SaveData) -> String {
+        String::new()
+    }
+    fn load_from_string(&mut self, _text: &str, _save: &mut ts_game::placemaker::save_data::SaveData) -> bool {
+        self.0
+    }
+    fn read_non_image_data_from(&mut self, _into: &mut ts_game::placemaker::save_data::SaveData, _from: &ts_game::placemaker::save_data::SaveData) {}
+    fn graph_save(&mut self, _save: &mut ts_game::placemaker::save_data::SaveData) {}
+}
+
+#[test]
+fn world_master_new_and_load_match_the_game() {
+    use ts_game::placemaker::save_data::SaveData;
+    use ts_game::unity::random::Rand;
+    let Some(mut h) = harness() else { return };
+    let wm = handle(&ok(h.request(json!({"new": "Placemaker.WorldMaster", "args": [], "main": true})), "new WorldMaster"), "wm");
+    let wmc = "Placemaker.WorldMaster";
+    // New(SaveData): one corner from the engine's random state (set and drawn in one batch)
+    let mut seeds = Rand { s: [11, 22, 33, 44] };
+    for k in 0..200 {
+        let start = Rand { s: [seeds.next_u32(), seeds.next_u32(), seeds.next_u32(), seeds.next_u32()] };
+        let sd = handle(&ok(h.request(json!({"new": "Placemaker.SaveData", "args": [], "main": true})), "new SaveData"), "sd");
+        let st: String = start.s.iter().flat_map(|w| w.to_le_bytes()).map(|b| format!("{b:02x}")).collect();
+        let r = h.batch(vec![
+            json!({"native": "UnityPlayer.dll", "va": "0x107A74F0", "args": [{"buf": st}]}),
+            json!({"call": format!("{wmc}.New"), "handle": wm, "args": [{"handle": sd}], "param_types": ["Placemaker.SaveData"], "main": true}),
+        ]);
+        ok(r[1].clone(), "New");
+        let l = handle(&ok(h.request(json!({"field": "corners", "handle": sd, "main": true})), "corners"), "corners");
+        let raw = ret::bytes(&ok(h.request(json!({"call": "ToArray", "class": "System.Collections.Generic.List`1[[Placemaker.SaveData+C, Assembly-CSharp]]", "handle": l, "args": [], "main": true})), "ToArray"));
+        let mut ours = SaveData::default();
+        let mut rand = start.clone();
+        WorldMaster::new_town(&mut ours, &mut rand);
+        assert_eq!(raw, bits_of(&ours.corners), "round {k}: New corner {:?}", ours.corners);
+    }
+    // shouldBeLoading
+    let set_u8 = |h: &mut ts_check::Harness, f: &str, v: u8| {
+        ok(h.request(json!({"field": f, "handle": wm, "set_raw": format!("{v:02x}"), "main": true})), f);
+    };
+    for s in 0..=45u8 {
+        set_u8(&mut h, "state", s);
+        let g = ret::bytes(&ok(h.request(json!({"call": format!("{wmc}.get_shouldBeLoading"), "handle": wm, "args": [], "main": true})), "shouldBeLoading"))[0] != 0;
+        assert_eq!(g, WorldMaster { state: s, ..Default::default() }.should_be_loading(), "shouldBeLoading in state {s}");
+    }
+    // Load(SaveData) of its own save, Load(string) good and bad: state and change window
+    let own = handle(&ok(h.request(json!({"field": "saveData", "handle": wm, "main": true})), "saveData"), "saveData");
+    let read = |h: &mut ts_check::Harness| {
+        (
+            ret::bytes(&ok(h.request(json!({"field": "state", "handle": wm, "main": true})), "state"))[0],
+            ret::bytes(&ok(h.request(json!({"field": "anyChange", "handle": wm, "main": true})), "anyChange"))[0] != 0,
+            ret::f32(&ok(h.request(json!({"field": "lastChangeTime", "handle": wm, "main": true})), "lastChangeTime")),
+        )
+    };
+    let prime = |h: &mut ts_check::Harness| {
+        set_u8(h, "state", 25);
+        set_u8(h, "anyChange", 1);
+        ok(h.request(json!({"field": "lastChangeTime", "handle": wm, "set_raw": "0000a040", "main": true})), "lastChangeTime");
+    };
+    let primed = || WorldMaster { state: 25, any_change: true, last_change_time: 5.0, ..Default::default() };
+    prime(&mut h);
+    ok(h.request(json!({"call": format!("{wmc}.Load"), "handle": wm, "args": [{"handle": own}], "param_types": ["Placemaker.SaveData"], "main": true})), "Load(SaveData)");
+    let mut o = primed();
+    o.load_save(&mut Saves(true), &mut SaveData::default(), None);
+    assert_eq!(read(&mut h), (o.state, o.any_change, o.last_change_time), "Load(own save)");
+    // a town string from the game's own text save system, and a bad one
+    let good = {
+        let c = handle(&ok(h.request(json!({"field": "corners", "handle": own, "main": true})), "c"), "c");
+        let v = handle(&ok(h.request(json!({"field": "voxels", "handle": own, "main": true})), "v"), "v");
+        let r = ok(h.request(json!({"call": "Placemaker.TextSaveSystem.SaveToString", "args": [{"handle": c}, {"handle": v}], "main": true})), "SaveToString");
+        r["string"].as_str().unwrap().to_string()
+    };
+    for (text, _) in [(good.as_str(), true), ("not a town", false)] {
+        prime(&mut h);
+        let g = ret::bytes(&ok(h.request(json!({"call": format!("{wmc}.Load"), "handle": wm, "args": [arg::string(text)], "param_types": ["System.String"], "main": true})), "Load(string)"))[0] != 0;
+        let mut o = primed();
+        let ours = o.load_string(&mut Saves(g), &mut SaveData::default(), text);
+        assert_eq!(ours, g);
+        assert_eq!(read(&mut h), (o.state, o.any_change, o.last_change_time), "Load({text:?}) = {g}");
+    }
+}
