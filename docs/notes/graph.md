@@ -157,14 +157,14 @@ then `recalculateHeightBounds` (`CeilToInt` of the highest top voxel's `localPos
 `boundsUpdated`:
 
 - `border`: `(e, maxHeight) = GetMaxExtents(bounds, boundsHeight)`; `border.min = bounds.max - 2e`,
-  `border.max = bounds.min + 2e` (how far every part of the town may reach); with no corners 1024 instead of 2e, and
-  `maxHeight = 256`;
+  `border.max = bounds.min + 2e` (how far every part of the town may reach); with no corners 1024 instead of
+  2e, and `maxHeight = 256`;
 - `genBounds` = bounds ± 96, clamped to the border ± 2; `viewBounds` = genBounds clamped to the border;
   `_GridViewMin/Max`, `_GridBorderMin/Max` set as global shader vectors;
 - `shadowMeshBounds`: a zero-size box at `PlaneToWorld(HexToPlane(bounds.min), boundsHeight)` grown by the
   eight corners of the hex box (min/max per axis, in the order x-major) at height 0, then extents + (2, 0, 2);
 - `groundCollider.size = (size.x + 50, 2, size.z + 50)`, `center = (center.x, -1, center.z)`;
-- `onBoundsUpdated()` (called unchecked), `BakeAo`, `grid.focusUpdated = true`, `boundsUpdated = false`; at
+- `onBoundsUpdated()` (called unchecked; the constructor sets an empty one), `BakeAo`, `grid.focusUpdated = true`, `boundsUpdated = false`; at
   `boundsHeight == 256` the `MaxHeight` achievement.
 
 ### Loading and saving: `Save` 0xE8F920, `BeginLoad` 0xE83440, `IterateLoad` 0xE88FF0
@@ -220,6 +220,31 @@ What the town looks like as a field, for the props, birds and effects that sit o
 The operand grouping of these float sums matters (results are compared bit for bit): Ghidra's printout regroups
 products (`a * b * c` for the compiled `a * (b * c)`) and sums, so both samplers were transcribed from the asm.
 
+## Flow (proven, E4f)
+
+`Placemaker.Graphs.Flow` keeps a distance field through the open space round the town in each corner's
+`flowDatas` (one `FlowData` per height: `dist`, `newDist`, `denom`, `dir`, `newDir`). One `Update` 0x6D2BA0 per
+frame:
+
+1. Every corner's column takes its new values: `dir = newDir / denom` when `denom > 0` (then `denom = 0`),
+   `dist = newDist`, `newDist = Min(newDist + 1, float.MaxValue)`, `newDir = 0`; then, up the column, two open
+   cells (no voxel) one above the other flow: the higher-`dist` one gets ±up in `newDir` and the other's
+   `dist + 1` as a `newDist` candidate — **cut to a 16-bit integer** (`(float)(ushort)(int)`, asm
+   `cvttss2si` + `movzx ax`; `float.MaxValue` becomes the x86 indefinite integer, so 0).
+2. Each target (the `Flow` transform's children, from the last) seeds the field (`AddFlowTarget`).
+3. Over every finished grid patch within 72 of the hex bounds, each quad whose first corner is within 18: its
+   four corners' cells (`FlowCalcData`, positions at the corner + 0.5 up) at every height flow pairwise with
+   `FlowTwoFlows` 0x6D0500 — across the quad (√2) when all four are open, along each open edge (1); and to the
+   next height: across the cube (√3) when all eight are open, across each side face (√2), straight up (1).
+   `FlowTwoFlows`: for two available cells, `t = Clamp(d0 - d1, -s, s)`; the farther one (the second on a tie)
+   gets `t · (p1 - p0) / s` added to `newDir`, `Min(newDist, other.dist + s)` and `denom + 1`.
+
+`AddFlowTarget` 0x6CF970 lowers `newDist` of the eight cells round a point (the grid quad under it,
+`ExtraMath.InvBilinear` position, the two heights round `y - 0.5`) to a product of its cell coordinates.
+`SampleFlow` 0x6D0940 returns the trilinear blend of the cells' `dir`, the solid cells' normal × 2 (as
+`SampleNormalDistance`, on the quad's plane edges), its coverage, and the total weight of the cells found; below
+the ground or above the town: (0, 0, `1 - Clamp01(y - 0.5)`, 0); off the grid: zeros.
+
 ## The other systems
 
 The graph reaches the rest of the game through `master` (`WorldMaster`): its grid, `WorldMeshes`,
@@ -227,6 +252,10 @@ The graph reaches the rest of the game through `master` (`WorldMaster`): its gri
 calls them through the `GraphHost` trait; the rows that port those systems implement it.
 
 ## How it was checked
+
+`game/tests/placemaker_graph_flow.rs` (E4f) adds a `Flow` component (disabled, stepped by the test) with two
+targets to a 60-voxel town and compares the whole graph after each of 14 frames, after 30 more targets, and
+`SampleFlow` at 500 random points.
 
 `game/tests/placemaker_graph_sampling.rs` (E4e) builds a 60-voxel town with the full update and compares every
 sampler bit for bit at 600 random points round it, and the qube sampler at 400 points in random qubes.

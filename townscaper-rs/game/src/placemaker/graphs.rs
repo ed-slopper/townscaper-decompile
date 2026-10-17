@@ -1,7 +1,10 @@
-//! `Placemaker.Graphs` and its records (rows E4a–E4e): the voxel graph of a town. The game keeps it as Unity
-//! objects (`Corner`, `Square`, `Qube`, `Voxel` components on pooled `GameObject`s); here they live in arenas
-//! of the `Graph` and refer to each other by id. Row E4a: the records; row E4b: the `Graph` structure. Checked against the running game by
-//! `tests/placemaker_graphs.rs` (`TS_HARNESS=1`).
+//! `Placemaker.Graphs` (rows E4a–E4f): the voxel graph of a town. The game keeps it as Unity objects
+//! (`Corner`, `Square`, `Qube`, `Voxel` components on pooled `GameObject`s); here they live in arenas of the
+//! `Graph` and refer to each other by id. The records (E4a), the structure (E4b), editing (E4c), the update
+//! loop, saving and loading (E4d), sampling (E4e) and the flow field (`flow`, E4f). Checked against the running
+//! game by `tests/placemaker_graph*.rs` (`TS_HARNESS=1`); notes in `docs/notes/graph.md`.
+
+pub mod flow;
 
 use std::collections::HashMap;
 

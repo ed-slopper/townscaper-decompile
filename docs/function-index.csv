@@ -1022,15 +1022,15 @@ rva,va,namespace,type,method,signature,status,notes
 0x443F70,0x10443F70,Placemaker.Graphs,Corner,AddSquare,public void AddSquare(Square quad0),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x444240,0x10444240,Placemaker.Graphs,Corner,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
 0x444840,0x10444840,Placemaker.Graphs,Corner,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
-0x1F53D0,0x101F53D0,Placemaker.Graphs,Flow,.ctor,public void .ctor(),dumped,
-0x6CF970,0x106CF970,Placemaker.Graphs,Flow,AddFlowTarget,public void AddFlowTarget(float3 worldPos),dumped,
-0x6D0500,0x106D0500,Placemaker.Graphs,Flow,FlowTwoFlows,"private void FlowTwoFlows(ref Flow.FlowCalcData flow0, ref Flow.FlowCalcData flow1, float spaceDist)",dumped,
-0x6D0720,0x106D0720,Placemaker.Graphs,Flow,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x6D0940,0x106D0940,Placemaker.Graphs,Flow,SampleFlow,"public ValueTuple<Vector3, Vector3, float, float> SampleFlow(Vector3 worldPos)",dumped,
-0x6D2AA0,0x106D2AA0,Placemaker.Graphs,Flow,SetupFlowData,private void SetupFlowData(ref Flow.FlowCalcData flow0),dumped,
-0x6D2BA0,0x106D2BA0,Placemaker.Graphs,Flow,Update,private void Update(),dumped,
+0x1F53D0,0x101F53D0,Placemaker.Graphs,Flow,.ctor,public void .ctor(),ported,placemaker::graphs::flow (empty MonoBehaviour constructor)
+0x6CF970,0x106CF970,Placemaker.Graphs,Flow,AddFlowTarget,public void AddFlowTarget(float3 worldPos),checked,tests/placemaker_graph_flow.rs
+0x6D0500,0x106D0500,Placemaker.Graphs,Flow,FlowTwoFlows,"private void FlowTwoFlows(ref Flow.FlowCalcData flow0, ref Flow.FlowCalcData flow1, float spaceDist)",checked,tests/placemaker_graph_flow.rs
+0x6D0720,0x106D0720,Placemaker.Graphs,Flow,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos (no game state)
+0x6D0940,0x106D0940,Placemaker.Graphs,Flow,SampleFlow,"public ValueTuple<Vector3, Vector3, float, float> SampleFlow(Vector3 worldPos)",checked,tests/placemaker_graph_flow.rs
+0x6D2AA0,0x106D2AA0,Placemaker.Graphs,Flow,SetupFlowData,private void SetupFlowData(ref Flow.FlowCalcData flow0),checked,tests/placemaker_graph_flow.rs
+0x6D2BA0,0x106D2BA0,Placemaker.Graphs,Flow,Update,private void Update(),checked,tests/placemaker_graph_flow.rs
 0x6CF900,0x106CF900,Placemaker.Graphs,FlowData,.cctor,private static void .cctor(),checked,tests/placemaker_graph_editing.rs
-0x1F53D0,0x101F53D0,Placemaker.Graphs,FlowTarget,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
+0x1F53D0,0x101F53D0,Placemaker.Graphs,FlowTarget,.ctor,public void .ctor(),ported,placemaker::graphs::flow (empty MonoBehaviour constructor)
 0xE829E0,0x10E829E0,Placemaker.Graphs,Graph,AddVoxel,"public Voxel AddVoxel(int2 hexPos, byte height, VoxelType voxelType, bool instantIntegration)",checked,tests/placemaker_graph_editing.rs
 0xE83110,0x10E83110,Placemaker.Graphs,Graph,ApplyAction,"public void ApplyAction(Action action, bool playEffect)",checked,tests/placemaker_graph_editing.rs
 0xE83440,0x10E83440,Placemaker.Graphs,Graph,BeginLoad,public void BeginLoad(SaveData saveData),checked,tests/placemaker_graph_loop.rs
@@ -1073,10 +1073,10 @@ rva,va,namespace,type,method,signature,status,notes
 0xE917C0,0x10E917C0,Placemaker.Graphs,Graph,.cctor,private static void .cctor(),read,Shader.PropertyToID of the grid view / border shader globals (Bevy side)
 0xE91870,0x10E91870,Placemaker.Graphs,Graph,.ctor,public void .ctor(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
 0xE91B20,0x10E91B20,Placemaker.Graphs,Graph,get_anyVoxels,public bool get_anyVoxels(),checked,placemaker::graphs::Graph; tests/placemaker_graph_structure.rs
-0x1D4430,0x101D4430,Placemaker.Graphs,Graph.<>c,<.ctor>b__87_0,internal void <.ctor>b__87_0(),dumped,
-0x1D4430,0x101D4430,Placemaker.Graphs,Graph.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(),dumped,
-0x1E73E0,0x101E73E0,Placemaker.Graphs,Graph.<>c,.ctor,public void .ctor(),dumped,
-0x1F2EA0,0x101F2EA0,Placemaker.Graphs,Graph.<>c,.cctor,private static void .cctor(),dumped,
+0x1D4430,0x101D4430,Placemaker.Graphs,Graph.<>c,<.ctor>b__87_0,internal void <.ctor>b__87_0(),ported,placemaker::graphs (GraphHost::on_bounds_updated / on_empty_bounds_loaded: the constructor's empty default delegates)
+0x1D4430,0x101D4430,Placemaker.Graphs,Graph.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(),ported,placemaker::graphs (GraphHost::on_bounds_updated / on_empty_bounds_loaded: the constructor's empty default delegates)
+0x1E73E0,0x101E73E0,Placemaker.Graphs,Graph.<>c,.ctor,public void .ctor(),read,compiler-generated closure class for the empty default delegates
+0x1F2EA0,0x101F2EA0,Placemaker.Graphs,Graph.<>c,.cctor,private static void .cctor(),read,compiler-generated closure class for the empty default delegates
 0x330990,0x10330990,Placemaker.Graphs,ModuleContainer,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0x6FC550,0x106FC550,Placemaker.Graphs,OrientedModuleSides,System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo,private int System.IComparable<Placemaker.Graphs.OrientedModuleSides>.CompareTo(OrientedModuleSides other),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x1D4430,0x101D4430,Placemaker.Graphs,Qube,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
