@@ -645,15 +645,15 @@ rva,va,namespace,type,method,signature,status,notes
 0x846A20,0x10846A20,Placemaker,RapidButton,Press,public bool Press(float intensity = 1),dumped,
 0x846AF0,0x10846AF0,Placemaker,RapidButton,.cctor,private static void .cctor(),dumped,
 0x846BE0,0x10846BE0,Placemaker,RapidButton,.ctor,"public void .ctor(float slowSpeed, float fastSpeed, int countThreshold)",dumped,
-0x84FB40,0x1084FB40,Placemaker,Sandbanker,Clear,public void Clear(),dumped,
-0x84FBA0,0x1084FBA0,Placemaker,Sandbanker,Iterate,public bool Iterate(),dumped,
-0x855BF0,0x10855BF0,Placemaker,Sandbanker,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x856120,0x10856120,Placemaker,Sandbanker,OnEnable,private void OnEnable(),dumped,
-0x856140,0x10856140,Placemaker,Sandbanker,OnStart,public void OnStart(),dumped,
-0x856200,0x10856200,Placemaker,Sandbanker,OnValidate,private void OnValidate(),dumped,
-0x856210,0x10856210,Placemaker,Sandbanker,Reset,public void Reset(),dumped,
-0x856220,0x10856220,Placemaker,Sandbanker,UpdateShadeUvs,private void UpdateShadeUvs(),dumped,
-0x8562E0,0x108562E0,Placemaker,Sandbanker,.ctor,public void .ctor(),dumped,
+0x84FB40,0x1084FB40,Placemaker,Sandbanker,Clear,public void Clear(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
+0x84FBA0,0x1084FBA0,Placemaker,Sandbanker,Iterate,public bool Iterate(),checked,"placemaker::sandbanker (tests/placemaker_sandbanker.rs: a fresh sandbanker stepped Reset to Done on the scene town, lists and both meshes bit-exact)"
+0x855BF0,0x10855BF0,Placemaker,Sandbanker,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos: not ported (Unity editor only)
+0x856120,0x10856120,Placemaker,Sandbanker,OnEnable,private void OnEnable(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
+0x856140,0x10856140,Placemaker,Sandbanker,OnStart,public void OnStart(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
+0x856200,0x10856200,Placemaker,Sandbanker,OnValidate,private void OnValidate(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
+0x856210,0x10856210,Placemaker,Sandbanker,Reset,public void Reset(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
+0x856220,0x10856220,Placemaker,Sandbanker,UpdateShadeUvs,private void UpdateShadeUvs(),checked,"placemaker::sandbanker (tests/placemaker_sandbanker.rs: a fresh sandbanker stepped Reset to Done on the scene town, lists and both meshes bit-exact)"
+0x8562E0,0x108562E0,Placemaker,Sandbanker,.ctor,public void .ctor(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
 0x1F53D0,0x101F53D0,Placemaker,SaveCamera,.ctor,public void .ctor(),dumped,
 0x965000,0x10965000,Placemaker,SaveCamera,GetImage,public byte[] GetImage(SaveData saveData),dumped,
 0x965B60,0x10965B60,Placemaker,SaveCamera,Save,public void Save(SaveData saveData),dumped,

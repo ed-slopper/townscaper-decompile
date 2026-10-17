@@ -12,6 +12,7 @@ pub mod materials;
 pub mod module_builder;
 pub mod modules;
 pub mod quads;
+pub mod sandbanker;
 pub mod save_data;
 pub mod shadow_baker;
 pub mod timing;

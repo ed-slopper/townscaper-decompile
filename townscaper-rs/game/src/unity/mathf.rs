@@ -124,6 +124,11 @@ pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
     (b - a) * clamp01(t) + a
 }
 
+/// `UnityEngine.Mathf.LerpUnclamped`: `a + (b - a) * t`.
+pub fn lerp_unclamped(a: f32, b: f32, t: f32) -> f32 {
+    a + (b - a) * t
+}
+
 /// `UnityEngine.Mathf.InverseLerp` 0xA3BA50: 0 when `a == b`, else `Clamp01((value - a) / (b - a))`.
 pub fn inverse_lerp(a: f32, b: f32, value: f32) -> f32 {
     if a == b {
@@ -257,5 +262,11 @@ fn perlin_raw(x: f32, y: f32) -> f32 {
 /// `UnityEngine.Mathf.PerlinNoise` 0xA3BF60 → `Mathf_CUSTOM_PerlinNoise` (UnityPlayer.dll 0x107A1A30, native):
 /// `(Noise(x, y) + 0.69f) / 1.483f` on the x87 unit (53-bit precision on Windows), rounded to `float` once.
 pub fn perlin_noise(x: f32, y: f32) -> f32 {
-    ((perlin_raw(x, y) as f64 + 0.69f32 as f64) / 1.483f32 as f64) as f32
+    perlin_noise_x87(x, y) as f32
+}
+
+/// [`perlin_noise`] before its result is rounded to `float`: the value left in `ST0`, for callers that go on
+/// computing on the x87 stack (`Sandbanker`'s sand shade adds 0.5 there).
+pub fn perlin_noise_x87(x: f32, y: f32) -> f64 {
+    (perlin_raw(x, y) as f64 + 0.69f32 as f64) / 1.483f32 as f64
 }

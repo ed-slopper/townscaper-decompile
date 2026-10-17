@@ -79,3 +79,46 @@ atlas of height slices.
 Checked (`tests/placemaker_ao_baker.rs`): ids, uncovered colours, the scene baker's lookup texture (every texel)
 and `powers`; 300 random bounds and heights through `BakeAo` on a fresh inactive baker (fields, both globals,
 the camera), bit-exact.
+
+## Sandbanks and shore water: `Sandbanker` (E9c, proven)
+
+`placemaker::sandbanker`. `Iterate` 0x84FBA0 is a state machine (`Reset`, `Gather`, `Smooth`, `ApplyWater`,
+`ApplySand`, `Done`), run by `WorldMaster.Iterate` until it returns false (`Done`).
+
+- `Reset`: lists and dictionary cleared, `index = 0`.
+- `Gather` (profiled "Sandbanker Gather"): while `index < graph.squares.childCount` and `WorldMaster.KeepGoing`,
+  square `index` (if it has a qube child): the first qube's `possibleModules[0]` (when
+  `possibleModuleListIndex != -1`), its module's oriented meshes with `materialType` 0, oriented by
+  `MulOrientations(module, mesh)`. For each triangle, the first rotation whose first edge is on the water line
+  (`|(a.y + b.y) * 0.5 - 0.1| < 0.01`): ends swapped unless the orientation is inverted, `+ 0.5`, through the
+  square (`GetTs`, `ModuleBuilder.MultiplyPoint`, the square transform's `TransformPoint`), `y = 0`. Each end is
+  a vertex pair (ground, raised twin), shared through `RoundToInt(z * 100) * 6113 + RoundToInt(x * 100) * 6101`
+  (taken out of the dictionary by the second edge using it); new pairs get the coverage `ts · corners`, a
+  corner's value `groundCoverage * angle * 0.00034722223` (0.8 everywhere when the qube has no upper voxel,
+  `voxelCount & 0xF0 == 0`). The quad is `(i0, i1, i1+1, i1+1, i0+1, i0)`. Done when every square is read.
+- `Smooth` (whole, one call): coverage spread 3x along edges (half the difference); pair normals = the sum of
+  edge `(-dz, 0, dx)`; ground vertices out by the raw sum times `Lerp(0.8, 0.2, coverage)`, normals normalised;
+  6 rounds of edge relaxing (half the edge); twins up 0.186; per quad (last first) the twins' sides along the
+  normals: neither outside → the quad lies flat on its twins' ground points, only the second → turned and the
+  first twin laid down, only the first → the second laid down, both → turned when that diagonal is shorter;
+  3 rounds over triangles (last first, each rotation): a ground edge under a raised point spreads its even
+  vertices 0.3 of the edge apart; in round 1, an odd-odd edge with a raised end pushes the even point opposite
+  to 0.3 off it (0.6 of the gap); slope caps of 0.4 (raised points at most 0.4 of the distance to the ground
+  point they lean on, or across a ground edge); twins pulled in along the normal by 0.4 of their height.
+- `ApplyWater`: water mesh cleared; two vertices per pair at the ground point, the first pushed out along the
+  water normal (sum of `(d.z, 0, -d.x) * 0.5` of the normalised edges) by `Lerp(2, 0.3, coverage)`; a middle vertex
+  per quad and triangles `(m, b+1, a+1), (a, m, a+1), (m, b, b+1)`; 2 rounds relaxing the a-m and m-b edges
+  (0.3); UVs: `x = LerpUnclamped(PerlinNoise(b.x/10, b.z/10), 0.5, 0.1)` (+1 on the outer vertex), middles the
+  average, then `y` along the flow (half and 0.3 of the bank lengths, plus 0.2 of the middle's offset across).
+- `ApplySand`: sand mesh cleared; triangles flat on the ground dropped (last first); each triangle gets a back
+  face on a copy of the vertices; tangents are the summed face normals, normalised, `w = PerlinNoise(x/5, z/5) +
+  0.5` (negated on the copy; the `+ 0.5` is done on the x87 stack: `mathf::perlin_noise_x87`), the copy's
+  tangents in swapped pair order (as the game appends them); vertices doubled; bounds recalculated.
+- `UpdateShadeUvs` (`OnEnable`, `OnValidate`): `_SandUv = (uvPos, uvSize) * 0.25`. `Clear`: both meshes cleared,
+  back to `Reset`. `OnStart`: both mesh filters get a pooled mesh (`WorldMeshes.GetMesh`), 32-bit indices.
+
+Squares are only translated, so `TransformPoint` is `p + position` (exact here). Checked
+(`tests/placemaker_sandbanker.rs`): a fresh sandbanker with the scene master and two fresh meshes stepped by the
+game's `Iterate` from `Reset` to `Done`, ours replaying each step (`Gather` as far as the game's frame went): the
+lists after every state, the water mesh (vertices, UVs, triangles) and the sand mesh (vertices, triangles,
+tangents) bit-exact, and `_SandUv`.
