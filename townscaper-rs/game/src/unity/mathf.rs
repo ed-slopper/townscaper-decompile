@@ -139,13 +139,19 @@ pub fn repeat(t: f32, length: f32) -> f32 {
 
 /// `UnityEngine.Mathf.LerpAngle` 0xA3BAC0: `a + d * Clamp01(t)` with `d = Repeat(b - a, 360)`, less 360 above 180.
 /// The build does the last multiply-add on the x87 stack (the function calls the CRT's x87 `floor` and returns
-/// in `ST0`), so it is rounded to `float` once, from extended precision: [`x87_mul_add`].
+/// in `ST0`), so it is rounded to `float` once, from extended precision ([`lerp_angle_x87`]).
 pub fn lerp_angle(a: f32, b: f32, t: f32) -> f32 {
+    lerp_angle_x87(a, b, t) as f32
+}
+
+/// [`lerp_angle`] before its result is rounded to `float`: the value left in `ST0` (53-bit precision), for
+/// callers that go on computing on the x87 stack (`ShadowBaker.LateUpdate` multiplies it by `1 / 360`).
+pub fn lerp_angle_x87(a: f32, b: f32, t: f32) -> f64 {
     let mut d = repeat(b - a, 360.0);
     if d > 180.0 {
         d -= 360.0;
     }
-    super::conv::x87_mul_add(clamp01(t), d, a)
+    clamp01(t) as f64 * d as f64 + a as f64
 }
 
 /// `UnityEngine.Mathf.MoveTowards` 0xA3BEC0.

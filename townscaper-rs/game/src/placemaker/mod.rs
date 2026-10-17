@@ -13,6 +13,7 @@ pub mod module_builder;
 pub mod modules;
 pub mod quads;
 pub mod save_data;
+pub mod shadow_baker;
 pub mod timing;
 pub mod wfc;
 pub mod world_master;

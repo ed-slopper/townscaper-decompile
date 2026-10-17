@@ -769,28 +769,28 @@ rva,va,namespace,type,method,signature,status,notes
 0x971880,0x10971880,Placemaker,ScreenshotCamera,SaveImageToPath,"public void SaveImageToPath(Texture2D image, string path)",dumped,
 0x973460,0x10973460,Placemaker,SettingsData,.ctor,public void .ctor(),dumped,
 0x973750,0x10973750,Placemaker,ShaderIds,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
-0x974500,0x10974500,Placemaker,ShadowBaker,BakeShadow,public void BakeShadow(),dumped,
-0x974520,0x10974520,Placemaker,ShadowBaker,GetQuaternion,private static Quaternion GetQuaternion(Vector2 value),dumped,
-0x9745A0,0x109745A0,Placemaker,ShadowBaker,LateUpdate,public void LateUpdate(),dumped,
-0x974860,0x10974860,Placemaker,ShadowBaker,Load,public void Load(SaveData saveData),dumped,
-0x974900,0x10974900,Placemaker,ShadowBaker,MaybeUpdateAngle,public void MaybeUpdateAngle(),dumped,
-0x974B30,0x10974B30,Placemaker,ShadowBaker,MaybeUpdateFraming,public void MaybeUpdateFraming(),dumped,
-0x975830,0x10975830,Placemaker,ShadowBaker,OnBuilt,public void OnBuilt(),dumped,
-0x975860,0x10975860,Placemaker,ShadowBaker,OnStart,public void OnStart(),dumped,
-0x975BB0,0x10975BB0,Placemaker,ShadowBaker,RotateAngle,public void RotateAngle(Vector2 delta),dumped,
-0x975C50,0x10975C50,Placemaker,ShadowBaker,Save,public void Save(SaveData saveData),dumped,
-0x975C90,0x10975C90,Placemaker,ShadowBaker,SetAngle,public void SetAngle(Vector2 newTarget),dumped,
-0x975CD0,0x10975CD0,Placemaker,ShadowBaker,SetFramingDirty,public void SetFramingDirty(),dumped,
-0x975CE0,0x10975CE0,Placemaker,ShadowBaker,SetX,public void SetX(float x),dumped,
-0x975D20,0x10975D20,Placemaker,ShadowBaker,SetY,public void SetY(float y),dumped,
-0x975D60,0x10975D60,Placemaker,ShadowBaker,UpdateLamps,private void UpdateLamps(),dumped,
-0x975EC0,0x10975EC0,Placemaker,ShadowBaker,.cctor,private static void .cctor(),dumped,
-0x976000,0x10976000,Placemaker,ShadowBaker,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,ShadowBaker.<>c,<.ctor>b__45_0,internal void <.ctor>b__45_0(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,ShadowBaker.<>c,.ctor,public void .ctor(),dumped,
-0x507550,0x10507550,Placemaker,ShadowBaker.<>c,.cctor,private static void .cctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,ShadowBakerCamera,.ctor,public void .ctor(),dumped,
-0x9744D0,0x109744D0,Placemaker,ShadowBakerCamera,OnPostRender,private void OnPostRender(),dumped,
+0x974500,0x10974500,Placemaker,ShadowBaker,BakeShadow,public void BakeShadow(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x974520,0x10974520,Placemaker,ShadowBaker,GetQuaternion,private static Quaternion GetQuaternion(Vector2 value),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x9745A0,0x109745A0,Placemaker,ShadowBaker,LateUpdate,public void LateUpdate(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x974860,0x10974860,Placemaker,ShadowBaker,Load,public void Load(SaveData saveData),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x974900,0x10974900,Placemaker,ShadowBaker,MaybeUpdateAngle,public void MaybeUpdateAngle(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x974B30,0x10974B30,Placemaker,ShadowBaker,MaybeUpdateFraming,public void MaybeUpdateFraming(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975830,0x10975830,Placemaker,ShadowBaker,OnBuilt,public void OnBuilt(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975860,0x10975860,Placemaker,ShadowBaker,OnStart,public void OnStart(),ported,"placemaker::shadow_baker (the lamp texture and _ShadowTex_TexelSize checked on the scene baker; the render texture and camera set-up are ShadowBakePass, needs the shaders (C3))"
+0x975BB0,0x10975BB0,Placemaker,ShadowBaker,RotateAngle,public void RotateAngle(Vector2 delta),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975C50,0x10975C50,Placemaker,ShadowBaker,Save,public void Save(SaveData saveData),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975C90,0x10975C90,Placemaker,ShadowBaker,SetAngle,public void SetAngle(Vector2 newTarget),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975CD0,0x10975CD0,Placemaker,ShadowBaker,SetFramingDirty,public void SetFramingDirty(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975CE0,0x10975CE0,Placemaker,ShadowBaker,SetX,public void SetX(float x),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975D20,0x10975D20,Placemaker,ShadowBaker,SetY,public void SetY(float y),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x975D60,0x10975D60,Placemaker,ShadowBaker,UpdateLamps,private void UpdateLamps(),ported,"placemaker::shadow_baker (the same lamps step as LateUpdate's, which is checked)"
+0x975EC0,0x10975EC0,Placemaker,ShadowBaker,.cctor,private static void .cctor(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x976000,0x10976000,Placemaker,ShadowBaker,.ctor,public void .ctor(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
+0x1D4430,0x101D4430,Placemaker,ShadowBaker.<>c,<.ctor>b__45_0,internal void <.ctor>b__45_0(),ported,placemaker::shadow_baker (the one-frame bake: needs the shaders (C3) to check)
+0x1E73E0,0x101E73E0,Placemaker,ShadowBaker.<>c,.ctor,public void .ctor(),ported,placemaker::shadow_baker (the one-frame bake: needs the shaders (C3) to check)
+0x507550,0x10507550,Placemaker,ShadowBaker.<>c,.cctor,private static void .cctor(),ported,placemaker::shadow_baker (the one-frame bake: needs the shaders (C3) to check)
+0x1F53D0,0x101F53D0,Placemaker,ShadowBakerCamera,.ctor,public void .ctor(),ported,placemaker::shadow_baker (the one-frame bake: needs the shaders (C3) to check)
+0x9744D0,0x109744D0,Placemaker,ShadowBakerCamera,OnPostRender,private void OnPostRender(),ported,placemaker::shadow_baker (the one-frame bake: needs the shaders (C3) to check)
 0x310D70,0x10310D70,Placemaker,SideProfile,Add,public void Add(SideProfile s),checked,tests/placemaker_modules.rs
 0x310DC0,0x10310DC0,Placemaker,SideProfile,Get0,public ushort Get0(int index),checked,tests/placemaker_modules.rs
 0x310E60,0x10310E60,Placemaker,SideProfile,Get1,public ushort Get1(int index),checked,tests/placemaker_modules.rs
