@@ -152,7 +152,7 @@ pub struct Color {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct Color32 {
     pub r: u8,
     pub g: u8,

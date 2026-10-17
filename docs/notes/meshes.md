@@ -93,3 +93,27 @@ meshes. After each of 12 actions and the collapse, `IterateDeconstructQubes` and
 steps every big mesh of every group (all lists, bit for bit), every qube's containers (module and parts' slots),
 the pool, the deconstruction list and the grass queue: equal, up to 5,177 live vertices, 796 modules and 357 decor
 built. The fence doubling was not reached (no fence module came up); `Iterate` (props) is not run.
+
+## Pools, materials, palette (E7d, proven)
+
+- `WorldMeshes` (`placemaker::world_meshes`): a stack of spare `Mesh`es and a pool of `"Mesh"` objects (a
+  `MeshRenderer` and a `MeshFilter`) kept under its own transform. `GetMesh` pops the stack or makes a mesh
+  (`MarkDynamic`). `GetMeshFilterOnly` takes the pool's last object (activated, moved under the caller), else
+  makes one there; `GetMeshFilter` also gives it a mesh (dropping whatever mesh it had). `ReturnMeshFilterOnly`
+  deactivates the object, puts it on `LayerMaster`'s first layer and back under the pool with an identity local
+  transform; `ReturnMeshFilter` first clears its mesh onto the stack; `ReturnMeshFilters` does that for a
+  container's children from the last; `ReturnMesh` clears a mesh onto the stack. `IterateRefillPools` runs
+  `GetMeshFilter` under the pool itself for `10 - pool size` rounds (after the first new object it hands the
+  same last object out again, each time with another mesh: kept), then tops the stack up to 10 meshes, checking
+  `KeepGoing` after each step. Checked on a fresh `WorldMeshes`: the refill, then 400 random gets and returns
+  between two parents; the pool, the stack and every object (active, parent, mesh) matched one to one.
+- `MaterialMaster` (`placemaker::materials`): `CreatePaletteTexture` makes a 16 × 2 `RGBA32` texture (clamped,
+  point filtered): row 1 transparent black, row 0 the palette's first 15 colours then `stoneColor` (the bytes
+  `SetPixel` stores; `GetPixels32` is stripped, so the test reads `GetPixels` back to bytes). `OnStart`:
+  `_ShadingTexLightStack = (1, 1, 1, 0)`; `OnOnEnable`: `_GrassColor`, `_GroundColor = backgroundColor × 0.6`
+  (alpha too), `_RoofColor` (read back with `GetGlobalVector`: stored as given). The constructor's colours
+  (blue, green, yellow, red, gray) are replaced by the scene's.
+- `PaletteHolder`: `SelectNextPicker(delta)` = `(selected + count + delta) % count` (C# remainder: negative for a
+  negative sum), `SelectPicker(i)` as given, each then `onNewColor`; checked over 300 steps.
+- `BitMeshQuadChange.CompareTo` (unused by the game): `hexPos.x`, `hexPos.y`, then `quadIndex` compared with
+  itself (always equal; confirmed on the harness).

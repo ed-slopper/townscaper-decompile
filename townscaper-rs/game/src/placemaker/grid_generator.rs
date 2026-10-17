@@ -1851,3 +1851,29 @@ impl GridGenerator {
 fn mathf_cvtt(v: f32) -> i32 {
     crate::unity::conv::f32_to_i32(v)
 }
+
+/// `Placemaker.BitMeshQuadChange` (row E7d): a quad of a grid bit's mesh switched on or off. Nothing in the
+/// shipped game uses it.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct BitMeshQuadChange {
+    pub quad_index: u8,
+    pub hex_pos: Int2,
+    pub state: bool,
+}
+
+impl BitMeshQuadChange {
+    /// `Placemaker.BitMeshQuadChange.System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo` 0x7C1B40: by
+    /// `hexPos.x`, then `hexPos.y`; the last step compares `quadIndex` with itself (always 0, kept).
+    pub fn compare_to(&self, other: &BitMeshQuadChange) -> i32 {
+        let c = self.hex_pos.x.cmp(&other.hex_pos.x) as i32;
+        if c != 0 {
+            return c;
+        }
+        let c = self.hex_pos.y.cmp(&other.hex_pos.y) as i32;
+        if c != 0 {
+            return c;
+        }
+        self.quad_index.cmp(&self.quad_index) as i32
+    }
+}

@@ -322,7 +322,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x7B9A30,0x107B9A30,Placemaker,BigMeshMaster,ReturnMesh,public void ReturnMesh(BigMeshPart bigMeshPart),checked,tests/placemaker_big_mesh.rs
 0x7B9C20,0x107B9C20,Placemaker,BigMeshMaster,.ctor,public void .ctor(),ported,placemaker::big_mesh
 0x7B9C80,0x107B9C80,Placemaker,BigMeshPart,.ctor,public void .ctor(),ported,placemaker::big_mesh
-0x7C1B40,0x107C1B40,Placemaker,BitMeshQuadChange,System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo,private int System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo(BitMeshQuadChange other),dumped,
+0x7C1B40,0x107C1B40,Placemaker,BitMeshQuadChange,System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo,private int System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo(BitMeshQuadChange other),checked,tests/placemaker_materials.rs
 0x7C1C80,0x107C1C80,Placemaker,BootGameCore,BootGameCore_OnComplete,private void BootGameCore_OnComplete(),dumped,
 0x7C1E30,0x107C1E30,Placemaker,BootGameCore,OnEnable,private void OnEnable(),dumped,
 0x7C1EA0,0x107C1EA0,Placemaker,BootGameCore,StartNewSignIn,public void StartNewSignIn(),dumped,
@@ -546,11 +546,11 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker,Maker.<>c,<.ctor>b__38_0,"internal void <.ctor>b__38_0(int <p0>, int <p1>)",dumped,
 0x1E73E0,0x101E73E0,Placemaker,Maker.<>c,.ctor,public void .ctor(),dumped,
 0x1F2DB0,0x101F2DB0,Placemaker,Maker.<>c,.cctor,private static void .cctor(),dumped,
-0x32C7C0,0x1032C7C0,Placemaker,MaterialMaster,CreatePaletteTexture,public Texture2D CreatePaletteTexture(),dumped,
-0x32C900,0x1032C900,Placemaker,MaterialMaster,OnStart,public void OnStart(),dumped,
-0x32C980,0x1032C980,Placemaker,MaterialMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),dumped,
-0x32CA40,0x1032CA40,Placemaker,MaterialMaster,.ctor,public void .ctor(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,MaterialMaster.VoxelMaterial,.ctor,public void .ctor(),dumped,
+0x32C7C0,0x1032C7C0,Placemaker,MaterialMaster,CreatePaletteTexture,public Texture2D CreatePaletteTexture(),checked,tests/placemaker_materials.rs
+0x32C900,0x1032C900,Placemaker,MaterialMaster,OnStart,public void OnStart(),checked,tests/placemaker_materials.rs
+0x32C980,0x1032C980,Placemaker,MaterialMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),checked,tests/placemaker_materials.rs
+0x32CA40,0x1032CA40,Placemaker,MaterialMaster,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
+0x1E73E0,0x101E73E0,Placemaker,MaterialMaster.VoxelMaterial,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
 0x1D4430,0x101D4430,Placemaker,MetaSave,SetPathAsName,public void SetPathAsName(),dumped,
 0x1E73D0,0x101E73D0,Placemaker,MetaSave,get_isLoading,public bool get_isLoading(),dumped,
 0x32CF50,0x1032CF50,Placemaker,MetaSave,ResetPooledObject,public void ResetPooledObject(),dumped,
@@ -608,14 +608,14 @@ rva,va,namespace,type,method,signature,status,notes
 0x6FC190,0x106FC190,Placemaker,Orientation,MultiplyPoint,public SbyteFloat3 MultiplyPoint(SbyteFloat3 point),checked,tests/placemaker_modules.rs
 0x6FC250,0x106FC250,Placemaker,Orientation,MultiplyVector,public SbyteFloat3 MultiplyVector(SbyteFloat3 vector),checked,tests/placemaker_modules.rs
 0x6FC310,0x106FC310,Placemaker,Orientation,get_matrix,public Matrix4x4 get_matrix(),checked,tests/placemaker_modules.rs
-0x6FE670,0x106FE670,Placemaker,Palette,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,PaletteHolder,OnStart,public void OnStart(),dumped,
-0x6FCA30,0x106FCA30,Placemaker,PaletteHolder,SelectNextPicker,public void SelectNextPicker(int delta = 1),dumped,
-0x6FCAA0,0x106FCAA0,Placemaker,PaletteHolder,SelectPicker,public void SelectPicker(int i),dumped,
-0x6FCAF0,0x106FCAF0,Placemaker,PaletteHolder,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,PaletteHolder.<>c,<.ctor>b__7_0,internal void <.ctor>b__7_0(int <p0>),dumped,
-0x1E73E0,0x101E73E0,Placemaker,PaletteHolder.<>c,.ctor,public void .ctor(),dumped,
-0x507730,0x10507730,Placemaker,PaletteHolder.<>c,.cctor,private static void .cctor(),dumped,
+0x6FE670,0x106FE670,Placemaker,Palette,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
+0x1D4430,0x101D4430,Placemaker,PaletteHolder,OnStart,public void OnStart(),ported,placemaker::materials (empty; onNewColor starts as a no-op)
+0x6FCA30,0x106FCA30,Placemaker,PaletteHolder,SelectNextPicker,public void SelectNextPicker(int delta = 1),checked,tests/placemaker_materials.rs
+0x6FCAA0,0x106FCAA0,Placemaker,PaletteHolder,SelectPicker,public void SelectPicker(int i),checked,tests/placemaker_materials.rs
+0x6FCAF0,0x106FCAF0,Placemaker,PaletteHolder,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
+0x1D4430,0x101D4430,Placemaker,PaletteHolder.<>c,<.ctor>b__7_0,internal void <.ctor>b__7_0(int <p0>),ported,placemaker::materials (empty; onNewColor starts as a no-op)
+0x1E73E0,0x101E73E0,Placemaker,PaletteHolder.<>c,.ctor,public void .ctor(),ported,placemaker::materials (empty; onNewColor starts as a no-op)
+0x507730,0x10507730,Placemaker,PaletteHolder.<>c,.cctor,private static void .cctor(),ported,placemaker::materials (empty; onNewColor starts as a no-op)
 0x70FAE0,0x1070FAE0,Placemaker,Prop,.ctor,public void .ctor(),dumped,
 0x707990,0x10707990,Placemaker,PropPlacement,GetMatrix,public Matrix4x4 GetMatrix(),dumped,
 0x707B00,0x10707B00,Placemaker,PropPlacement,get_rotation,public Vector3 get_rotation(),dumped,
@@ -1000,17 +1000,17 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker,WorldMaster.<>c,<.ctor>b__87_1,internal void <.ctor>b__87_1(SaveData <p0>),dumped,
 0x1E73E0,0x101E73E0,Placemaker,WorldMaster.<>c,.ctor,public void .ctor(),dumped,
 0x5075F0,0x105075F0,Placemaker,WorldMaster.<>c,.cctor,private static void .cctor(),dumped,
-0x1FA130,0x101FA130,Placemaker,WorldMeshes,GetMeshFilterOnly,public MeshFilter GetMeshFilterOnly(Transform parent),dumped,
-0x1FA280,0x101FA280,Placemaker,WorldMeshes,GetMeshFilter,public MeshFilter GetMeshFilter(Transform parent),dumped,
-0x1FA480,0x101FA480,Placemaker,WorldMeshes,GetMesh,public Mesh GetMesh(),dumped,
-0x1FA520,0x101FA520,Placemaker,WorldMeshes,GetNewMeshFilter,private MeshFilter GetNewMeshFilter(Transform parent),dumped,
-0x1FA5A0,0x101FA5A0,Placemaker,WorldMeshes,GetNewMesh,private Mesh GetNewMesh(),dumped,
-0x1FA5F0,0x101FA5F0,Placemaker,WorldMeshes,IterateRefillPools,public bool IterateRefillPools(WorldMaster master),dumped,
-0x1FA7A0,0x101FA7A0,Placemaker,WorldMeshes,ReturnMeshFilterOnly,public void ReturnMeshFilterOnly(MeshFilter mf),dumped,
-0x1FA8E0,0x101FA8E0,Placemaker,WorldMeshes,ReturnMeshFilter,public void ReturnMeshFilter(MeshFilter mf),dumped,
-0x1FAAE0,0x101FAAE0,Placemaker,WorldMeshes,ReturnMeshFilters,public void ReturnMeshFilters(Transform container),dumped,
-0x1FABA0,0x101FABA0,Placemaker,WorldMeshes,ReturnMesh,public void ReturnMesh(Mesh mesh),dumped,
-0x1FAC00,0x101FAC00,Placemaker,WorldMeshes,.ctor,public void .ctor(),dumped,
+0x1FA130,0x101FA130,Placemaker,WorldMeshes,GetMeshFilterOnly,public MeshFilter GetMeshFilterOnly(Transform parent),checked,tests/placemaker_materials.rs
+0x1FA280,0x101FA280,Placemaker,WorldMeshes,GetMeshFilter,public MeshFilter GetMeshFilter(Transform parent),checked,tests/placemaker_materials.rs
+0x1FA480,0x101FA480,Placemaker,WorldMeshes,GetMesh,public Mesh GetMesh(),checked,tests/placemaker_materials.rs
+0x1FA520,0x101FA520,Placemaker,WorldMeshes,GetNewMeshFilter,private MeshFilter GetNewMeshFilter(Transform parent),checked,tests/placemaker_materials.rs
+0x1FA5A0,0x101FA5A0,Placemaker,WorldMeshes,GetNewMesh,private Mesh GetNewMesh(),checked,tests/placemaker_materials.rs
+0x1FA5F0,0x101FA5F0,Placemaker,WorldMeshes,IterateRefillPools,public bool IterateRefillPools(WorldMaster master),checked,tests/placemaker_materials.rs
+0x1FA7A0,0x101FA7A0,Placemaker,WorldMeshes,ReturnMeshFilterOnly,public void ReturnMeshFilterOnly(MeshFilter mf),checked,tests/placemaker_materials.rs
+0x1FA8E0,0x101FA8E0,Placemaker,WorldMeshes,ReturnMeshFilter,public void ReturnMeshFilter(MeshFilter mf),checked,tests/placemaker_materials.rs
+0x1FAAE0,0x101FAAE0,Placemaker,WorldMeshes,ReturnMeshFilters,public void ReturnMeshFilters(Transform container),checked,tests/placemaker_materials.rs
+0x1FABA0,0x101FABA0,Placemaker,WorldMeshes,ReturnMesh,public void ReturnMesh(Mesh mesh),checked,tests/placemaker_materials.rs
+0x1FAC00,0x101FAC00,Placemaker,WorldMeshes,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
 0x329D50,0x10329D50,Placemaker.Audio,ManySound,.ctor,public void .ctor(),dumped,
 0x329D90,0x10329D90,Placemaker.Audio,ManySoundsManager,OnEnable,private void OnEnable(),dumped,
 0x32A000,0x1032A000,Placemaker.Audio,ManySoundsManager,OnUpdate,public void OnUpdate(),dumped,
