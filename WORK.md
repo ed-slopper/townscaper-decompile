@@ -29,8 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E4b | Graph structure: the corner / square / voxel / qube objects and their pools as the game keeps them (transform children in sibling order), `GetNew*`, `GetOrCreateCorner`, `BinaryTreeSearch*` (3), `CheckVoxel`, `IsCoordinateAllowed`, `GetMaxExtents`, `SetEmptyBoundsCenter`, `anyVoxels`, `.ctor` / `.cctor`, `OnEnable`, `IterateRefillPools`, `GetQubeRelation` / `GetQubeRelation6` | unowned | E4a | ed-slopper/wren (2026-10-16) | Split of E4 |
-| E4c | Graph editing: `AddVoxel` 0xE829E0, `IntegrateCorner` 0xE84F60 (squares from `GridGenerator.GetVertOrIterate`), `IntegrateVoxel`, `PaintVoxel`, `RemoveVoxel`, `QubeUpdated`, `ApplyAction`; calls into WFC / AoBaker / ModuleBuilder / WorldMeshes / ClickEffect through a host interface those rows fill | unowned | E4b | | Split of E4 |
+| E4c | Graph editing: `AddVoxel` 0xE829E0, `IntegrateCorner` 0xE84F60 (squares from `GridGenerator.GetVertOrIterate`), `IntegrateVoxel`, `PaintVoxel`, `RemoveVoxel`, `QubeUpdated`, `ApplyAction`; calls into WFC / AoBaker / ModuleBuilder / WorldMeshes / ClickEffect through a host interface those rows fill | unowned | E4b | ed-slopper/wren (2026-10-16) | Split of E4 |
 | E4d | Graph loop: `Iterate` 0xE89CF0, `IterateFocus` (bounds, `genBounds`, `viewBounds`, ground collider), `OnStart`, `BeginLoad` / `IterateLoad`, `Save` 0xE8F920 (the `SaveData` voxel list, G3), `Test` | unowned | E4c | | Split of E4 |
 | E4e | Graph sampling and flow: `GetQubeWithContext`, `SampleNormal` / `SampleNormalCoverage` (3) / `SampleNormalDistance` (2), `Qube.SampleNormalCoverage`, `Flow` (`Update`, `AddFlowTarget`, `SampleFlow`, `SetupFlowData`, `FlowTwoFlows`), `FlowData..cctor` | unowned | E4d | | Split of E4 |
 | E5 | Modules: `ModuleMath` (17), `ByteQube`, `Orientation`, `SideProfile`, `Module`/`BaseModule`/`DecorModule`/`ModuleMesh`, `Placemaker.Modules` (`ModuleLibrary`, `OrientedModule`, `CornerLookup`, `OutlineUv`) | unowned | E4e | | |
@@ -129,6 +128,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E3d | `GridGenerator` clusters and bits: Motivate/Unmotivate (bits, clusters), `IterateCluster` (patches, gather, relax), `IterateBit` (verts, relax, clusters, compose, mesh: `BitMesh` data for Bevy), `IterateBits`, `IterateFocus` (bounds passed in), `IterateGenerateCenter`, `OnEnable`, `SceneProcessIteration`; 16 rows `checked` (4 bits from scratch at every state change, 2 focus rounds), `Measure` read (no callers) | P1 | ed-slopper/wren | 2026-10-16 | bc8254f |
 | E3e | `GridGenerator` queries and meshes: `GetQuad` (plane point, edge), `GetClostestVertPosition`, `GetAdjecentQuad`, `AppendQuadList`, `GetVertOrIterate`, `PopulateBorderMesh` (`BorderMesh` data; `Graph.border`, `AoBaker` inputs passed in); 7 rows `checked` on a finished neighbourhood (400 points, 120 strips, 150 verts + border meshes); `SetQuadMesh` (no callers) and gizmos read. With E3a–E3d the grid section is complete: every `Placemaker.Quads*` / `GridGenerator` / `GridBit` row `checked` or `ported`/`read` with a reason | P1 | ed-slopper/wren | 2026-10-16 | 75ffb13 |
 | E4a | `placemaker::graphs` records: `VoxelType`, `MaterialType`, `Action`, `Voxel` / `OrientedModuleSides` comparers, `Square` / `Qube` relations, `Corner.AddSquare`, `Square` accessors, `Qube` getters (objects in arenas by id); 11 rows `checked`, 15 `ported`, `Action.ToString` waits on E13, `GetNormal` moves to E4e | P1 | ed-slopper/wren | 2026-10-16 | e42429e |
+| E4b | `Graph` structure: arenas + container transforms as sibling-ordered lists, pools, `GetOrCreateCorner`, binary searches, `CheckVoxel`, bounds (`SetEmptyBoundsCenter`, `GetMaxExtents`, `IsCoordinateAllowed`), `GetQubeRelation(6)`, `OnEnable`; 18 rows `checked`, `.cctor` read (shader ids) | P1 | ed-slopper/wren | 2026-10-16 | 657f21e |
 
 ## Changes to the board
 
@@ -176,3 +176,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: split E4 into E4a–E4e; claim E4a.
 - 2026-10-16 ed-slopper/wren: E4a done.
 - 2026-10-16 ed-slopper/wren: claim E4b.
+- 2026-10-16 ed-slopper/wren: E4b done; claim E4c.
