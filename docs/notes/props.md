@@ -21,3 +21,30 @@ Chimneys, lamps, flags, wires, plants: the small objects modules carry. `placema
 Checked (`tests/placemaker_props.rs`): 500 random placements (rotation, matrix, `set_rotation` on random and
 whole-turn angles), and 400 random relation edits on fresh nodes (relations, counts, index getters, which edits
 throw) and every pair through `CompareTo`.
+
+## Placing props (E10b, read so far; blocked on E11)
+
+`PropPlacer.PlacePropsInQube` 0x70A800 (read up to the prop modifiers), for a qube with possible modules:
+
+- A `Unity.Mathematics.Random` seeded from the qube's world position: `s = Abs(position.GetHashCode())`, one
+  xorshift step (`<< 13`, `>> 17`, `<< 5`).
+- For each module container under the qube (the last child first) not yet holding props (`hasProps`), the
+  matching `possibleModules[i]`: container 0 is the module, the others its decor modules (an out-of-range decor
+  logs an error and breaks into the debugger). The orientation's matrix (`ModuleMath.orientations[o]`).
+- For each of the module's prop placements (the last first): the prop prefab's `PropNode.priority`, and a draw
+  `NextFloat(prioAdd + priority, priority + 1 + prioAdd)` (both `prioAdd` from the placement's second byte); a
+  placement whose draw is negative is skipped. The corner value under the placement (`cornerTransform1`; none
+  for a negative corner) must be in the prop's `voxelTypeMask`. The placement matrix (`orientation * GetMatrix`)
+  gives the prop's columns, sent through the square (`GetTs` at `column3 + 0.5`, `ModuleBuilder.MultiplyVector`
+  / `MultiplyPoint`). Props reaching past a side (`|x|` or `|z|` of the position over 0.4) are only kept where
+  the side profile there is open (`SideProfile.Get0`; at the ground, not a water side) and, across into the
+  neighbouring qube (`Graph.GetQubeRelation`), the neighbour's orientation and square are blended in (`Max`,
+  `Min`, the doubled offset), with corner-position tests deciding which square owns a shared prop.
+- The prop instance comes from `GetProp` (pooled), gets `localPosition`, `rotation = LookRotation(forward, up)`
+  and `localScale` (x negated where the placement mirrors), then each transform under it: coloured meshes swap
+  to the voxel type's mesh (`GetMeshWithVoxelType`, 0xF unless the placement's corner is ≥ 0 and its value < 15),
+  `PropTransformer`s with `fitInSquare` refit through the world / local matrices…
+
+Blocked here: from this point the placement reads Unity's native transform math back (`worldToLocalMatrix`,
+`localToWorldMatrix`, `lossyScale`, and the rotation / scale round trips on prop instances it has just moved), so
+an exact port needs row E11 (`unity::transform`) first.
