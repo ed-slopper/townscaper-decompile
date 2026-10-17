@@ -46,6 +46,11 @@ inputs with zeros, axes, NaN, huge values (`game/tests/unity_vectors.rs`: 6 grou
   else identity; `Matrix4x4.inverse` = Mesa's Gauss-Jordan (`InvertMatrix4x4_Full`), zeros when singular;
   `TRS` = `QuaternionToMatrix` with scaled columns; `lossyScale` = column lengths, x negated by a negative
   3×3 determinant; `LookAt` = `LookRotationToMatrix` + translation.
+- `Quaternion.Euler(x, y, z)`: degrees times `Deg2Rad` (float), then native `EulerToQuaternion` in Unity's
+  default order: per axis `(sin, cos)` of the half angle in double, cast to float, combined by
+  `CreateQuaternionFromAxisQuaternions(qy, qx, qz)` = `(qy * qx) * qz`. Bit-exact up to about 1e12 degrees;
+  beyond that the game's `__libm_sse2_sin_precise` reduces the argument differently from Rust's `sin`, and the
+  test skips those inputs (row E5c).
 - `LookRotationToMatrix` with a NaN input or a frame failing `|y·y − 1| <= 1e-6` writes **nothing**:
   `Matrix4x4.LookAt` then returns uninitialised stack. Our port uses identity there (STANDIN) and the test skips
   those inputs (`LookMatrix::Unwritten`).

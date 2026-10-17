@@ -584,30 +584,30 @@ rva,va,namespace,type,method,signature,status,notes
 0x3307B0,0x103307B0,Placemaker,ModuleBuilder,<ApplyDecor>g__GetNewBigMeshPart|9_0,internal static BigMeshPart <ApplyDecor>g__GetNewBigMeshPart|9_0(ref ModuleBuilder.<>c__DisplayClass9_0 ),dumped,
 0x330870,0x10330870,Placemaker,ModuleBuilder,<ApplyModule>g__GetNewBigMeshPart|8_0,internal static BigMeshPart <ApplyModule>g__GetNewBigMeshPart|8_0(ref ModuleBuilder.<>c__DisplayClass8_0 ),dumped,
 0x330930,0x10330930,Placemaker,ModuleBuilder,.ctor,public void .ctor(),dumped,
-0x330E60,0x10330E60,Placemaker,ModuleMath,AreCornersLinked,"public static bool AreCornersLinked(int cornerA, int cornerB, int link)",dumped,
-0x330F00,0x10330F00,Placemaker,ModuleMath,GetBidirectionalHash,"public static int GetBidirectionalHash(OrientedModule orientedModule0, OrientedModule orientedModule1)",dumped,
-0x330F50,0x10330F50,Placemaker,ModuleMath,GetCornerLinkIndex,"public static int GetCornerLinkIndex(int cornerA, int cornerB)",dumped,
-0x330FE0,0x10330FE0,Placemaker,ModuleMath,GetDoubleHash,"public static int GetDoubleHash(OrientedModule orientedModule0, OrientedModule orientedModule1)",dumped,
-0x331010,0x10331010,Placemaker,ModuleMath,GetIndexedMaterials,public static ByteQube GetIndexedMaterials(ByteQube materials),dumped,
-0x3310E0,0x103310E0,Placemaker,ModuleMath,GetMaterialCount,public static int GetMaterialCount(ByteQube materials),dumped,
-0x331140,0x10331140,Placemaker,ModuleMath,InvertOrientation,public static byte InvertOrientation(int orientationIndex0),dumped,
-0x3311B0,0x103311B0,Placemaker,ModuleMath,MarkHiddenCornersAmbigous,public static ByteQube MarkHiddenCornersAmbigous(ByteQube byteQube),dumped,
-0x3312D0,0x103312D0,Placemaker,ModuleMath,MulOrientations,"public static byte MulOrientations(int orientationIndex0, int orientationIndex1)",dumped,
-0x331360,0x10331360,Placemaker,ModuleMath,MulOrientations,"public static byte MulOrientations(byte orientationIndex0, byte orientationIndex1)",dumped,
-0x3313F0,0x103313F0,Placemaker,ModuleMath,Mul,"public static Orientation Mul(Orientation parent, Orientation child)",dumped,
-0x3314F0,0x103314F0,Placemaker,ModuleMath,MultiplyBounds,"public static int3x2 MultiplyBounds(int4x4 m, int3x2 bounds)",dumped,
-0x331640,0x10331640,Placemaker,ModuleMath,MultiplyPoint,"public static int3 MultiplyPoint(int4x4 m, int3 p)",dumped,
-0x3316D0,0x103316D0,Placemaker,ModuleMath,MultiplyPoint,"public static SbyteFloat3 MultiplyPoint(int4x4 m, SbyteFloat3 p)",dumped,
-0x331760,0x10331760,Placemaker,ModuleMath,MultiplyVector,"public static SbyteFloat3 MultiplyVector(int4x4 m, SbyteFloat3 p)",dumped,
-0x3317F0,0x103317F0,Placemaker,ModuleMath,MultiplyVector,"public static int3 MultiplyVector(int4x4 m, int3 p)",dumped,
-0x331880,0x10331880,Placemaker,ModuleMath,.cctor,private static void .cctor(),dumped,
+0x330E60,0x10330E60,Placemaker,ModuleMath,AreCornersLinked,"public static bool AreCornersLinked(int cornerA, int cornerB, int link)",checked,tests/placemaker_modules.rs
+0x330F00,0x10330F00,Placemaker,ModuleMath,GetBidirectionalHash,"public static int GetBidirectionalHash(OrientedModule orientedModule0, OrientedModule orientedModule1)",checked,tests/placemaker_modules.rs
+0x330F50,0x10330F50,Placemaker,ModuleMath,GetCornerLinkIndex,"public static int GetCornerLinkIndex(int cornerA, int cornerB)",checked,tests/placemaker_modules.rs
+0x330FE0,0x10330FE0,Placemaker,ModuleMath,GetDoubleHash,"public static int GetDoubleHash(OrientedModule orientedModule0, OrientedModule orientedModule1)",checked,tests/placemaker_modules.rs
+0x331010,0x10331010,Placemaker,ModuleMath,GetIndexedMaterials,public static ByteQube GetIndexedMaterials(ByteQube materials),checked,tests/placemaker_modules.rs
+0x3310E0,0x103310E0,Placemaker,ModuleMath,GetMaterialCount,public static int GetMaterialCount(ByteQube materials),checked,tests/placemaker_modules.rs
+0x331140,0x10331140,Placemaker,ModuleMath,InvertOrientation,public static byte InvertOrientation(int orientationIndex0),checked,tests/placemaker_modules.rs
+0x3311B0,0x103311B0,Placemaker,ModuleMath,MarkHiddenCornersAmbigous,public static ByteQube MarkHiddenCornersAmbigous(ByteQube byteQube),checked,tests/placemaker_modules.rs
+0x3312D0,0x103312D0,Placemaker,ModuleMath,MulOrientations,"public static byte MulOrientations(int orientationIndex0, int orientationIndex1)",checked,tests/placemaker_modules.rs
+0x331360,0x10331360,Placemaker,ModuleMath,MulOrientations,"public static byte MulOrientations(byte orientationIndex0, byte orientationIndex1)",checked,tests/placemaker_modules.rs
+0x3313F0,0x103313F0,Placemaker,ModuleMath,Mul,"public static Orientation Mul(Orientation parent, Orientation child)",checked,tests/placemaker_modules.rs
+0x3314F0,0x103314F0,Placemaker,ModuleMath,MultiplyBounds,"public static int3x2 MultiplyBounds(int4x4 m, int3x2 bounds)",checked,tests/placemaker_modules.rs
+0x331640,0x10331640,Placemaker,ModuleMath,MultiplyPoint,"public static int3 MultiplyPoint(int4x4 m, int3 p)",checked,tests/placemaker_modules.rs
+0x3316D0,0x103316D0,Placemaker,ModuleMath,MultiplyPoint,"public static SbyteFloat3 MultiplyPoint(int4x4 m, SbyteFloat3 p)",checked,tests/placemaker_modules.rs
+0x331760,0x10331760,Placemaker,ModuleMath,MultiplyVector,"public static SbyteFloat3 MultiplyVector(int4x4 m, SbyteFloat3 p)",checked,tests/placemaker_modules.rs
+0x3317F0,0x103317F0,Placemaker,ModuleMath,MultiplyVector,"public static int3 MultiplyVector(int4x4 m, int3 p)",checked,tests/placemaker_modules.rs
+0x331880,0x10331880,Placemaker,ModuleMath,.cctor,private static void .cctor(),checked,tests/placemaker_modules.rs
 0x3342C0,0x103342C0,Placemaker,ModuleMesh,.ctor,public void .ctor(),dumped,
-0x6FBFA0,0x106FBFA0,Placemaker,Orientation,GetSideTransform0,public byte GetSideTransform0(int index),dumped,
-0x6FC030,0x106FC030,Placemaker,Orientation,GetSideTransform1,public byte GetSideTransform1(int index),dumped,
-0x6FC0C0,0x106FC0C0,Placemaker,Orientation,MultiplyBounds,public int3x2 MultiplyBounds(int3x2 bounds),dumped,
-0x6FC190,0x106FC190,Placemaker,Orientation,MultiplyPoint,public SbyteFloat3 MultiplyPoint(SbyteFloat3 point),dumped,
-0x6FC250,0x106FC250,Placemaker,Orientation,MultiplyVector,public SbyteFloat3 MultiplyVector(SbyteFloat3 vector),dumped,
-0x6FC310,0x106FC310,Placemaker,Orientation,get_matrix,public Matrix4x4 get_matrix(),dumped,
+0x6FBFA0,0x106FBFA0,Placemaker,Orientation,GetSideTransform0,public byte GetSideTransform0(int index),checked,tests/placemaker_modules.rs
+0x6FC030,0x106FC030,Placemaker,Orientation,GetSideTransform1,public byte GetSideTransform1(int index),checked,tests/placemaker_modules.rs
+0x6FC0C0,0x106FC0C0,Placemaker,Orientation,MultiplyBounds,public int3x2 MultiplyBounds(int3x2 bounds),checked,tests/placemaker_modules.rs
+0x6FC190,0x106FC190,Placemaker,Orientation,MultiplyPoint,public SbyteFloat3 MultiplyPoint(SbyteFloat3 point),checked,tests/placemaker_modules.rs
+0x6FC250,0x106FC250,Placemaker,Orientation,MultiplyVector,public SbyteFloat3 MultiplyVector(SbyteFloat3 vector),checked,tests/placemaker_modules.rs
+0x6FC310,0x106FC310,Placemaker,Orientation,get_matrix,public Matrix4x4 get_matrix(),checked,tests/placemaker_modules.rs
 0x6FE670,0x106FE670,Placemaker,Palette,.ctor,public void .ctor(),dumped,
 0x1D4430,0x101D4430,Placemaker,PaletteHolder,OnStart,public void OnStart(),dumped,
 0x6FCA30,0x106FCA30,Placemaker,PaletteHolder,SelectNextPicker,public void SelectNextPicker(int delta = 1),dumped,

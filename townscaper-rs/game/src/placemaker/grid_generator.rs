@@ -345,18 +345,10 @@ pub fn is_new_grid(h: Int3) -> bool {
     1.55 < c + b + a
 }
 
-/// `Placemaker.ModuleMath.baryVectors` as `ModuleMath..cctor` leaves them (read from the running game; the
-/// class is row E5): per sixth of the hexagon, the gradient of a barycentric weight in the plane.
+/// `Placemaker.ModuleMath.baryVectors` (built by `ModuleMath..cctor`, row E5c): per sixth of the hexagon, the
+/// gradient of a barycentric weight in the plane.
 pub fn bary_vectors() -> [Float2; 6] {
-    let b = f32::from_bits;
-    [
-        f2(b(0xBD86_FE02), b(0x3DE9_D037)),
-        f2(b(0x3D86_FE00), b(0x3DE9_D039)),
-        f2(b(0x3E06_FE01), b(0x318E_5DCA)),
-        f2(b(0x3D86_FE02), b(0xBDE9_D037)),
-        f2(b(0xBD86_FE00), b(0xBDE9_D039)),
-        f2(b(0xBE06_FE01), b(0xB18E_5DCA)),
-    ]
+    crate::placemaker::modules::ModuleMath::get().bary_vectors
 }
 
 /// `Placemaker.GridGenerator`'s state. Patches, clusters and bits are kept in their lists and found by position

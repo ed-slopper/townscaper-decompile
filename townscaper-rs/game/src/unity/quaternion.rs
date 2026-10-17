@@ -77,6 +77,37 @@ impl Quaternion {
         quat(q.x / len, q.y / len, q.z / len, q.w / len)
     }
 
+    /// `UnityEngine.Quaternion.Euler(float, float, float)`: degrees times `Mathf.Deg2Rad`, then
+    /// `Quaternion_CUSTOM_Internal_FromEulerRad_Injected` → native `EulerToQuaternion` in Unity's default
+    /// order (Z, then X, then Y): one quaternion per axis from the half angle's `sin`/`cos` in double, then
+    /// `CreateQuaternionFromAxisQuaternions(y, x, z)` = `(y * x) * z`. Bit-exact up to about 1e12 degrees;
+    /// past that the game's `__libm_sse2_sin_precise` reduces the argument differently from Rust's `sin`.
+    pub fn euler(x: f32, y: f32, z: f32) -> Quaternion {
+        const DEG2RAD: f32 = 0.017453292;
+        let axis = |a: f32| {
+            let h = (a * DEG2RAD * 0.5) as f64;
+            (h.sin() as f32, h.cos() as f32)
+        };
+        let (sx, cx) = axis(x);
+        let (sy, cy) = axis(y);
+        let (sz, cz) = axis(z);
+        let q1 = quat(0.0, sy, 0.0, cy);
+        let q2 = quat(sx, 0.0, 0.0, cx);
+        let q3 = quat(0.0, 0.0, sz, cz);
+        let t = quat(
+            q1.x * q2.w + q2.x * q1.w + q2.z * q1.y - q2.y * q1.z,
+            q1.y * q2.w + q2.y * q1.w + q1.z * q2.x - q2.z * q1.x,
+            q1.z * q2.w + q2.z * q1.w + q2.y * q1.x - q1.y * q2.x,
+            q2.w * q1.w - q1.x * q2.x - q2.y * q1.y - q1.z * q2.z,
+        );
+        quat(
+            q3.x * t.w + q3.w * t.x + q3.z * t.y - q3.y * t.z,
+            q3.y * t.w + q3.w * t.y + q3.x * t.z - q3.z * t.x,
+            q3.z * t.w + q3.w * t.z + q3.y * t.x - q3.x * t.y,
+            q3.w * t.w - q3.x * t.x - q3.y * t.y - q3.z * t.z,
+        )
+    }
+
     /// `UnityEngine.Quaternion.LookRotation(Vector3)`: up = `Vector3.up`.
     pub fn look_rotation(forward: Vector3) -> Quaternion {
         Quaternion::look_rotation_up(forward, Vector3::UP)

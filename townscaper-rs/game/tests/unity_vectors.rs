@@ -190,9 +190,33 @@ fn quaternion_matches_the_game() {
         check!(st(&mut h, "UnityEngine.Quaternion.op_Multiply", vec![a(&p), a(&v)], &[Q, V3]), Quaternion::rotate(p, v), format!("{p:?} * {v:?}"));
         check!(st(&mut h, "UnityEngine.Quaternion.Inverse", vec![a(&p)], &[]), Quaternion::inverse(p), format!("Inverse({p:?})"));
         check!(st(&mut h, "UnityEngine.Quaternion.Lerp", vec![a(&p), a(&q), arg::f32(t)], &[]), Quaternion::lerp(p, q, t), format!("Lerp({p:?}, {q:?}, {t})"));
+        let e = r.v3();
+        // past ~1e12 degrees the game's `__libm_sse2_sin_precise` reduces the argument differently from ours
+        if e.x.abs() < 1e12 && e.y.abs() < 1e12 && e.z.abs() < 1e12 {
+            check!(st(&mut h, "UnityEngine.Quaternion.Euler", vec![arg::f32(e.x), arg::f32(e.y), arg::f32(e.z)], &[F, F, F]), Quaternion::euler(e.x, e.y, e.z), format!("Euler({e:?})"));
+        }
         let (f, u) = (r.v3(), r.v3());
         check!(st(&mut h, "UnityEngine.Quaternion.LookRotation", vec![a(&f)], &[V3]), Quaternion::look_rotation(f), format!("LookRotation({f:?})"));
         check!(st(&mut h, "UnityEngine.Quaternion.LookRotation", vec![a(&f), a(&u)], &[V3, V3]), Quaternion::look_rotation_up(f, u), format!("LookRotation({f:?}, {u:?})"));
+    }
+}
+
+#[test]
+fn quaternion_euler_matches_the_game() {
+    let Some(mut h) = harness() else { return };
+    let mut r = Rng(36);
+    for i in 0..N {
+        // whole and quarter-turn angles (ModuleMath's tables), then wide random ones
+        let e = if i < 500 {
+            let k = |n: u32| ((n % 17) as i32 * 45 - 360) as f32;
+            Vector3 { x: k(r.next()), y: k(r.next()), z: k(r.next()) }
+        } else {
+            Vector3 { x: (r.f() - 0.5) * 2000.0, y: (r.f() - 0.5) * 2000.0, z: (r.f() - 0.5) * 2000.0 }
+        };
+        if !(e.x.abs() < 1e12 && e.y.abs() < 1e12 && e.z.abs() < 1e12) {
+            continue; // see `Quaternion::euler`
+        }
+        check!(st(&mut h, "UnityEngine.Quaternion.Euler", vec![arg::f32(e.x), arg::f32(e.y), arg::f32(e.z)], &[F, F, F]), Quaternion::euler(e.x, e.y, e.z), format!("Euler({e:?})"));
     }
 }
 

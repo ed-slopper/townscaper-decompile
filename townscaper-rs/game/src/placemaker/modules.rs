@@ -1,10 +1,17 @@
 //! The modules (row E5): the building pieces the wave function collapse places in the qubes. `Placemaker`'s
 //! `ByteQube`, `SideProfile`, `ModuleMath`, `Orientation` and module classes, and `Placemaker.Modules`
-//! (`OrientedModule`, `OutlineUv`, `CornerLookup`, `ModuleLibrary`). Row E5b: the records. Checked against the
-//! running game by `tests/placemaker_modules.rs` (`TS_HARNESS=1`).
+//! (`OrientedModule`, `OutlineUv`, `CornerLookup`, `ModuleLibrary`). Row E5b: the records; row E5c:
+//! `Orientation` and `ModuleMath`. Checked against the running game by `tests/placemaker_modules.rs`
+//! (`TS_HARNESS=1`).
 
-use crate::os::utils;
-use crate::unity::vector::Vector2;
+use std::sync::OnceLock;
+
+use crate::os::hex;
+use crate::os::utils::{self, SbyteFloat3};
+use crate::placemaker::grid_generator;
+use crate::unity::mathematics::{self as math, f4, Float2, Float4, Float4x4, Int3, Int3x2, Int4, Int4x4};
+use crate::unity::quaternion::{Matrix4x4, Quaternion};
+use crate::unity::vector::{v3, v4, Vector2, Vector4};
 
 /// `Placemaker.ByteQube`: one byte per corner of a cube, the lower four (round the square) then the upper four.
 #[repr(C)]
@@ -348,4 +355,391 @@ impl OutlineUv {
     pub fn border(&self) -> bool {
         self.b & 0xF != 0
     }
+}
+
+// ---- Orientation and ModuleMath (row E5c) ----
+
+/// `Placemaker.Orientation` (0x5C bytes): one of the eight turns of a qube (four about y, each also mirrored in
+/// z), as an integer matrix, the corner permutations both ways, and the side permutations.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct Orientation {
+    pub int4x4: Int4x4,
+    /// `cornerTransform0[i]`: the corner that lands on corner i.
+    pub corner_transform0: ByteQube,
+    /// `cornerTransform1[j]`: where corner j lands.
+    pub corner_transform1: ByteQube,
+    /// Sides 0..=3 round y: `[0..4]` like `cornerTransform0`, `[4..8]` like `cornerTransform1`.
+    pub side_transform: ByteQube,
+    pub inverted: bool,
+}
+
+impl Orientation {
+    /// `Placemaker.Orientation.get_matrix` 0x6FC310: the columns as floats.
+    pub fn matrix(&self) -> Matrix4x4 {
+        let c = |v: Int4| v4(v.x as f32, v.y as f32, v.z as f32, v.w as f32);
+        let m = &self.int4x4.c;
+        Matrix4x4::from_columns(c(m[0]), c(m[1]), c(m[2]), c(m[3]))
+    }
+
+    /// `Placemaker.Orientation.GetSideTransform0` 0x6FBFA0: the bottom (4) and top (5) stay.
+    pub fn get_side_transform0(&self, index: i32) -> u8 {
+        match index {
+            0..=3 => self.side_transform.v[index as usize],
+            4 | 5 => index as u8,
+            _ => panic!("IndexOutOfRangeException: GetSideTransform0({index})"),
+        }
+    }
+
+    /// `Placemaker.Orientation.GetSideTransform1` 0x6FC030.
+    pub fn get_side_transform1(&self, index: i32) -> u8 {
+        match index {
+            0..=3 => self.side_transform.v[index as usize + 4],
+            4 | 5 => index as u8,
+            _ => panic!("IndexOutOfRangeException: GetSideTransform1({index})"),
+        }
+    }
+
+    /// `Placemaker.Orientation.MultiplyBounds` 0x6FC0C0.
+    pub fn multiply_bounds(&self, bounds: Int3x2) -> Int3x2 {
+        ModuleMath::multiply_bounds(&self.int4x4, bounds)
+    }
+
+    /// `Placemaker.Orientation.MultiplyPoint` 0x6FC190.
+    pub fn multiply_point(&self, point: SbyteFloat3) -> SbyteFloat3 {
+        ModuleMath::multiply_point_s(&self.int4x4, point)
+    }
+
+    /// `Placemaker.Orientation.MultiplyVector` 0x6FC250.
+    pub fn multiply_vector(&self, vector: SbyteFloat3) -> SbyteFloat3 {
+        ModuleMath::multiply_vector_s(&self.int4x4, vector)
+    }
+}
+
+/// `Placemaker.ModuleMath`'s statics, as `ModuleMath..cctor` 0x331880 builds them. Get them with
+/// [`ModuleMath::get`].
+#[derive(Clone, Debug)]
+pub struct ModuleMath {
+    /// `corners`: the qube's corners at ±0.5 (±127 as sbytes), the lower four round the square, then the upper.
+    pub corners: [SbyteFloat3; 8],
+    pub qube_forward: ByteQube,
+    pub qube_backward: ByteQube,
+    pub qube_upside_down: ByteQube,
+    pub orientations: Vec<Orientation>,
+    /// `orientationMulLookup[i, j]`: the orientation of `mul(o_i, o_j)`.
+    pub orientation_mul_lookup: [[u8; 8]; 8],
+    pub orientation_inverse_lookup: [u8; 8],
+    /// `sideMatrices`: from qube space into each side's frame (sides 0..=3 round y, then 4 and 5).
+    pub side_matrices: [Int4x4; 6],
+    /// `invSideMatrices`: allocated, never filled.
+    pub inv_side_matrices: [Int4x4; 6],
+    /// `cornerLinkLookup[a, b]`: the index of the corner pair (0..28 for a ≠ b, symmetric; 0 on the diagonal).
+    pub corner_link_lookup: [[i32; 8]; 8],
+    /// `baryVectors`: per sixth of the hexagon, the gradient of a barycentric weight in the plane.
+    pub bary_vectors: [Float2; 6],
+    pub ground_byte_qube: ByteQube,
+    pub any_byte_qube: ByteQube,
+}
+
+static MODULE_MATH: OnceLock<ModuleMath> = OnceLock::new();
+
+/// `(int)f` per component (`int4(Vector4)` in the cctor).
+fn int4_of(v: Vector4) -> Int4 {
+    Int4 { x: v.x as i32, y: v.y as i32, z: v.z as i32, w: v.w as i32 }
+}
+
+fn int4x4_of(m: &Matrix4x4) -> Int4x4 {
+    Int4x4 { c: std::array::from_fn(|i| int4_of(m.column(i))) }
+}
+
+/// Each column dotted with `v` (`mul(transpose(m), v)`, as the cctor's inlined code reads its matrix; every
+/// value here is a small integer, so the grouping can't matter).
+fn mul_transposed(m: &Float4x4, v: Float4) -> Float4 {
+    let d = |c: &Float4| c.x * v.x + c.y * v.y + c.z * v.z + c.w * v.w;
+    f4(d(&m.c[0]), d(&m.c[1]), d(&m.c[2]), d(&m.c[3]))
+}
+
+impl ModuleMath {
+    /// The statics, built once (`ModuleMath..cctor`).
+    pub fn get() -> &'static ModuleMath {
+        MODULE_MATH.get_or_init(ModuleMath::cctor)
+    }
+
+    /// `Placemaker.ModuleMath..cctor` 0x331880.
+    pub fn cctor() -> ModuleMath {
+        let h = 0.5f32;
+        let corners = [
+            SbyteFloat3::new(-h, -h, -h),
+            SbyteFloat3::new(h, -h, -h),
+            SbyteFloat3::new(h, -h, h),
+            SbyteFloat3::new(-h, -h, h),
+            SbyteFloat3::new(-h, h, -h),
+            SbyteFloat3::new(h, h, -h),
+            SbyteFloat3::new(h, h, h),
+            SbyteFloat3::new(-h, h, h),
+        ];
+
+        // the sides: inverse(Rotate(Euler(..)) * Translate(..)), cut to ints
+        let side = |e: (f32, f32, f32), t: f32| {
+            let r = Matrix4x4::rotate(Quaternion::euler(e.0, e.1, e.2));
+            let m = Matrix4x4::mul(&r, &Matrix4x4::translate(v3(0.0, 0.0, t)));
+            int4x4_of(&m.inverse())
+        };
+        let mut side_matrices = [Int4x4::default(); 6];
+        side_matrices[4] = side((-90.0, 0.0, 0.0), -127.0);
+        side_matrices[5] = side((-90.0, 0.0, 0.0), 127.0);
+        let mut angle = 0i32;
+        for s in side_matrices.iter_mut().take(4) {
+            *s = side((0.0, angle as f32, 0.0), -127.0);
+            angle -= 90;
+        }
+
+        // the orientations: four turns about y, then the same mirrored in z
+        let rot_y = Matrix4x4::from_columns(
+            v4(0.0, 0.0, 1.0, 0.0),
+            v4(0.0, 1.0, 0.0, 0.0),
+            v4(-1.0, 0.0, 0.0, 0.0),
+            v4(0.0, 0.0, 0.0, 1.0),
+        );
+        let mirror_z = Matrix4x4::from_columns(
+            v4(1.0, 0.0, 0.0, 0.0),
+            v4(0.0, 1.0, 0.0, 0.0),
+            v4(0.0, 0.0, -1.0, 0.0),
+            v4(0.0, 0.0, 0.0, 1.0),
+        );
+        let side_pos: Vec<Float4> =
+            side_matrices[..4].iter().map(|s| math::inverse(&math::float4x4_from_int(s)).c[3]).collect();
+        let mut orientations = Vec::with_capacity(8);
+        let mut m = Matrix4x4::IDENTITY;
+        for _mirror in 0..2 {
+            for _turn in 0..4 {
+                let mut o = Orientation { int4x4: int4x4_of(&m), ..Default::default() };
+                for i in 0..8u8 {
+                    let ci = corners[i as usize].to_int3();
+                    let want = v3(ci.x as f32, ci.y as f32, ci.z as f32);
+                    for j in 0..8u8 {
+                        let cj = corners[j as usize].to_int3();
+                        if want == m.multiply_vector(v3(cj.x as f32, cj.y as f32, cj.z as f32)) {
+                            o.corner_transform0.v[i as usize] = j;
+                            o.corner_transform1.v[j as usize] = i;
+                            break;
+                        }
+                    }
+                }
+                let om = math::float4x4_from_int(&o.int4x4);
+                for a in 0..4u8 {
+                    for b in 0..4u8 {
+                        if side_pos[a as usize] == mul_transposed(&om, side_pos[b as usize]) {
+                            o.side_transform.v[a as usize] = b;
+                            o.side_transform.v[b as usize + 4] = a;
+                            break;
+                        }
+                    }
+                }
+                let c = &o.int4x4.c;
+                let f = |v: i32| v as f32;
+                let det = f(c[2].y) * (f(c[1].x) * f(c[0].z) - f(c[0].x) * f(c[1].z))
+                    + f(c[2].x) * (f(c[0].y) * f(c[1].z) - f(c[1].y) * f(c[0].z))
+                    + f(c[2].z) * (f(c[0].x) * f(c[1].y) - f(c[0].y) * f(c[1].x));
+                o.inverted = det < 0.0;
+                orientations.push(o);
+                m = Matrix4x4::mul(&m, &rot_y);
+            }
+            m = Matrix4x4::mul(&m, &mirror_z);
+        }
+
+        let mut orientation_mul_lookup = [[0u8; 8]; 8];
+        for i in 0..8 {
+            for j in 0..8 {
+                let p = math::mul_i4x4(&orientations[i].int4x4, &orientations[j].int4x4);
+                if let Some(k) = orientations.iter().position(|o| o.int4x4 == p) {
+                    orientation_mul_lookup[i][j] = k as u8;
+                }
+            }
+        }
+        let mut orientation_inverse_lookup = [0u8; 8];
+        for i in 0..8 {
+            for k in 0..8 {
+                if orientations[i].corner_transform0 == orientations[k].corner_transform1 {
+                    orientation_inverse_lookup[i] = k as u8;
+                }
+            }
+        }
+        let mut corner_link_lookup = [[0i32; 8]; 8];
+        let mut n = 0;
+        for a in 0..8 {
+            for b in a + 1..8 {
+                corner_link_lookup[a][b] = n;
+                corner_link_lookup[b][a] = n;
+                n += 1;
+            }
+        }
+
+        let mut bary_vectors = [Float2::default(); 6];
+        let mut c = grid_generator::get_cluster_offset();
+        for v in bary_vectors.iter_mut() {
+            let a = grid_generator::hex_to_plane_i2(c);
+            c = hex::rotate_cw2i(c);
+            let b = grid_generator::hex_to_plane_i2(c);
+            let mid = math::f2((b.x + a.x) * 0.5, (b.y + a.y) * 0.5);
+            let len = math::length2(mid);
+            *v = math::f2(-((mid.x / len) / len), -((mid.y / len) / len));
+        }
+
+        ModuleMath {
+            corners,
+            qube_forward: ByteQube::new(1, 2, 3, 0, 5, 6, 7, 4),
+            qube_backward: ByteQube::new(3, 0, 1, 2, 7, 4, 5, 6),
+            qube_upside_down: ByteQube::new(4, 5, 6, 7, 0, 1, 2, 3),
+            orientations,
+            orientation_mul_lookup,
+            orientation_inverse_lookup,
+            side_matrices,
+            inv_side_matrices: [Int4x4::default(); 6],
+            corner_link_lookup,
+            bary_vectors,
+            ground_byte_qube: ByteQube::new(15, 15, 15, 15, 18, 18, 18, 18),
+            any_byte_qube: ByteQube::splat(16),
+        }
+    }
+
+    /// `Placemaker.ModuleMath.AreCornersLinked` 0x330E60: `(1 << (index & 31) & link) == 1`, so only the pair
+    /// with index 0 (corners 0 and 1) can ever be linked (kept).
+    pub fn are_corners_linked(corner_a: i32, corner_b: i32, link: i32) -> bool {
+        let i = ModuleMath::get_corner_link_index(corner_a, corner_b);
+        (1i32 << (i & 31)) & link == 1
+    }
+
+    /// `Placemaker.ModuleMath.GetCornerLinkIndex` 0x330F50 (throws outside 0..=7).
+    pub fn get_corner_link_index(corner_a: i32, corner_b: i32) -> i32 {
+        ModuleMath::get().corner_link_lookup[ix8(corner_a)][ix8(corner_b)]
+    }
+
+    /// `Placemaker.ModuleMath.GetBidirectionalHash` 0x330F00: the same for either order.
+    pub fn get_bidirectional_hash(m0: OrientedModule, m1: OrientedModule) -> i32 {
+        let (h1, h2) = (m0.get_hash_code(), m1.get_hash_code());
+        if h2 <= h1 {
+            h2.wrapping_mul(0x184D).wrapping_add(h1.wrapping_mul(0x1849))
+        } else {
+            h2.wrapping_mul(0x1849).wrapping_add(h1.wrapping_mul(0x184D))
+        }
+    }
+
+    /// `Placemaker.ModuleMath.GetDoubleHash` 0x330FE0.
+    pub fn get_double_hash(m0: OrientedModule, m1: OrientedModule) -> i32 {
+        let (h1, h2) = (m0.get_hash_code(), m1.get_hash_code());
+        h2.wrapping_mul(0x1849).wrapping_add(h1.wrapping_mul(0x184D))
+    }
+
+    /// `Placemaker.ModuleMath.GetIndexedMaterials` 0x331010: the materials (values below 15) renumbered 0, 1, ...
+    /// by first appearance.
+    pub fn get_indexed_materials(mut materials: ByteQube) -> ByteQube {
+        let mut done = 0u8;
+        let mut next = 0u8;
+        for i in 0..8 {
+            if utils::is_bit_set_u8(done, i) {
+                continue;
+            }
+            let value = materials.get(i);
+            if value >= 15 {
+                continue;
+            }
+            materials.set(i, next);
+            utils::set_bit(&mut done, i, true);
+            for j in i + 1..8 {
+                if materials.get(j) == value && !utils::is_bit_set_u8(done, j) {
+                    materials.set(j, next);
+                    utils::set_bit(&mut done, j, true);
+                }
+            }
+            next = next.wrapping_add(1);
+        }
+        materials
+    }
+
+    /// `Placemaker.ModuleMath.GetMaterialCount` 0x3310E0: distinct values below 15, kept in a byte of bits, so
+    /// values 8..=14 count every time they appear (kept).
+    pub fn get_material_count(materials: ByteQube) -> i32 {
+        let mut seen = 0u8;
+        let mut n = 0u8;
+        for i in 0..8 {
+            let v = materials.get(i);
+            if v < 15 && !utils::is_bit_set_u8(seen, v as i32) {
+                n = n.wrapping_add(1);
+                utils::set_bit(&mut seen, v as i32, true);
+            }
+        }
+        n as i32
+    }
+
+    /// `Placemaker.ModuleMath.InvertOrientation` 0x331140.
+    pub fn invert_orientation(orientation: i32) -> u8 {
+        ModuleMath::get().orientation_inverse_lookup[ix8(orientation)]
+    }
+
+    /// `Placemaker.ModuleMath.MarkHiddenCornersAmbigous` 0x3311B0: a corner that isn't 18 (air) in the qube nor
+    /// in its forward, backward and upside-down turns becomes 16.
+    pub fn mark_hidden_corners_ambigous(mut q: ByteQube) -> ByteQube {
+        let mm = ModuleMath::get();
+        let f = q.get_oriented(mm.qube_forward);
+        let b = q.get_oriented(mm.qube_backward);
+        let u = q.get_oriented(mm.qube_upside_down);
+        for i in 0..8 {
+            if f.get(i) != 18 && b.get(i) != 18 && u.get(i) != 18 && q.get(i) != 18 {
+                q.set(i, 16);
+            }
+        }
+        q
+    }
+
+    /// `Placemaker.ModuleMath.MulOrientations(int, int)` 0x3312D0 / `(byte, byte)` 0x331360.
+    pub fn mul_orientations(o0: i32, o1: i32) -> u8 {
+        ModuleMath::get().orientation_mul_lookup[ix8(o0)][ix8(o1)]
+    }
+
+    /// `Placemaker.ModuleMath.Mul` 0x3313F0: the child's side transform is kept.
+    pub fn mul(parent: &Orientation, child: &Orientation) -> Orientation {
+        Orientation {
+            int4x4: math::mul_i4x4(&parent.int4x4, &child.int4x4),
+            corner_transform0: parent.corner_transform0.get_oriented(child.corner_transform0),
+            corner_transform1: parent.corner_transform1.get_oriented(child.corner_transform1),
+            side_transform: child.side_transform,
+            inverted: parent.inverted != child.inverted,
+        }
+    }
+
+    /// `Placemaker.ModuleMath.MultiplyBounds` 0x3314F0: both corners turned, then min and max.
+    pub fn multiply_bounds(m: &Int4x4, bounds: Int3x2) -> Int3x2 {
+        let a = ModuleMath::multiply_point(m, bounds.c0);
+        let b = ModuleMath::multiply_point(m, bounds.c1);
+        Int3x2 { c0: math::i3(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z)), c1: math::max3(a, b) }
+    }
+
+    /// `Placemaker.ModuleMath.MultiplyPoint(int4x4, int3)` 0x331640.
+    pub fn multiply_point(m: &Int4x4, p: Int3) -> Int3 {
+        let r = math::mul_i4x4_v(m, Int4 { x: p.x, y: p.y, z: p.z, w: 1 });
+        math::i3(r.x, r.y, r.z)
+    }
+
+    /// `Placemaker.ModuleMath.MultiplyVector(int4x4, int3)` 0x3317F0.
+    pub fn multiply_vector(m: &Int4x4, p: Int3) -> Int3 {
+        let r = math::mul_i4x4_v(m, Int4 { x: p.x, y: p.y, z: p.z, w: 0 });
+        math::i3(r.x, r.y, r.z)
+    }
+
+    /// `Placemaker.ModuleMath.MultiplyPoint(int4x4, SbyteFloat3)` 0x3316D0: cut to the low bytes.
+    pub fn multiply_point_s(m: &Int4x4, p: SbyteFloat3) -> SbyteFloat3 {
+        let r = ModuleMath::multiply_point(m, p.to_int3());
+        SbyteFloat3::from_ints(r.x, r.y, r.z)
+    }
+
+    /// `Placemaker.ModuleMath.MultiplyVector(int4x4, SbyteFloat3)` 0x331760.
+    pub fn multiply_vector_s(m: &Int4x4, p: SbyteFloat3) -> SbyteFloat3 {
+        let r = ModuleMath::multiply_vector(m, p.to_int3());
+        SbyteFloat3::from_ints(r.x, r.y, r.z)
+    }
+}
+
+/// An index into the 8-wide tables (`IndexOutOfRangeException` otherwise).
+fn ix8(i: i32) -> usize {
+    usize::try_from(i).ok().filter(|&i| i < 8).unwrap_or_else(|| panic!("IndexOutOfRangeException: {i}"))
 }

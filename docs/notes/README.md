@@ -10,4 +10,5 @@ Names, signatures, addresses and constants only: no pasted decompiler output.
 | [files.md](files.md) | The game's files: SerializedFile layout, what each file holds |
 | [unity.md](unity.md) | Unity / .NET behaviour the game depends on (F11): what is ported, how it was proven |
 | [grid.md](grid.md) | The irregular grid (E3): units, patch generation step by step |
+| [modules.md](modules.md) | Modules (E5): the records, `Orientation` and `ModuleMath`'s tables |
 | [graph.md](graph.md) | The voxel graph (E4): objects and containers, editing, the update loop, saving and loading, sampling, the flow field |
