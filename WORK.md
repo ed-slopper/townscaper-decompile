@@ -29,7 +29,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E7d | `WorldMeshes` (11: mesh / mesh filter pools), `MaterialMaster` (palette texture, voxel materials), `Palette` / `PaletteHolder`, `BitMeshQuadChange.CompareTo` | unowned | E7c | ed-slopper/wren (2026-10-16) | Split of E7 |
 | E8 | Boot and the main loop as Bevy systems in the game's order: `BootMaster`, `BootGameCore` (`Update` 0x7C1FA0), `WorldMaster` (23: `Iterate` 0x1F8C00, `Update` 0x1F9AF0, `LateUpdate` 0x1F91B0, `Load`), `TimeManager`, `FastCoroutines`/`FastCoroutineUpdater`, `LayerMaster`, `UniversalStopwatch`, `ShaderIds`, `MiscReferences` | unowned | E7d | | Who ticks whom each frame (Unity's Awake/Start/Update/LateUpdate order, script execution order from `globalgamemanagers`); scene `level0..2` wiring from F8f |
 | E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | GPU passes: need the shaders (C3) to check |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | |
@@ -137,6 +136,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E7a | Module geometry in `placemaker::module_builder`: `GetTs`, `MultiplyPoint`, `MultiplyVector`; 3 rows `checked` (12,000 results on random corner matrices, bit for bit); notes/meshes.md | P1 | ed-slopper/wren | 2026-10-16 | 70a2eee |
 | E7b | Big meshes in `placemaker::big_mesh` (plain data): `BigMesh`, `BigMeshGroup`, `BigMeshPart`, `BigMeshList`, `BigMeshMaster` (`GetBigMesh`, `AddMesh`, `ReturnMesh`, `MaybeApply`, `OnLateUpdate`); 7 rows `checked` (300 random add / return steps on the scene's master, all lists equal), 11 `ported` (ctors, `Populate`, list pool) | P1 | ed-slopper/wren | 2026-10-16 | be55274 |
 | E7c | `ModuleBuilder` in `placemaker::module_builder`: containers, `ApplyModule`, `ApplyDecor`, deconstruction, grass queue; 10 rows `checked` with the WFC loop test (every big mesh, container and part equal over 12 actions; fence doubling not reached), `Iterate` / `OnStart` / ctors `ported` | P1 | ed-slopper/wren | 2026-10-16 | 174b00d |
+| E7d | `placemaker::world_meshes` (mesh and mesh filter pools), `placemaker::materials` (`MaterialMaster` palette texture and shader globals, `Palette`, `PaletteHolder`), `BitMeshQuadChange`; 16 rows `checked`, 9 `ported` (ctors, empty `OnStart`, the no-op lambda). With E7a–E7c the mesh building section is complete: every row `checked`, `ported` or `read` (the fence doubling of `ApplyModule` / `ApplyDecor` not reached by the test) | P1 | ed-slopper/wren | 2026-10-16 | f8e2d7b |
 
 ## Changes to the board
 
@@ -202,3 +202,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: E7a done; claim E7b.
 - 2026-10-16 ed-slopper/wren: E7b done; claim E7c.
 - 2026-10-16 ed-slopper/wren: E7c done; claim E7d.
+- 2026-10-16 ed-slopper/wren: E7d done; the mesh building section E7 (E7a–E7d) is complete.
