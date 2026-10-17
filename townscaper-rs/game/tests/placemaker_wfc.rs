@@ -19,7 +19,9 @@ use ts_game::placemaker::ao_baker::AoBaker;
 use ts_game::placemaker::graphs::{Action, Graph, GraphHost, OrientedModuleSides, QubeId, VoxelType};
 use ts_game::placemaker::grid_generator::{GridBitState, GridGenerator};
 use ts_game::placemaker::maker::Maker;
-use ts_game::placemaker::modules::OrientedModule;
+use ts_game::placemaker::big_mesh::{BigMeshLog, BigMeshMaster};
+use ts_game::placemaker::module_builder::{ModuleBuilder, ModuleBuilderHost};
+use ts_game::placemaker::modules::{ModuleLibrary, OrientedModule};
 use ts_game::placemaker::wfc::{Propagation, WaveFunctionCollapse, WfcHost};
 use ts_game::unity::mathematics::{f2, Int2};
 use ts_game::unity::vector::Vector3;
@@ -363,35 +365,37 @@ fn hex(b: &[u8]) -> String {
     b.iter().map(|x| format!("{x:02x}")).collect()
 }
 
-/// The module builder as far as the collapse sees it: the module each qube shows (`ApplyModule` replaces it,
-/// clears it for module 0 or a fully covered qube; `Iterate0` clears it for an empty or fully covered qube).
-#[derive(Default)]
-struct Builder {
-    current: HashMap<QubeId, OrientedModule>,
+/// No sound, sandbanker, camera or props on our side (the game's stand-in has them, they change nothing compared).
+struct NoSides;
+impl ModuleBuilderHost for NoSides {}
+
+/// Our module builder and big meshes behind the collapse.
+struct Builder<'a> {
+    lib: &'a ModuleLibrary,
+    mb: ModuleBuilder,
+    bmm: BigMeshMaster,
+    log: Vec<BigMeshLog>,
     applied: usize,
     decor: usize,
     errors: usize,
 }
-impl WfcHost for Builder {
+impl WfcHost for Builder<'_> {
     fn apply_module(&mut self, graph: &mut Graph, qube: QubeId, module: OrientedModuleSides) {
         self.applied += 1;
-        if module.oriented_module.module_index != 0 && !graph.qube(qube).fully_covered() {
-            self.current.insert(qube, module.oriented_module);
-        } else {
-            self.current.remove(&qube);
-        }
+        self.mb.apply_module(graph, self.lib, &mut self.bmm, &mut NoSides, &mut self.log, qube, module);
+    }
+    fn apply_decor(&mut self, graph: &mut Graph, qube: QubeId) {
+        self.decor += 1;
+        self.mb.apply_decor(graph, self.lib, &mut self.bmm, &mut NoSides, &mut self.log, qube);
     }
     fn mark_module_containers_for_deconstruction(&mut self, _graph: &mut Graph, qube: QubeId) {
-        self.current.remove(&qube);
+        self.mb.mark_qube_containers_for_deconstruction(&mut self.bmm, &mut NoSides, qube);
     }
     fn current_module(&mut self, _graph: &Graph, qube: QubeId) -> Option<OrientedModule> {
-        self.current.get(&qube).copied()
+        self.mb.children(qube).first().map(|&c| self.mb.container(c).oriented_module)
     }
     fn log_error(&mut self, _message: &str, _qube: QubeId) {
         self.errors += 1;
-    }
-    fn apply_decor(&mut self, _graph: &mut Graph, _qube: QubeId) {
-        self.decor += 1;
     }
 }
 
@@ -411,28 +415,102 @@ fn run_game(g: &mut Game, wfc: u64, m: &str) -> usize {
     }
 }
 
-/// The module the game shows in each qube: its first child's `ModuleContainer` (decor containers follow it).
-fn check_containers(g: &mut Game, qs: &Qubes, ours: &Graph, b: &Builder, what: &str) {
+fn u16s(b: &[u8]) -> Vec<u16> {
+    b.chunks(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect()
+}
+fn f32s(b: &[u8]) -> Vec<f32> {
+    b.chunks(4).map(|c| f32::from_le_bytes(c.try_into().unwrap())).collect()
+}
+fn bits_of_f32<T: Copy>(v: &[T]) -> Vec<u8> {
+    unsafe { std::slice::from_raw_parts(v.as_ptr() as *const u8, std::mem::size_of_val(v)) }.to_vec()
+}
+
+/// The game's `List<T>` field of an object, as element bytes.
+fn list_bytes(g: &mut Game, obj: u64, f: &str, elem: &str) -> Vec<u8> {
+    let l = handle(&ok(g.h.request(Game::field(obj, f)), f), f);
+    ret::bytes(&ok(g.h.request(Game::call(l, &list(elem), "ToArray", vec![], false)), f))
+}
+
+/// The objects of a `List<class>` field.
+fn list_items(g: &mut Game, obj: u64, f: &str, elem: &str) -> Vec<u64> {
+    let l = handle(&ok(g.h.request(Game::field(obj, f)), f), f);
+    let lc = list(elem);
+    let n = ret::i32(&ok(g.h.request(Game::call(l, &lc, "get_Count", vec![], false)), "Count"));
+    g.batch((0..n).map(|i| Game::call(l, &lc, "get_Item", vec![arg::i32(i)], true)).collect(), "get_Item").iter().map(|r| handle(r, "item")).collect()
+}
+
+const V3T: &str = "UnityEngine.Vector3, UnityEngine.CoreModule";
+const V4T: &str = "UnityEngine.Vector4, UnityEngine.CoreModule";
+const V2T: &str = "UnityEngine.Vector2, UnityEngine.CoreModule";
+
+/// The game's module builder and big meshes against ours: every big mesh of every group, each qube's
+/// containers (module, then decor) with their parts' slots, the pool, the deconstruction list, the grass queue.
+fn check_builder(g: &mut Game, qs: &Qubes, mb: u64, groups: &[u64], b: &Builder, what: &str) {
+    // big meshes, and their addresses
+    let mut mesh_of: HashMap<u64, (usize, usize)> = HashMap::new();
+    for (gi, &grp) in groups.iter().enumerate() {
+        let meshes = list_items(g, grp, "bigMeshes", "Placemaker.BigMesh, Assembly-CSharp");
+        let ours_meshes = &b.bmm.big_mesh_groups[gi].big_meshes;
+        assert_eq!(meshes.len(), ours_meshes.len(), "{what}: group {gi}: big mesh count");
+        let addrs = g.addrs(&meshes);
+        for (k, (&m, &a)) in meshes.iter().zip(&addrs).enumerate() {
+            mesh_of.insert(a, (gi, k));
+            let o = &ours_meshes[k];
+            let w = format!("{what}: group {gi} big mesh {k}");
+            assert_eq!(ret::i32(&ok(g.h.request(Game::field(m, "createdCount")), "createdCount")), o.created_count, "{w}: createdCount");
+            assert_eq!(u16s(&list_bytes(g, m, "availableIndexes", "System.UInt16")), o.available_indexes, "{w}: availableIndexes");
+            assert_eq!(i32s(&list_bytes(g, m, "availableTris", "System.Int32")), o.available_tris, "{w}: availableTris");
+            assert_eq!(list_bytes(g, m, "verts", V3T), bits_of_f32(&o.verts), "{w}: verts");
+            assert_eq!(list_bytes(g, m, "normals", V3T), bits_of_f32(&o.normals), "{w}: normals");
+            assert_eq!(list_bytes(g, m, "tangents", V4T), bits_of_f32(&o.tangents), "{w}: tangents");
+            let uv = list_bytes(g, m, "uvs", V2T);
+            if uv != bits_of_f32(&o.uvs) {
+                let gu = f32s(&uv);
+                let k0 = gu.iter().zip(o.uvs.iter().flat_map(|v| [v.x, v.y])).position(|(a, b)| a.to_bits() != b.to_bits());
+                panic!("{w}: uvs differ at {k0:?} ({} vs {})", gu.len(), o.uvs.len() * 2);
+            }
+            assert_eq!(i32s(&list_bytes(g, m, "tris", "System.Int32")), o.tris, "{w}: tris");
+        }
+    }
+    // each qube's containers
     let qube_ts: Vec<u64> = g.batch(qs.handles.iter().map(|&q| Game::call(q, "UnityEngine.Component", "get_transform", vec![], true)).collect(), "transform").iter().map(|r| handle(r, "t")).collect();
     let kids = g.children(&qube_ts);
-    let firsts: Vec<u64> = kids.iter().filter_map(|k| k.first().copied()).collect();
     if !g.types.contains_key(MC) {
         let t = handle(&ok(g.h.request(json!({"call": "System.Type.GetType", "args": [arg::string(&format!("{MC}, Assembly-CSharp"))], "param_types": ["System.String"], "main": true, "keep": true})), MC), MC);
         g.types.insert(MC, t);
     }
-    let containers = g.components(&firsts, MC);
-    let mods = g.batch(containers.iter().map(|&c| Game::field(c, "orientedModule")).collect(), "orientedModule");
-    let mut m = mods.iter();
     for (k, &q) in qs.ids.iter().enumerate() {
-        let game = if kids[k].is_empty() {
-            None
-        } else {
-            let b = ret::bytes(m.next().unwrap());
-            Some((u16::from_le_bytes([b[0], b[1]]), b[2]))
-        };
-        let ours_m = b.current.get(&q).map(|o| (o.module_index, o.flags));
-        assert_eq!(game, ours_m, "{what}: qube {q:?} current module (in square: {})", ours.qube(q).square.is_some());
+        let ours_kids = b.mb.children(q);
+        assert_eq!(kids[k].len(), ours_kids.len(), "{what}: qube {q:?} container count");
+        if kids[k].is_empty() {
+            continue;
+        }
+        let cs = g.components(&kids[k], MC);
+        for (ci, (&c, &oc)) in cs.iter().zip(ours_kids).enumerate() {
+            let w = format!("{what}: qube {q:?} container {ci}");
+            let om = ret::bytes(&ok(g.h.request(Game::field(c, "orientedModule")), "orientedModule"));
+            let oo = b.mb.container(oc);
+            assert_eq!((u16::from_le_bytes([om[0], om[1]]), om[2]), (oo.oriented_module.module_index, oo.oriented_module.flags), "{w}: orientedModule");
+            let parts = list_items(g, c, "bigMeshParts", "Placemaker.BigMeshPart, Assembly-CSharp");
+            assert_eq!(parts.len(), oo.big_mesh_parts.len(), "{w}: part count");
+            for (pi, (&p, op)) in parts.iter().zip(&oo.big_mesh_parts).enumerate() {
+                let bm = ok(g.h.request(Game::field(p, "bigMesh")), "bigMesh");
+                let gm = if bm["null"] == json!(true) { None } else { Some(mesh_of[&g.addrs(&[handle(&bm, "bigMesh")])[0]]) };
+                assert_eq!(gm, op.big_mesh.map(|m| (m.group, m.mesh)), "{w} part {pi}: big mesh");
+                assert_eq!(u16s(&list_bytes(g, p, "vertIndexes", "System.UInt16")), op.vert_indexes, "{w} part {pi}: vertIndexes");
+                assert_eq!(i32s(&list_bytes(g, p, "triIndexes", "System.Int32")), op.tri_indexes, "{w} part {pi}: triIndexes");
+            }
+        }
     }
+    // the pool, the deconstruction list, the grass queue
+    for (f, n) in [("moduleContainerPool", b.mb.container_pool.len()), ("moduleContainersToDeconstruct", b.mb.containers_to_deconstruct.len())] {
+        let t = handle(&ok(g.h.request(Game::field(mb, f)), f), f);
+        let c = ret::i32(&ok(g.h.request(Game::call(t, "UnityEngine.Transform", "get_childCount", vec![], false)), "childCount"));
+        assert_eq!(c as usize, n, "{what}: {f}");
+    }
+    let grass = list_items(g, mb, "qubesToGrass", "Placemaker.Graphs.Qube, Assembly-CSharp");
+    let grass: Vec<QubeId> = g.addrs(&grass).into_iter().map(|a| qube_of(qs, a).unwrap()).collect();
+    assert_eq!(grass, b.mb.qubes_to_grass, "{what}: qubesToGrass");
 }
 
 #[test]
@@ -443,13 +521,51 @@ fn wave_function_collapse_loops_match_the_game() {
     lib.setup();
     let master = handle(&ok(g.h.request(Game::field(g.graph, "master")), "master"), "master");
     let wfc = handle(&ok(g.h.request(Game::field(master, "waveFunctionCollapse")), "wfc"), "wfc");
-    // the scene's prop placer, so that replaced module containers leave their qube at once
+    // the scene's prop placer, so that replaced module containers leave their qube at once, and its sounds
     let scene_master = handle(&ok(g.h.request(json!({"field": "master", "on": "Placemaker.GridGenerator", "main": true})), "scene master"), "scene master");
-    // (and its big mesh master, which takes back their meshes)
-    for f in ["propPlacer", "bigMeshMaster", "manySoundsManager"] {
+    for f in ["propPlacer", "manySoundsManager"] {
         let v = handle(&ok(g.h.request(Game::field(scene_master, f)), f), f);
         ok(g.h.request(json!({"field": f, "handle": master, "set_handle": v, "main": true})), f);
     }
+    // a fresh big mesh master (the scene's own LateUpdate never touches it): one group per scene group, with its
+    // material and a copy of its template; materials are matched to ours through the module meshes'
+    let mat_of: HashMap<u64, ts_game::placemaker::modules::AssetRef> = {
+        let scene_lib = handle(&ok(g.h.request(Game::field(scene_master, "moduleLibrary")), "moduleLibrary"), "moduleLibrary");
+        let meshes = list_items(&mut g, scene_lib, "moduleMeshes", "Placemaker.ModuleMesh, Assembly-CSharp");
+        let mats: Vec<u64> = g.batch(meshes.iter().map(|&m| Game::field(m, "material")).collect(), "material").iter().map(|r| handle(r, "material")).collect();
+        g.addrs(&mats).into_iter().zip(&lib.module_meshes).map(|(a, m)| (a, m.material)).collect()
+    };
+    let bmm = handle(&ok(g.h.request(json!({"new": "Placemaker.BigMeshMaster", "args": [], "main": true})), "new BigMeshMaster"), "bmm");
+    ok(g.h.request(json!({"field": "master", "handle": bmm, "set_handle": master, "main": true})), "bmm.master");
+    let scene_bmm = handle(&ok(g.h.request(Game::field(scene_master, "bigMeshMaster")), "bigMeshMaster"), "bigMeshMaster");
+    let group_type = handle(&ok(g.h.request(json!({"call": "System.Type.GetType", "args": [arg::string("Placemaker.BigMeshGroup, Assembly-CSharp")], "param_types": ["System.String"], "main": true, "keep": true})), "type"), "type");
+    let gl = list("Placemaker.BigMeshGroup, Assembly-CSharp");
+    let new_groups = handle(&ok(g.h.request(Game::field(bmm, "bigMeshGroups")), "bigMeshGroups"), "bigMeshGroups");
+    let mut groups = vec![];
+    let mut ours_bmm = ts_game::placemaker::big_mesh::BigMeshMaster::default();
+    for sg in list_items(&mut g, scene_bmm, "bigMeshGroups", "Placemaker.BigMeshGroup, Assembly-CSharp") {
+        let go = handle(&ok(g.h.request(json!({"new": "UnityEngine.GameObject", "args": [arg::string("ts_check big mesh group")], "param_types": ["System.String"], "main": true})), "go"), "go");
+        let grp = handle(&ok(g.h.request(json!({"call": "AddComponent", "class": "UnityEngine.GameObject", "handle": go, "args": [{"handle": group_type}], "param_types": ["System.Type"], "main": true, "keep": true})), "AddComponent"), "group");
+        let mat = handle(&ok(g.h.request(Game::field(sg, "material")), "material"), "material");
+        ok(g.h.request(json!({"field": "material", "handle": grp, "set_handle": mat, "main": true})), "material");
+        let st = handle(&ok(g.h.request(Game::call(sg, "UnityEngine.Component", "get_transform", vec![], true)), "t"), "t");
+        let template = handle(&ok(g.h.request(Game::call(st, "UnityEngine.Transform", "GetChild", vec![arg::i32(0)], true)), "child"), "child");
+        let gt = handle(&ok(g.h.request(Game::call(grp, "UnityEngine.Component", "get_transform", vec![], true)), "t"), "t");
+        let copy = handle(&ok(g.h.request(json!({"call": "UnityEngine.Object.Instantiate", "args": [{"handle": template}], "param_types": ["UnityEngine.Object"], "main": true, "keep": true})), "Instantiate"), "copy");
+        ok(g.h.request(json!({"call": "SetParent", "class": "UnityEngine.Transform", "handle": copy, "args": [{"handle": gt}, arg::bool(false)], "param_types": ["UnityEngine.Transform", "System.Boolean"], "main": true})), "SetParent");
+        ok(g.h.request(Game::call(new_groups, &gl, "Add", vec![json!({"handle": grp})], false)), "Add group");
+        let a = g.addrs(&[mat])[0];
+        let material = mat_of.get(&a).copied().unwrap_or(ts_game::placemaker::modules::AssetRef { file_id: -1, path_id: a as i64 });
+        ours_bmm.big_mesh_groups.push(ts_game::placemaker::big_mesh::BigMeshGroup { material, ..Default::default() });
+        groups.push(grp);
+    }
+    ok(g.h.request(json!({"field": "bigMeshMaster", "handle": master, "set_handle": bmm, "main": true})), "master.bigMeshMaster");
+    let fence = {
+        let mm = handle(&ok(g.h.request(Game::field(scene_master, "materialMaster")), "materialMaster"), "materialMaster");
+        let f = handle(&ok(g.h.request(Game::field(mm, "fenceMaterial")), "fenceMaterial"), "fenceMaterial");
+        let a = g.addrs(&[f])[0];
+        mat_of.get(&a).copied().expect("the fence material is a module mesh material")
+    };
     // the fresh module builder's two containers (its `OnStart` needs a transform of its own)
     let mb = handle(&ok(g.h.request(Game::field(master, "moduleBuilder")), "moduleBuilder"), "moduleBuilder");
     for f in ["moduleContainerPool", "moduleContainersToDeconstruct"] {
@@ -461,7 +577,7 @@ fn wave_function_collapse_loops_match_the_game() {
     let mut ours = Graph { shadow_mesh_index_iterator: (g.ao_skip as i32) * 16383, ..Default::default() };
     ours.ground_collider.size = Vector3 { x: 1.0, y: 1.0, z: 1.0 };
     let mut host = Host { ao, ..Default::default() };
-    let mut b = Builder::default();
+    let mut b = Builder { lib: &lib, mb: ModuleBuilder { fence_material: fence, ..Default::default() }, bmm: ours_bmm, log: vec![], applied: 0, decor: 0, errors: 0 };
     while ret::bytes(&g.g("IterateRefillPools", vec![]))[0] != 0 {}
     while ours.iterate_refill_pools(&mut || true) {}
     settle(&mut g, &mut grid, &mut ours, &mut host);
@@ -489,7 +605,7 @@ fn wave_function_collapse_loops_match_the_game() {
         g.g("ApplyAction", vec![arg::raw(&bytes(&a)), arg::bool(false)]);
         settle(&mut g, &mut grid, &mut ours, &mut host);
         for q in host.cleared.drain(..) {
-            b.current.remove(&q);
+            b.mb.mark_qube_containers_for_deconstruction(&mut b.bmm, &mut NoSides, q);
         }
         // the world master's order: a new step, Iterate0, the queued rebuilds, Iterate1; then LaterUpdate
         ok(g.h.request(Game::call(wfc, WFC, "IteratePropagationCount", vec![], false)), "IteratePropagationCount");
@@ -531,15 +647,21 @@ fn wave_function_collapse_loops_match_the_game() {
             ok(g.h.request(Game::call(wfc, WFC, "LaterUpdate", vec![], false)), "LaterUpdate");
             host.wfc.later_update(&mut ours, &lib, &mut b);
         }
+        // the module builder's deconstruction (one call per request: time-budgeted), then the big meshes applied
+        while ret::bytes(&ok(g.h.request(Game::call(mb, "Placemaker.ModuleBuilder", "IterateDeconstructQubes", vec![], false)), "IterateDeconstructQubes"))[0] != 0 {}
+        while b.mb.iterate_deconstruct_qubes(&mut NoSides) {}
+        ok(g.h.request(Game::call(bmm, "Placemaker.BigMeshMaster", "OnLateUpdate", vec![], false)), "OnLateUpdate");
+        b.bmm.on_late_update(&mut b.log);
         steps0 += n0;
         steps1 += n1;
         eprintln!("step {step}: {:.1} s (settled {ts:.1}, Iterate0 {t1:.1}, apply {t2:.1}, Iterate1 {t3:.1}, decor {t4:.1}; {n0} / {n1} / {nd} rounds)", t0.elapsed().as_secs_f32());
         if step % 3 == 2 {
             let qs = qubes(&mut g, &ours);
             check_state_with(&mut g, &qs, wfc, &ours, &host.wfc, &format!("step {step}"), false);
-            check_containers(&mut g, &qs, &ours, &b, &format!("step {step}"));
+            check_builder(&mut g, &qs, mb, &groups, &b, &format!("step {step}"));
             eprintln!(
-                "step {step}: same ({removals} lastRemovals and {decor_removals} lastDecorRemovals seen; {} qubes, {steps0} Iterate0, {steps1} Iterate1, {steps_d} IterateDecor rounds, {} modules and {} decor applied, {} decor updates, {} errors)",
+                "step {step}: same (big meshes: {:?} vertices by group; {removals} lastRemovals and {decor_removals} lastDecorRemovals seen; {} qubes, {steps0} Iterate0, {steps1} Iterate1, {steps_d} IterateDecor rounds, {} modules and {} decor applied, {} decor updates, {} errors)",
+                b.bmm.big_mesh_groups.iter().map(|g| g.big_meshes.iter().map(|m| m.created_count - m.available_indexes.len() as i32).sum::<i32>()).collect::<Vec<_>>(),
                 qs.ids.len(),
                 b.applied,
                 b.decor,

@@ -46,3 +46,50 @@ Checked on the scene's `BigMeshMaster`: one group's big meshes copied into ours,
 `AddMesh` (0–400 vertices, now and then 20,000–50,000, optional normals / tangents / uvs, random triangles) and
 `ReturnMesh`, each followed by `OnLateUpdate`; the parts' slots every step and the group's big meshes (all lists,
 counts, dirty and active) every 25 steps, then with everything returned: equal. The group grew to 4 big meshes.
+
+## The module builder (E7c, proven)
+
+Port: `placemaker::module_builder::ModuleBuilder`. Module containers (`ModuleContainer`: the shown module and its
+parts in the big meshes) sit under the qubes, the module's first and its decor after it; spare ones wait in
+`moduleContainerPool`, taken-down ones in `moduleContainersToDeconstruct`. The sandbanker, sounds, camera and
+props stay behind `ModuleBuilderHost`.
+
+- `ApplyModule` 0x32E5F0: a real module (index ≠ 0) in a qube that isn't fully covered: unless the qube already
+  shows it (its first container's module, then nothing happens), that container is taken down; a bottom qube
+  resets the sandbanker; a qube whose normal faces away from `Camera.main` plays sound 3 (unless dimmed); a
+  container from the pool (`GetModuleContainer`: its last, or a new one) goes first under the qube; the qube
+  joins the grass queue. Then each of the module's meshes, turned by `orientations[MulOrientations(module,
+  mesh)]`:
+  - vertex: the orientation's sbyte `MultiplyPoint`, as floats (s/254), + 0.5 per axis; a bottom qube clamps y
+    to `Mathf.Max(0, y)`; `GetTs`, then `MultiplyPoint` into the square, + the qube's world position;
+  - normal / tangent: the orientation's `MultiplyVector`, `MultiplyVector` into the square, normalized (tangent
+    w = 1);
+  - uv: the colour `c` is 15 when the qube's corner 0 is 17, else the qube's corner value at
+    `cornerTransform1[top bit of mesh.corner]`; `u = ((c & 3) + uv.x)·0.25`, `v = ((c >> 2) + uv.y)·0.25 +
+    2·outlineUv` (the outline byte rides in v);
+  - triangles reversed unless the orientation is inverted; meshes of the fence material are doubled back to
+    back (tangent w = 0, triangles reversed).
+  Meshes of one material in a row go into the big meshes together (`BigMeshMaster.AddMesh`), each into the
+  container's next part (its old parts first, `GetNewBigMeshPart`). Module 0 or a fully covered qube: every
+  container under it taken down.
+- `ApplyDecor` 0x32D340: for each decor after the module (`possibleModules[1..]`), a container already under the
+  qube with that decor is moved to its index; otherwise a new container at that index, and each decor mesh is
+  built like a module mesh but turned by the orientation's float matrix (`Orientation.matrix`), with no bottom
+  clamp, colour 15 for dirt meshes (`materialType == 2`), no outline in v, and one part per mesh. When anything
+  was built: sound 3 and the grass queue. Containers past the decor are taken down.
+- `MarkModuleContainerForDeconstruction` 0x330090: props removed (`PropPlacer`), the container moved to the
+  deconstruction list, its parts returned to the big meshes from the back (the parts stay in the container,
+  empty, for reuse). With no prop placer on the master, the game skips all of it.
+  `MarkQubeForDeconstruction` 0x330190 does that for each container under a qube (the graph pools the qube, E4).
+- `IterateDeconstructQubes` 0x32FED0: from the last, while `KeepGoing`, each container back to the pool with
+  `OrientedModule.empty` (`DeconstructModuleContainer` 0x32FB90; child mesh filters, which the shipped modules
+  don't make, would go back to `WorldMeshes`). `Iterate` 0x32FF90: the grass queue, `PropPlacer.PlacePropsInQube`
+  for the qubes still awaiting (E10).
+
+Checked with the wave function collapse's loop test (`tests/placemaker_wfc.rs`): the game's stand-in master gets
+a fresh `BigMeshMaster` whose groups copy the scene groups' materials and templates (so the scene's own
+`LateUpdate` never applies it between steps), ours the same groups empty, materials matched through the module
+meshes. After each of 12 actions and the collapse, `IterateDeconstructQubes` and `OnLateUpdate`; every three
+steps every big mesh of every group (all lists, bit for bit), every qube's containers (module and parts' slots),
+the pool, the deconstruction list and the grass queue: equal, up to 5,177 live vertices, 796 modules and 357 decor
+built. The fence doubling was not reached (no fence module came up); `Iterate` (props) is not run.
