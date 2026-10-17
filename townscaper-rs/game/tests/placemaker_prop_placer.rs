@@ -59,39 +59,6 @@ fn new_go(h: &mut Harness, n: &str) -> (u64, u64) {
     (go, t)
 }
 
-/// The game's prefab `Prop` objects in our prefabs' order (by the module library's placements).
-fn game_prefabs(h: &mut Harness, props: &prop_common::Props) -> Vec<u64> {
-    let lib = handle(&ok(h.request(json!({"field": "moduleLibrary", "on": "Placemaker.WorldMaster", "main": true})), "lib"), "lib");
-    let mut placement_addrs = vec![];
-    let pl = list("Placemaker.PropPlacement, Assembly-CSharp");
-    for (f, lc) in [("modules", list("Placemaker.Module, Assembly-CSharp")), ("decorModules", list("Placemaker.DecorModule, Assembly-CSharp"))] {
-        let l = field_h(h, lib, f).unwrap();
-        let n = ret::i32(&call(h, l, &lc, "get_Count", vec![]));
-        let reqs: Vec<Value> = (0..n).map(|i| json!({"call": "get_Item", "class": lc, "handle": l, "args": [arg::i32(i)], "main": true, "keep": true})).collect();
-        let mods: Vec<u64> = h.batch(reqs).into_iter().map(|r| handle(&ok(r, "module"), "module")).collect();
-        for m in mods {
-            let pls = field_h(h, m, "propPlacements").unwrap();
-            for c in ret::bytes(&call(h, pls, &pl, "ToArray", vec![])).chunks(20) {
-                placement_addrs.push(u32::from_le_bytes(c[12..16].try_into().unwrap()) as u64);
-            }
-        }
-    }
-    let prop_type = ty(h, "Placemaker.Prop, Assembly-CSharp");
-    let all = handle(&ok(h.request(json!({"call": "UnityEngine.Resources.FindObjectsOfTypeAll", "args": [{"handle": prop_type}], "param_types": ["System.Type"], "main": true, "keep": true})), "all"), "all");
-    let n = ret::i32(&call(h, all, "System.Array", "get_Length", vec![]));
-    let mut by_addr = HashMap::new();
-    for i in 0..n {
-        let p = handle(&ok(h.request(json!({"call": "GetValue", "class": "System.Array", "handle": all, "args": [arg::i32(i)], "param_types": ["System.Int32"], "main": true, "keep": true})), "GetValue"), "item");
-        let a = addr(h, p);
-        by_addr.insert(a, p);
-    }
-    let mut out: Vec<Option<u64>> = vec![None; props.prefabs.len()];
-    for (k, &pa) in placement_addrs.iter().enumerate() {
-        out[props.placement_prefab[k]].get_or_insert(by_addr[&pa]);
-    }
-    out.into_iter().map(Option::unwrap).collect()
-}
-
 struct Types {
     prop_node: u64,
     mesh_ref: u64,
@@ -128,7 +95,7 @@ fn check_instance(h: &mut Harness, scene: &PropScene, ours: TransformId, game: u
         let what = format!("{what}: {}", ob.name);
         let go = call_keep(h, g, "UnityEngine.Component", "get_gameObject", vec![]);
         assert_eq!(name(h, go), ob.name, "{what}: name");
-        assert_eq!(ret::bytes(&call(h, go, "UnityEngine.GameObject", "get_activeSelf", vec![]))[0] != 0, ob.active, "{what}: active");
+        assert_eq!(ret::bytes(&call(h, go, "UnityEngine.GameObject", "get_activeSelf", vec![]))[0] != 0, scene.active[o], "{what}: active");
         assert_eq!(ret::i32(&call(h, go, "UnityEngine.GameObject", "get_layer", vec![])) as u32, ob.layer, "{what}: layer");
         let gb = |h: &mut Harness, m: &str| bits(&f32s(&ret::bytes(&call(h, g, T, m, vec![]))));
         let lp = scene.transforms.local_position(o);
@@ -196,7 +163,7 @@ fn get_prop_matches_the_game() {
     let Some(mut guard) = harness() else { return };
     let h: &mut Harness = &mut guard;
     h.wait_for_object("Placemaker.GridGenerator");
-    let prefab_handles = game_prefabs(h, &props);
+    let prefab_handles = prop_common::game_prefabs(h, &props);
     let prefab_addrs: Vec<u64> = prefab_handles.iter().map(|&p| addr(h, p)).collect();
     let master = handle(&ok(h.request(json!({"field": "master", "on": "Placemaker.GridGenerator", "main": true})), "master"), "master");
     // the door material, by name
@@ -231,8 +198,12 @@ fn get_prop_matches_the_game() {
         secondary_props_container: cont[1].1,
         deconstruction_container: cont[2].1,
         door_material: Some(door_ids[0]),
+        hole_material: None,
+        collider_dict: HashMap::new(),
+        material_meshes: vec![],
+        prefab_of: HashMap::new(),
     };
-    ours.on_enable(&scene);
+    ours.on_enable(&mut scene, &props.prefabs, &[]);
     let types = Types {
         prop_node: ty(h, "Placemaker.Props.PropNode, Assembly-CSharp"),
         mesh_ref: ty(h, "Placemaker.Props.PropMeshReference, Assembly-CSharp"),

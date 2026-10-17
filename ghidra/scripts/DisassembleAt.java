@@ -1,4 +1,4 @@
-// Print the instructions of the functions containing each given address (hex).
+// Print the instructions of the functions containing each given address (hex), call targets named.
 //   args: 0x1008ed50 [0x...]
 //@category Townscaper
 
@@ -19,7 +19,16 @@ public class DisassembleAt extends GhidraScript {
 			}
 			println("==== " + f.getEntryPoint() + "  " + f.getName(true));
 			for (Instruction i : currentProgram.getListing().getInstructions(f.getBody(), true)) {
-				println(i.getAddress() + "  " + i);
+				String extra = "";
+				if (i.getMnemonicString().equals("CALL")) {
+					for (Address t : i.getFlows()) {
+						Function g = getFunctionAt(t);
+						if (g != null) {
+							extra = "    ; " + g.getName(true);
+						}
+					}
+				}
+				println(i.getAddress() + "  " + i + extra);
 			}
 		}
 	}

@@ -22,32 +22,100 @@ Checked (`tests/placemaker_props.rs`): 500 random placements (rotation, matrix, 
 whole-turn angles), and 400 random relation edits on fresh nodes (relations, counts, index getters, which edits
 throw) and every pair through `CompareTo`.
 
-## Placing props (E10b, read so far; blocked on E11)
+## Placing props (E10b2, proven)
 
-`PropPlacer.PlacePropsInQube` 0x70A800 (read up to the prop modifiers), for a qube with possible modules:
+`PropPlacer.PlacePropsInQube` 0x70A800 (`placemaker::prop_placer::place_props_in_qube`). The decompile hides
+half of it: the `using` block's `finally` funclet (0x1070D3E7 and the fragment 0x1070DA93) holds the node part,
+and Ghidra mislabels several of the vectors; the port follows the disassembly.
 
-- A `Unity.Mathematics.Random` seeded from the qube's world position: `s = Abs(position.GetHashCode())`, one
-  xorshift step (`<< 13`, `>> 17`, `<< 5`).
-- For each module container under the qube (the last child first) not yet holding props (`hasProps`), the
-  matching `possibleModules[i]`: container 0 is the module, the others its decor modules (an out-of-range decor
-  logs an error and breaks into the debugger). The orientation's matrix (`ModuleMath.orientations[o]`).
-- For each of the module's prop placements (the last first): the prop prefab's `PropNode.priority`, and a draw
-  `NextFloat(prioAdd + priority, priority + 1 + prioAdd)` (both `prioAdd` from the placement's second byte); a
-  placement whose draw is negative is skipped. The corner value under the placement (`cornerTransform1`; none
-  for a negative corner) must be in the prop's `voxelTypeMask`. The placement matrix (`orientation * GetMatrix`)
-  gives the prop's columns, sent through the square (`GetTs` at `column3 + 0.5`, `ModuleBuilder.MultiplyVector`
-  / `MultiplyPoint`). Props reaching past a side (`|x|` or `|z|` of the position over 0.4) are only kept where
-  the side profile there is open (`SideProfile.Get0`; at the ground, not a water side) and, across into the
-  neighbouring qube (`Graph.GetQubeRelation`), the neighbour's orientation and square are blended in (`Max`,
-  `Min`, the doubled offset), with corner-position tests deciding which square owns a shared prop.
-- The prop instance comes from `GetProp` (pooled), gets `localPosition`, `rotation = LookRotation(forward, up)`
-  and `localScale` (x negated where the placement mirrors), then each transform under it: coloured meshes swap
-  to the voxel type's mesh (`GetMeshWithVoxelType`, 0xF unless the placement's corner is ≥ 0 and its value < 15),
-  `PropTransformer`s with `fitInSquare` refit through the world / local matrices…
+- Nothing without possible modules. The random state is `Unity.Mathematics.Random(|hash(qube.position)|)`.
+- Each child of the qube (a module container; from the last) without props yet gets them (`hasProps`). Child 0
+  takes the module's placements, the others the decor modules' (`moduleIndex` out of range logs an error and
+  then throws). The orientation is `orientations[flags & 7]`.
+- Each placement (from the last) draws `NextFloat(prioAdd + p, (p + 1) + prioAdd)` with `p` the prefab root
+  node's priority; a draw below 0 skips it. `cornerTransform1[corner]` is read first (a negative corner
+  throws), the corner value is 0 for a negative corner, and its type must be in `voxelTypeMask`
+  (`1 << (value & 3)`).
+- `m = orientation.matrix * placement.GetMatrix()`; `p = column3 + 0.5`, `ts = GetTs(p)`; up and forward are
+  columns 1 and 2 through `ModuleBuilder.MultiplyVector`, the position `MultiplyPoint(p)`. (Column 0, the right
+  vector, only feeds a `LookRotation(..) * Euler(0, -90, 0)` the code throws away.)
+- Sides: x side 1 (x > 0) or 3, z side 2 (z > 0) or 0. A side counts when `|c| > 0.4` and the container's side
+  profile there is non-zero. Not both: for each axis with `|c| > 0`, where the *module's* profile (container
+  0's) is open (at height 0 not a water side) and the neighbour exists, forward leans towards the neighbour:
+  `forward += MV(neighbour square, GetTs(Min(one, Max(zero, (n + c3) + 0.5))), N.MultiplyVector(±column 2)) *
+  2|c|` with `N` the orientation `(side + indexInOther) % 4`, `n` its column 0, the column negated for z. A
+  decor (child > 0) on a counting side only stays on the corner of smaller x (`GetCorner(side)` against the
+  next). Both sides: the corner pair (`(x + 1) & 3` against z) must straddle along x, or it's skipped.
+- `GetProp(prefab, container)`; mirrored (`(lossy.z < 0) != (lossy.x < 0)` differs from `lossy.y < 0`) flips
+  scale x and forward; `localPosition`, `rotation = LookRotation(-forward, up)`, `localScale = lossyScale`.
+- The instance's objects breadth first (a pooled `List<Transform>`): a `PropColoredMesh` takes
+  `GetMeshWithVoxelType(mesh, corner >= 0 && value < 15 ? value : 15)`; a `PropTransformer` with `fitInSquare`
+  is bent in again (`m * inst.worldToLocal * t.localToWorld`, a new `ts`; position `qube.position +
+  MultiplyPoint`, rotation as above); every `IPropModifier` (from the last) gets `Apply(master, ref random,
+  {square, qube, ts, cornerIndex, orientedModule, cornerValue})` with the latest `ts`.
+- A `PropNode`: turned off and hidden, `hideCount` 0. No parents: priority = the placement's draw, into the
+  placed list. Otherwise `lo = Min(Max(pp - 0.1, pp * 0.9), lo)`, `hi = Min(pp, hi)` over the parents (each
+  parent not turned on hides it once), then `priority = NextFloat(lo, hi)`; below 0 hides it and stops its
+  branch (no anchors, no children). A `PropWireAnchor` takes the corner value as `voxelType`, its node joins the
+  dictionary, and to every anchor partner with an anchor a wire is strung: a `srcWire` prop under the secondary
+  props, at the middle of the two `TransformPoint(connectPos)`, `localRotation = LookRotation(dir)` (the
+  smaller-x end first), child of both anchor nodes, motivated by both `wireConnectorNode`s, its
+  `PropWireFlagMesh` / `PropWireItalianMesh.Setup(master, wire, length)`, then into the breadth-first list.
+- Last: the placed nodes sorted by priority (`List.Sort`), `RecursiveCheck` from the last.
 
-Blocked here: from this point the placement reads Unity's native transform math back (`worldToLocalMatrix`,
-`localToWorldMatrix`, `lossyScale`, and the rotation / scale round trips on prop instances it has just moved), so
-an exact port needs row E11 (`unity::transform`) first.
+The modifiers it runs (row E10c, ported here): `PropTransformer` (scale × `(float)pow(2, NextFloat(-v, v))`,
+local rotation × `Euler(0, NextFloat(-v, v), 0)`, position + `localToWorld.MultiplyVector` of three draws;
+`Reset` copies the prefab's local scale, position, rotation), `PropNgonScaler` (local scale × the distance
+between two opposite square corners' translations / √2, the diagonal chosen by `(ts.x > 0.5) == (ts.y <
+0.5)`), `PropPropeller` (the splash effect at `y = 0` and shown below 1.5, else hidden), `WindVane` (compass
+identity, rotator 23.5° about y), `Window` (a variation hashed from the square corner and the rounded height;
+`mf0` the mesh reference's first item, `mf1` the last other one drawn with `hole0`; both take
+`Window.GetMeshWithVoxelType`). Mesh copies are data (`MeshClone`): `GetMeshWithVoxelType` keeps sixteen
+copies per mesh in `materialMeshes` (copy `k`: uv + 0.25·(k mod 4, k div 4)), `Window` sixty per mesh in its
+static list (type `g`, variation `r`: u + 0.25·(g mod 4), ((7g + r) + v) + 0.25·(g div 4)).
+
+## The collider dictionary and turning nodes on (E10b3, proven)
+
+- `PropCollider.GetMatrix`: `localToWorld * Translate(center) * Scale(extents)` (anchors, layer 3: the x and z
+  columns `(c2 ± c0) / 2`); `CalculateWorldBounds` grows `Bounds(0, -MaxValue)` over the eight ±1 corners.
+  `Collides`: 0 with 0, 2, 5; 1, 3, 4, 5 with themselves.
+- `AddColliderToDict` 0x707C40: `inDict`; each collider (from the last) gets its world bounds and goes into
+  every 2-unit chunk its box meets (`OrientedBoxOrientedBox` with `GetChunkMatrix`), inserted before the first
+  collider of a higher priority (or its own node's). Against the chunk's colliders: other nodes, bounds
+  touching, not already related, colliding layers; layer 7 only within the same `srcProp`; anchors must face
+  each other (rights ≥ 0.3 along the line, ≥ 0.5 against each other) and share `srcWire`; then the boxes must
+  intersect and neither be the other's child. Anchors `AddAnchor` both ways; others `InserOverlap` both ways,
+  and a turned-on node of at least its priority hides it.
+- `RemoveColliderFromDict` 0x70E920 (its body in the funclets 0x1070EAEA / 0x1070EF8F): out of every chunk (a
+  missing one logs "Prop Collider not int dict"), empty chunks removed, `RecursiveCheck(node)`, then its
+  anchors and overlaps drop it (from the last) and are cleared.
+- `RecursiveCheck` 0x70DC20: shown when `hideCount == 0` and motivated: into the dictionary if needed (which
+  may hide it), then if not yet on: on and active; the first time its children are bubble-sorted by priority and
+  its first `IPropEnable` gets `OnFirstEnable`; `OnEnable`, sound (only active in hierarchy), achievement; the
+  overlaps of lower priority hidden (in order, up to the first that isn't lower), children shown, motevees
+  motivated, then those overlaps checked in order, children and motevees from the last. Otherwise a node that
+  is on turns off the mirror way (every check from the last) and is hidden unless turned back on. The first
+  `IPropEnable` is the prefab's (`BirdLanding`, `ButterflyLanding`) before the added `PropMeshReference`.
+
+## Taking props down (E10b4, proven)
+
+`ReturnProp` 0x70F2B0 walks the prefab and the instance side by side, breadth first: each node hidden,
+checked, taken out of the dictionary, given back the prefab's priority and motivations, not turned on before;
+an anchor's wires (from the last) unhooked from both anchors and returned; then every object's modifiers reset
+(from the last), and the instance back into its pool keeping its world pose. `RemovePropsFromContainer`: each
+child (from the last; one without a node ends it) hidden, checked, moved to the deconstruction container.
+`IterateDeconstructProps` returns them from the last while `KeepGoing`. `OnReset` / `OnDoneResetting` hide and
+show the secondary props.
+
+Checked by `tests/placemaker_prop_placing.rs`: the WFC loops build a town on both sides with a fresh game
+`PropPlacer`; after each step every prop object (poses bit for bit, flags, node states and relations, meshes,
+collider bounds, anchors, wires, windows), `srcProps`, `materialMeshes` and the collider dictionary match. The
+game's time-budgeted loops (`ModuleBuilder.Iterate`, `IterateDeconstructQubes`, `IterateDeconstructProps`) run
+on `UniversalStopwatch.KeepGoing`, the scene's frame budget, which can stay spent for a stand-in: the test calls
+their bodies directly in the loops' order. The game's squares and qubes hold the rotation (-0, -0, -0, 1),
+which reaches the props' local rotations. Twelve steps (159 qubes, 329 prop objects) match; that town met no
+wire anchor pair, propeller, wind vane or n-gon scaler, so those paths are ported but not yet seen (row E10d's
+check covers the wires).
 
 ## Prefabs and pools (E10b1, proven)
 

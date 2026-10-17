@@ -67,7 +67,7 @@ pub trait ModuleBuilderHost {
     /// `master.manySoundsManager.PlaySound(sound, position, pitch, volume)`.
     fn play_sound(&mut self, _sound: i32, _position: Vector3, _pitch: f32, _volume: f32) {}
     /// `master.propPlacer.RemovePropsFromContainer(container)` (row E10).
-    fn remove_props_from_container(&mut self, _container: &mut ModuleContainer) {}
+    fn remove_props_from_container(&mut self, _id: ContainerId, _container: &mut ModuleContainer) {}
     /// `master.propPlacer.PlacePropsInQube(qube)` (row E10).
     fn place_props_in_qube(&mut self, _graph: &mut Graph, _qube: QubeId) {}
     /// `WorldMaster.KeepGoing`.
@@ -180,7 +180,7 @@ impl ModuleBuilder {
     /// `Placemaker.ModuleBuilder.MarkModuleContainerForDeconstruction` 0x330090: its props removed, the container
     /// moved to the deconstruction list and its parts given back to the big meshes (from the back).
     pub fn mark_module_container_for_deconstruction(&mut self, bmm: &mut BigMeshMaster, host: &mut dyn ModuleBuilderHost, c: ContainerId) {
-        host.remove_props_from_container(&mut self.containers[c.0 as usize]);
+        host.remove_props_from_container(c, &mut self.containers[c.0 as usize]);
         self.unparent(c);
         self.containers_to_deconstruct.push(c);
         for p in self.containers[c.0 as usize].big_mesh_parts.iter_mut().rev() {

@@ -4,6 +4,7 @@
 //! prop component fields (`PropNode` relations as nodes of the prefab). Needs `TS_HARNESS=1` and the install.
 
 mod graph_common;
+mod prop_common;
 
 use graph_common::*;
 use serde_json::{json, Value};
@@ -77,6 +78,7 @@ fn check_prefab(h: &mut Harness, prop: u64, ours: &PropPrefab, comp_type: u64, t
     // each node's components, and the PropNode components' addresses (for the relations)
     let mut comps: Vec<Vec<u64>> = vec![];
     let mut node_addr: Vec<Option<u64>> = vec![];
+    let transform_addr: Vec<u64> = nodes.iter().map(|&t| addr(h, t)).collect();
     for &t in &nodes {
         let go = call_keep(h, t, "UnityEngine.Component", "get_gameObject", vec![]);
         let arr = handle(&ok(h.request(json!({"call": "GetComponents", "class": "UnityEngine.GameObject", "handle": go, "args": [{"handle": comp_type}], "param_types": ["System.Type"], "main": true, "keep": true})), "GetComponents"), "components");
@@ -87,7 +89,7 @@ fn check_prefab(h: &mut Harness, prop: u64, ours: &PropPrefab, comp_type: u64, t
     }
     for (i, (&t, o)) in nodes.iter().zip(&ours.nodes).enumerate() {
         let what = format!("{} node {i} {}", ours.nodes[0].name, o.name);
-        check_node(h, t, &comps[i], o, &node_addr, types, &what);
+        check_node(h, t, &comps[i], o, &node_addr, &transform_addr, types, &what);
     }
 }
 
@@ -118,7 +120,8 @@ fn class_name(h: &mut Harness, o: u64) -> String {
     ret::string(&call(h, t, "System.RuntimeType", "get_FullName", vec![]))
 }
 
-fn check_node(h: &mut Harness, t: u64, comps: &[u64], o: &PrefabNode, node_addr: &[Option<u64>], types: &Types, what: &str) {
+#[allow(clippy::too_many_arguments)]
+fn check_node(h: &mut Harness, t: u64, comps: &[u64], o: &PrefabNode, node_addr: &[Option<u64>], transform_addr: &[u64], types: &Types, what: &str) {
     let go = call_keep(h, t, "UnityEngine.Component", "get_gameObject", vec![]);
     assert_eq!(name(h, go), o.name, "{what}: name");
     assert_eq!(ret::bytes(&call(h, go, "UnityEngine.GameObject", "get_activeSelf", vec![]))[0] != 0, o.active, "{what}: active");
@@ -199,6 +202,36 @@ fn check_node(h: &mut Harness, t: u64, comps: &[u64], o: &PrefabNode, node_addr:
             "Placemaker.Props.PropWireAnchor" => {
                 let wd = o.wire_anchor.as_ref().unwrap();
                 assert_eq!(bits(&f32s(&field(h, c, "connectPos"))), bits(&wd.connect_pos), "{what}: connectPos");
+                let cn = field_h(h, c, "wireConnectorNode");
+                let want = match &wd.wire_connector_node {
+                    Relation::Node(j) => node_addr[*j],
+                    Relation::Other(_) => None,
+                };
+                assert_eq!(cn.map(|n| addr(h, n)), want, "{what}: wireConnectorNode");
+            }
+            "Placemaker.Props.PropPropeller" => {
+                let pd = o.propeller.as_ref().unwrap();
+                assert_eq!(field(h, c, "forward")[0] != 0, pd.forward, "{what}: forward");
+                let fx = field_h(h, c, "waterSplashEffect").map(|g| call_keep(h, g, "UnityEngine.GameObject", "get_transform", vec![]));
+                let want = match &pd.water_splash_effect {
+                    Relation::Node(j) => Some(transform_addr[*j]),
+                    Relation::Other(_) => None,
+                };
+                assert_eq!(fx.map(|t| addr(h, t)), want, "{what}: waterSplashEffect");
+            }
+            "Placemaker.Props.WindVane" => {
+                let wd = o.wind_vane.as_ref().unwrap();
+                for (f, r) in [("compass", &wd.compass), ("rotator", &wd.rotator)] {
+                    let want = match r {
+                        Relation::Node(j) => Some(transform_addr[*j]),
+                        Relation::Other(_) => None,
+                    };
+                    let got = field_h(h, c, f);
+                    assert_eq!(got.map(|t| addr(h, t)), want, "{what}: {f}");
+                }
+            }
+            "Placemaker.Props.PropWireFlagMesh" => {
+                assert_eq!(bits(&f32s(&field(h, c, "uv"))), bits(&o.flag_mesh_uv.unwrap()), "{what}: uv");
             }
             _ => {}
         }
@@ -241,7 +274,7 @@ fn prop_prefabs_match_the_game() {
         let a = addr(h, p);
         by_addr.insert(a, p);
     }
-    // the same prefabs in the same placement order
+    // the same prefabs in the same placement order, then the wires their anchors make
     let mut game_prefab: Vec<u64> = vec![];
     for (k, &pa) in placement_addrs.iter().enumerate() {
         let i = index[k];
@@ -250,7 +283,12 @@ fn prop_prefabs_match_the_game() {
         }
         assert_eq!(game_prefab[i], pa, "placement {k}: prefab {i}");
     }
-    assert_eq!(game_prefab.len(), prefabs.len(), "prefab count");
+    let wires = prop_common::game_prefabs(h, &prop_common::load());
+    assert_eq!(wires.len(), prefabs.len(), "prefab count");
+    for &w in &wires[game_prefab.len()..] {
+        game_prefab.push(addr(h, w));
+    }
+    eprintln!("{} prefabs, {} of them wires", prefabs.len(), prefabs.len() - index.iter().max().unwrap() - 1);
     let comp_type = ty(h, "UnityEngine.Component, UnityEngine.CoreModule");
     let types = Types { mesh_filter: ty(h, "UnityEngine.MeshFilter, UnityEngine.CoreModule"), material_names: material_names(&a) };
     for (i, pf) in prefabs.iter().enumerate() {

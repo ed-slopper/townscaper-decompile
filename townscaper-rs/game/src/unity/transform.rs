@@ -188,6 +188,23 @@ impl Transforms {
         id
     }
 
+    /// `Transform.IsChildOf` (native): `id` is `parent` or below it.
+    pub fn is_child_of(&self, id: TransformId, parent: TransformId) -> bool {
+        let mut p = Some(id);
+        while let Some(i) = p {
+            if i == parent {
+                return true;
+            }
+            p = self.nodes[i].parent;
+        }
+        false
+    }
+
+    /// `Transform.right` (managed): `rotation * Vector3.right`.
+    pub fn right(&self, id: TransformId) -> Vector3 {
+        Quaternion::rotate(self.rotation(id), Vector3::RIGHT)
+    }
+
     /// `Transform.childCount`.
     pub fn child_count(&self, id: TransformId) -> usize {
         self.children[id].len()

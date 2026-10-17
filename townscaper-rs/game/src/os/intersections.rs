@@ -5,17 +5,18 @@ use crate::unity::mathf;
 use crate::unity::quaternion::Matrix4x4;
 use crate::unity::vector::{v3, Vector3};
 
-/// `Intersections` static table (`..cctor` 0x3EA3B0): the unit cube's corners at ±1 (the boxes are matrices
-/// mapping this cube; the order only matters for NaN).
+/// `Intersections.corners` (`..cctor` 0x3EA3B0): the unit cube's corners at ±1, x slowest, each sign + before -
+/// (read back from the running game). The boxes are matrices mapping this cube; the order matters for NaN and
+/// for `PropCollider.CalculateWorldBounds`, whose `Bounds.Encapsulate` rounds through center ± extents.
 pub const CORNERS: [Vector3; 8] = [
     v3(1.0, 1.0, 1.0),
     v3(1.0, 1.0, -1.0),
-    v3(-1.0, 1.0, -1.0),
+    v3(1.0, -1.0, 1.0),
     v3(1.0, -1.0, -1.0),
     v3(-1.0, 1.0, 1.0),
-    v3(-1.0, -1.0, -1.0),
-    v3(1.0, -1.0, 1.0),
+    v3(-1.0, 1.0, -1.0),
     v3(-1.0, -1.0, 1.0),
+    v3(-1.0, -1.0, -1.0),
 ];
 
 /// `(float.MaxValue, -float.MaxValue)` grown by `ExtraMath.Encapsulate` over the projections.

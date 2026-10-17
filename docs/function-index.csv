@@ -620,26 +620,26 @@ rva,va,namespace,type,method,signature,status,notes
 0x707990,0x10707990,Placemaker,PropPlacement,GetMatrix,public Matrix4x4 GetMatrix(),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707B00,0x10707B00,Placemaker,PropPlacement,get_rotation,public Vector3 get_rotation(),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707B50,0x10707B50,Placemaker,PropPlacement,set_rotation,public void set_rotation(Vector3 value),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
-0x707C40,0x10707C40,Placemaker,PropPlacer,AddColliderToDict,private void AddColliderToDict(PropNode node0),dumped,
+0x707C40,0x10707C40,Placemaker,PropPlacer,AddColliderToDict,private void AddColliderToDict(PropNode node0),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x708B00,0x10708B00,Placemaker,PropPlacer,AddSmoothTangentsToMesh,private void AddSmoothTangentsToMesh(Mesh mesh),dumped,
-0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",ported,placemaker::prop_placer
+0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x709A50,0x10709A50,Placemaker,PropPlacer,FirstTurnOn,private void FirstTurnOn(PropNode node),ported,placemaker::prop_placer
 0x709A70,0x10709A70,Placemaker,PropPlacer,GetChunkMatrix,private Matrix4x4 GetChunkMatrix(int3 coordinate),ported,placemaker::prop_placer
-0x709BE0,0x10709BE0,Placemaker,PropPlacer,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType)",dumped,
+0x709BE0,0x10709BE0,Placemaker,PropPlacer,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x709EE0,0x10709EE0,Placemaker,PropPlacer,GetProp,"private Prop GetProp(Prop srcProp, Transform parent)",checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
 0x70A0C0,0x1070A0C0,Placemaker,PropPlacer,HideCountMinus,private void HideCountMinus(PropNode node),ported,placemaker::prop_placer
-0x70A0E0,0x1070A0E0,Placemaker,PropPlacer,HideCountPlus,private void HideCountPlus(PropNode node),ported,placemaker::prop_placer
-0x70A100,0x1070A100,Placemaker,PropPlacer,IterateDeconstructProps,public bool IterateDeconstructProps(),dumped,
-0x70A1A0,0x1070A1A0,Placemaker,PropPlacer,OnDoneResetting,public void OnDoneResetting(),dumped,
-0x70A1D0,0x1070A1D0,Placemaker,PropPlacer,OnDrawGizmos,private void OnDrawGizmos(),dumped,
+0x70A0E0,0x1070A0E0,Placemaker,PropPlacer,HideCountPlus,private void HideCountPlus(PropNode node),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x70A100,0x1070A100,Placemaker,PropPlacer,IterateDeconstructProps,public bool IterateDeconstructProps(),ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
+0x70A1A0,0x1070A1A0,Placemaker,PropPlacer,OnDoneResetting,public void OnDoneResetting(),ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
+0x70A1D0,0x1070A1D0,Placemaker,PropPlacer,OnDrawGizmos,private void OnDrawGizmos(),read,"editor aid (OnDrawGizmos), not ported"
 0x70A5C0,0x1070A5C0,Placemaker,PropPlacer,OnEnable,private void OnEnable(),ported,placemaker::prop_placer (the pools part checked through GetProp; the colliders re-added are row E10b4)
-0x70A7D0,0x1070A7D0,Placemaker,PropPlacer,OnReset,public void OnReset(),dumped,
-0x70A800,0x1070A800,Placemaker,PropPlacer,PlacePropsInQube,public void PlacePropsInQube(Qube qube),dumped,
-0x70DC20,0x1070DC20,Placemaker,PropPlacer,RecursiveCheck,"private bool RecursiveCheck(PropNode node0, PropNode inNode)",dumped,
+0x70A7D0,0x1070A7D0,Placemaker,PropPlacer,OnReset,public void OnReset(),ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
+0x70A800,0x1070A800,Placemaker,PropPlacer,PlacePropsInQube,public void PlacePropsInQube(Qube qube),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x70DC20,0x1070DC20,Placemaker,PropPlacer,RecursiveCheck,"private bool RecursiveCheck(PropNode node0, PropNode inNode)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x70E500,0x1070E500,Placemaker,PropPlacer,RecursivePropNodeSetup,"private void RecursivePropNodeSetup(PropNode parentNode, Transform srcT, Transform dstT)",checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
-0x70E920,0x1070E920,Placemaker,PropPlacer,RemoveColliderFromDict,private void RemoveColliderFromDict(PropNode node0),dumped,
-0x70F1C0,0x1070F1C0,Placemaker,PropPlacer,RemovePropsFromContainer,public void RemovePropsFromContainer(ModuleContainer moduleContainer),dumped,
-0x70F2B0,0x1070F2B0,Placemaker,PropPlacer,ReturnProp,public void ReturnProp(Prop prop),dumped,
+0x70E920,0x1070E920,Placemaker,PropPlacer,RemoveColliderFromDict,private void RemoveColliderFromDict(PropNode node0),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x70F1C0,0x1070F1C0,Placemaker,PropPlacer,RemovePropsFromContainer,public void RemovePropsFromContainer(ModuleContainer moduleContainer),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x70F2B0,0x1070F2B0,Placemaker,PropPlacer,ReturnProp,public void ReturnProp(Prop prop),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x70F910,0x1070F910,Placemaker,PropPlacer,<RecursivePropNodeSetup>g__ShouldBeBatched|24_0,private bool <RecursivePropNodeSetup>g__ShouldBeBatched|24_0(MeshFilter mf),checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
 0x70FA20,0x1070FA20,Placemaker,PropPlacer,.ctor,public void .ctor(),ported,placemaker::prop_placer
 0x846A20,0x10846A20,Placemaker,RapidButton,Press,public bool Press(float intensity = 1),dumped,
@@ -1189,9 +1189,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x704EF0,0x10704EF0,Placemaker.Props,PropAchievements,TriggerAchievements,public void TriggerAchievements(),dumped,
 0x705070,0x10705070,Placemaker.Props,PropAchievements,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropCollider,.ctor,public void .ctor(),dumped,
-0x7050D0,0x107050D0,Placemaker.Props,PropCollider,CalculateWorldBounds,public void CalculateWorldBounds(),dumped,
-0x705270,0x10705270,Placemaker.Props,PropCollider,Collides,"public static bool Collides(PropCollider.Layer layer0, PropCollider.Layer layer1)",dumped,
-0x7052E0,0x107052E0,Placemaker.Props,PropCollider,GetMatrix,public Matrix4x4 GetMatrix(),dumped,
+0x7050D0,0x107050D0,Placemaker.Props,PropCollider,CalculateWorldBounds,public void CalculateWorldBounds(),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x705270,0x10705270,Placemaker.Props,PropCollider,Collides,"public static bool Collides(PropCollider.Layer layer0, PropCollider.Layer layer1)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x7052E0,0x107052E0,Placemaker.Props,PropCollider,GetMatrix,public Matrix4x4 GetMatrix(),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x1F53D0,0x101F53D0,Placemaker.Props,PropColoredMesh,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropMeshAnimator,.ctor,public void .ctor(),dumped,
 0x7056A0,0x107056A0,Placemaker.Props,PropMeshAnimator,OnDone,public void OnDone(PropMeshReference propMeshReference),dumped,
@@ -1208,8 +1208,8 @@ rva,va,namespace,type,method,signature,status,notes
 0x706F60,0x10706F60,Placemaker.Props,PropMeshReference,.ctor,public void .ctor(),dumped,
 0x1E73E0,0x101E73E0,Placemaker.Props,PropMeshReference.Item,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropNgonScaler,.ctor,public void .ctor(),dumped,
-0x706FC0,0x10706FC0,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
-0x707380,0x10707380,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
+0x706FC0,0x10706FC0,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
+0x707380,0x10707380,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
 0x222F90,0x10222F90,Placemaker.Props,PropNode,get_parentIndex,public int get_parentIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
 0x707450,0x10707450,Placemaker.Props,PropNode,AddAnchor,public void AddAnchor(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
 0x7074C0,0x107074C0,Placemaker.Props,PropNode,AddChild,public void AddChild(PropNode node),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
@@ -1232,14 +1232,14 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropPropeller,.ctor,public void .ctor(),dumped,
 0x83E900,0x1083E900,Placemaker.Props,PropPropeller,OnValidate,private void OnValidate(),dumped,
-0x83E9C0,0x1083E9C0,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
+0x83E9C0,0x1083E9C0,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
 0x83EB30,0x1083EB30,Placemaker.Props,PropPropeller,Update,private void Update(),dumped,
 0x1D4430,0x101D4430,Placemaker.Props,PropReference,RecursiveDraw,private void RecursiveDraw(Transform t),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropReference,.ctor,public void .ctor(),dumped,
 0x83EBD0,0x1083EBD0,Placemaker.Props,PropReference,NameAfterProps,private void NameAfterProps(),dumped,
 0x83EC50,0x1083EC50,Placemaker.Props,PropReference,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x707380,0x10707380,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x83F260,0x1083F260,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
+0x707380,0x10707380,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x83F260,0x1083F260,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x83F710,0x1083F710,Placemaker.Props,PropTransformer,.ctor,public void .ctor(),dumped,
 0x1D4430,0x101D4430,Placemaker.Props,PropWire,Setup,public void Setup(),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,PropWire,.ctor,public void .ctor(),dumped,
@@ -1258,11 +1258,11 @@ rva,va,namespace,type,method,signature,status,notes
 0x976210,0x10976210,Placemaker.Props,ShiftingMesh,System.IComparable<UnityEngine.Vector3>.CompareTo,private int System.IComparable<UnityEngine.Vector3>.CompareTo(Vector3 other),dumped,
 0x1D4430,0x101D4430,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,WindVane,.ctor,public void .ctor(),dumped,
-0x1F53E0,0x101F53E0,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
+0x1F53E0,0x101F53E0,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
 0x1D4430,0x101D4430,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
 0x1F53D0,0x101F53D0,Placemaker.Props,Window,.ctor,public void .ctor(),dumped,
-0x1F7B20,0x101F7B20,Placemaker.Props,Window,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType, int variation)",dumped,
-0x1F8110,0x101F8110,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
+0x1F7B20,0x101F7B20,Placemaker.Props,Window,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType, int variation)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
+0x1F8110,0x101F8110,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x1F8890,0x101F8890,Placemaker.Props,Window,.cctor,private static void .cctor(),dumped,
 0x1D4430,0x101D4430,Placemaker.Props,Window.<OnEnableAsync>d__64,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
 0x1E4050,0x101E4050,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,

@@ -1,7 +1,8 @@
 //! The prop prefabs (row E10b1): every prop the module library places, as a flat tree of nodes with their
 //! local poses, meshes and the fields of the game's prop components (`Prop`, `PropNode` with its relations
-//! resolved to nodes, `PropCollider`, `PropTransformer`, `PropWireAnchor`), for
-//! `ts_game::placemaker::props`. Read with the layouts of row F8g.
+//! resolved to nodes, `PropCollider`, `PropTransformer`, `PropWireAnchor`, `PropPropeller`, `WindVane`,
+//! `PropWireFlagMesh`), for `ts_game::placemaker::props`; and the wire prefabs the anchors make (rows E10b2-E10b4).
+//! Read with the layouts of row F8g.
 
 use std::collections::HashMap;
 
@@ -76,6 +77,22 @@ pub struct PropWireAnchorData {
     pub connect_pos: [f32; 3],
 }
 
+/// `Placemaker.Props.PropPropeller`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PropPropellerData {
+    pub forward: bool,
+    /// A GameObject.
+    pub water_splash_effect: Relation,
+}
+
+/// `Placemaker.Props.WindVane`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct WindVaneData {
+    /// Transforms.
+    pub compass: Relation,
+    pub rotator: Relation,
+}
+
 /// One GameObject of a prefab.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PrefabNode {
@@ -98,6 +115,10 @@ pub struct PrefabNode {
     pub colliders: Vec<PropColliderData>,
     pub transformers: Vec<PropTransformerData>,
     pub wire_anchor: Option<PropWireAnchorData>,
+    pub propeller: Option<PropPropellerData>,
+    pub wind_vane: Option<WindVaneData>,
+    /// `PropWireFlagMesh.uv`.
+    pub flag_mesh_uv: Option<[f32; 4]>,
 }
 
 /// A prop prefab: its nodes, the root first, depth first in child order.
@@ -142,9 +163,9 @@ fn boolean(v: Option<&Value>) -> Option<bool> {
 fn floats<const N: usize>(v: Option<&Value>) -> Option<[f32; N]> {
     match v? {
         Value::Floats(f) if f.len() == N => f.as_slice().try_into().ok(),
-        s @ Value::Struct(_) if N == 3 => {
+        s @ Value::Struct(_) if N == 3 || N == 4 => {
             let mut o = [0f32; N];
-            for (k, n) in ["x", "y", "z"].iter().enumerate() {
+            for (k, n) in ["x", "y", "z", "w"].iter().take(N).enumerate() {
                 o[k] = float(s.get(n))?;
             }
             Some(o)
@@ -182,6 +203,7 @@ pub fn prop_prefab(a: &AssetSet, file: &str, prop: PPtr) -> Option<PropPrefab> {
     walk(&root, None, &mut flat);
     let mut node_of: HashMap<(String, i64), usize> = HashMap::new();
     for (i, (n, _)) in flat.iter().enumerate() {
+        node_of.insert((n.file.clone(), n.game_object), i);
         for c in &n.components {
             node_of.insert((n.file.clone(), c.path_id), i);
         }
@@ -214,6 +236,9 @@ pub fn prop_prefab(a: &AssetSet, file: &str, prop: PPtr) -> Option<PropPrefab> {
             colliders: Vec::new(),
             transformers: Vec::new(),
             wire_anchor: None,
+            propeller: None,
+            wind_vane: None,
+            flag_mesh_uv: None,
         };
         for c in &n.components {
             if let Some(m) = c.mesh {
@@ -268,6 +293,16 @@ pub fn prop_prefab(a: &AssetSet, file: &str, prop: PPtr) -> Option<PropPrefab> {
                         connect_pos: floats(v.get("connectPos"))?,
                     })
                 }
+                "Placemaker.Props.PropPropeller" => {
+                    pn.propeller = Some(PropPropellerData {
+                        forward: boolean(v.get("forward"))?,
+                        water_splash_effect: relation(&n.file, pptr(v.get("waterSplashEffect"))?),
+                    })
+                }
+                "Placemaker.Props.WindVane" => {
+                    pn.wind_vane = Some(WindVaneData { compass: relation(&n.file, pptr(v.get("compass"))?), rotator: relation(&n.file, pptr(v.get("rotator"))?) })
+                }
+                "Placemaker.Props.PropWireFlagMesh" => pn.flag_mesh_uv = Some(floats(v.get("uv"))?),
                 _ => {}
             }
         }
@@ -292,7 +327,8 @@ pub fn prop_prefabs(a: &AssetSet, file: &str, props: impl IntoIterator<Item = PP
 }
 
 /// The props the module library places (its modules', then its decor modules' placements, in stored order), each
-/// prefab once in first-seen order; and each placement's prefab index in that order.
+/// prefab once in first-seen order, then the wire prefabs their anchors make (`srcWire`, each once, `id` the
+/// `PropWire` component); and each placement's prefab index in that order.
 pub fn library_props(a: &AssetSet) -> Option<(Vec<PropPrefab>, Vec<usize>)> {
     use crate::objects::{class_id, MonoBehaviourHeader};
     let lib = crate::modules::module_library(a)?;
@@ -306,7 +342,19 @@ pub fn library_props(a: &AssetSet) -> Option<(Vec<PropPrefab>, Vec<usize>)> {
         })
     })?;
     let placements: Vec<PPtr> = lib.modules.iter().chain(lib.decor_modules.iter()).flat_map(|m| m.prop_placements.iter().map(|p| p.prop)).collect();
-    let prefabs = prop_prefabs(a, &file.name, placements.iter().copied());
+    let mut prefabs = prop_prefabs(a, &file.name, placements.iter().copied());
+    let mut k = 0;
+    while k < prefabs.len() {
+        let wires: Vec<AssetId> = prefabs[k].nodes.iter().filter_map(|n| n.wire_anchor.as_ref()?.src_wire.clone()).collect();
+        for w in wires {
+            if !prefabs.iter().any(|pf| pf.id == w) {
+                if let Some(pf) = prop_prefab(a, &w.file, PPtr { file_id: 0, path_id: w.path_id }) {
+                    prefabs.push(pf);
+                }
+            }
+        }
+        k += 1;
+    }
     let index: Vec<usize> = placements
         .iter()
         .filter_map(|&p| {
