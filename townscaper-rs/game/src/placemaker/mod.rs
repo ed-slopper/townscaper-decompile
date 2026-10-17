@@ -3,6 +3,7 @@
 //! bakes (E9), props (E10), building (G1), camera (G2), saving (G3), life (G5), audio (G6), UI (G7).
 
 pub mod ao_baker;
+pub mod big_mesh;
 pub mod graphs;
 pub mod grid_generator;
 pub mod maker;

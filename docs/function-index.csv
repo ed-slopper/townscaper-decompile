@@ -304,24 +304,24 @@ rva,va,namespace,type,method,signature,status,notes
 0x7B51A0,0x107B51A0,Placemaker,AudioSourcePool,Start,private void Start(),dumped,
 0x7B5250,0x107B5250,Placemaker,AudioSourcePool,.ctor,public void .ctor(),dumped,
 0x7B5A90,0x107B5A90,Placemaker,BaseModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
-0x7B9D10,0x107B9D10,Placemaker,BigMesh,Clear,public void Clear(),dumped,
-0x7B9E10,0x107B9E10,Placemaker,BigMesh,SetDirty,public void SetDirty(),dumped,
-0x7B9E20,0x107B9E20,Placemaker,BigMesh,.ctor,public void .ctor(),dumped,
-0x7B9F80,0x107B9F80,Placemaker,BigMesh,get_availableCount,public int get_availableCount(),dumped,
-0x7B9FC0,0x107B9FC0,Placemaker,BigMesh,get_remainingCount,public int get_remainingCount(),dumped,
-0x7B80A0,0x107B80A0,Placemaker,BigMeshGroup,.ctor,public void .ctor(),dumped,
-0x7B8100,0x107B8100,Placemaker,BigMeshList,Get,public static BigMeshList Get(),dumped,
-0x7B8250,0x107B8250,Placemaker,BigMeshList,Populate,public void Populate(MeshFilter mf),dumped,
-0x7B8610,0x107B8610,Placemaker,BigMeshList,ReturnToPool,public void ReturnToPool(),dumped,
-0x7B86A0,0x107B86A0,Placemaker,BigMeshMaster,AddMesh,"public void AddMesh(BigMeshPart bigMeshPart, Material material, BigMeshList lists)",dumped,
-0x7B86D0,0x107B86D0,Placemaker,BigMeshMaster,AddMesh,"public void AddMesh(BigMeshPart bigMeshPart, Material material, List<Vector3> verts, List<Vector3> normals, List<Vector4> tangents, List<Vector2> uvs, List<int> tris)",dumped,
-0x7B9100,0x107B9100,Placemaker,BigMeshMaster,GetBigMesh,"public BigMesh GetBigMesh(Material material, int vertCount)",dumped,
-0x7B9460,0x107B9460,Placemaker,BigMeshMaster,MaybeApply,private void MaybeApply(BigMesh bigMesh),dumped,
-0x7B9910,0x107B9910,Placemaker,BigMeshMaster,OnLateUpdate,public void OnLateUpdate(),dumped,
-0x7B99F0,0x107B99F0,Placemaker,BigMeshMaster,OnStart,public void OnStart(),dumped,
-0x7B9A30,0x107B9A30,Placemaker,BigMeshMaster,ReturnMesh,public void ReturnMesh(BigMeshPart bigMeshPart),dumped,
-0x7B9C20,0x107B9C20,Placemaker,BigMeshMaster,.ctor,public void .ctor(),dumped,
-0x7B9C80,0x107B9C80,Placemaker,BigMeshPart,.ctor,public void .ctor(),dumped,
+0x7B9D10,0x107B9D10,Placemaker,BigMesh,Clear,public void Clear(),checked,tests/placemaker_big_mesh.rs
+0x7B9E10,0x107B9E10,Placemaker,BigMesh,SetDirty,public void SetDirty(),ported,placemaker::big_mesh
+0x7B9E20,0x107B9E20,Placemaker,BigMesh,.ctor,public void .ctor(),ported,placemaker::big_mesh
+0x7B9F80,0x107B9F80,Placemaker,BigMesh,get_availableCount,public int get_availableCount(),checked,tests/placemaker_big_mesh.rs
+0x7B9FC0,0x107B9FC0,Placemaker,BigMesh,get_remainingCount,public int get_remainingCount(),ported,placemaker::big_mesh
+0x7B80A0,0x107B80A0,Placemaker,BigMeshGroup,.ctor,public void .ctor(),ported,placemaker::big_mesh
+0x7B8100,0x107B8100,Placemaker,BigMeshList,Get,public static BigMeshList Get(),ported,placemaker::big_mesh
+0x7B8250,0x107B8250,Placemaker,BigMeshList,Populate,public void Populate(MeshFilter mf),ported,placemaker::big_mesh
+0x7B8610,0x107B8610,Placemaker,BigMeshList,ReturnToPool,public void ReturnToPool(),ported,placemaker::big_mesh
+0x7B86A0,0x107B86A0,Placemaker,BigMeshMaster,AddMesh,"public void AddMesh(BigMeshPart bigMeshPart, Material material, BigMeshList lists)",ported,placemaker::big_mesh (add_mesh_list: forwards to the list overload)
+0x7B86D0,0x107B86D0,Placemaker,BigMeshMaster,AddMesh,"public void AddMesh(BigMeshPart bigMeshPart, Material material, List<Vector3> verts, List<Vector3> normals, List<Vector4> tangents, List<Vector2> uvs, List<int> tris)",checked,tests/placemaker_big_mesh.rs
+0x7B9100,0x107B9100,Placemaker,BigMeshMaster,GetBigMesh,"public BigMesh GetBigMesh(Material material, int vertCount)",checked,tests/placemaker_big_mesh.rs
+0x7B9460,0x107B9460,Placemaker,BigMeshMaster,MaybeApply,private void MaybeApply(BigMesh bigMesh),checked,tests/placemaker_big_mesh.rs
+0x7B9910,0x107B9910,Placemaker,BigMeshMaster,OnLateUpdate,public void OnLateUpdate(),checked,tests/placemaker_big_mesh.rs
+0x7B99F0,0x107B99F0,Placemaker,BigMeshMaster,OnStart,public void OnStart(),ported,placemaker::big_mesh
+0x7B9A30,0x107B9A30,Placemaker,BigMeshMaster,ReturnMesh,public void ReturnMesh(BigMeshPart bigMeshPart),checked,tests/placemaker_big_mesh.rs
+0x7B9C20,0x107B9C20,Placemaker,BigMeshMaster,.ctor,public void .ctor(),ported,placemaker::big_mesh
+0x7B9C80,0x107B9C80,Placemaker,BigMeshPart,.ctor,public void .ctor(),ported,placemaker::big_mesh
 0x7C1B40,0x107C1B40,Placemaker,BitMeshQuadChange,System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo,private int System.IComparable<Placemaker.BitMeshQuadChange>.CompareTo(BitMeshQuadChange other),dumped,
 0x7C1C80,0x107C1C80,Placemaker,BootGameCore,BootGameCore_OnComplete,private void BootGameCore_OnComplete(),dumped,
 0x7C1E30,0x107C1E30,Placemaker,BootGameCore,OnEnable,private void OnEnable(),dumped,
