@@ -29,8 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E8c | `WorldMaster` save / load / new: `Load` (2), `New` (2), `NothingToLoadAtStartup`, `GetSaveString`, `PopulateSaveData`, `MaybeUpdateGameVersionInSettingsData`, `settingsData`, `shouldBeLoading`, `OnScenePostProcess` (the save system itself is G3, behind a host) | unowned | E8b | ed-slopper/wren (2026-10-17) | Split of E8 |
-| E8d | Boot: `BootMaster` (`Start`, `OnEnable`, the boot routines `FirstBootWrapper` / `GameBootRoutine` / `UserBootRoutine` / `SignedOutBootWrapper`, `DoFullscreen`, `OnSignedOut`), `BootGameCore` (`Update` 0x7C1FA0, `OnEnable`, sign-in) | unowned | E8c | | Split of E8 |
+| E8d | Boot: `BootMaster` (`Start`, `OnEnable`, the boot routines `FirstBootWrapper` / `GameBootRoutine` / `UserBootRoutine` / `SignedOutBootWrapper`, `DoFullscreen`, `OnSignedOut`), `BootGameCore` (`Update` 0x7C1FA0, `OnEnable`, sign-in) | unowned | E8c | ed-slopper/wren (2026-10-17) | Split of E8 |
 | E9 | Lighting and ground bakes (GPU passes as Bevy render passes): `AoBaker` (9), `ShadowBaker` (17), `ShadowBakerCamera`, `Sandbanker` (9, `Iterate` 0x84FBA0), `DrawPlane`, `BorderDrawer` | unowned | E7d | | GPU passes: need the shaders (C3) to check |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | |
 | E11 | `ts_game::unity::transform`: Unity's `Transform` hierarchy math the game reads back (`position`/`rotation`/`lossyScale` from the parent chain, `TransformPoint`, `InverseTransformPoint`, `TransformDirection`, `localToWorldMatrix`, `SetParent` keeping world pose), exact (native code in UnityPlayer.dll), checked with the harness on real scene transforms | unowned | F11b | | Gap of F11f |
@@ -140,6 +139,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E7d | `placemaker::world_meshes` (mesh and mesh filter pools), `placemaker::materials` (`MaterialMaster` palette texture and shader globals, `Palette`, `PaletteHolder`), `BitMeshQuadChange`; 16 rows `checked`, 9 `ported` (ctors, empty `OnStart`, the no-op lambda). With E7a–E7c the mesh building section is complete: every row `checked`, `ported` or `read` (the fence doubling of `ApplyModule` / `ApplyDecor` not reached by the test) | P1 | ed-slopper/wren | 2026-10-16 | f8e2d7b |
 | E8a | Timing and statics in `placemaker::timing`: `UniversalStopwatch` (8 ms budget), `TimeManager`, `FastCoroutines`, `LayerMaster`, `ShaderIds`, `MiscReferences`; 11 rows `checked`, the wall-clock parts `ported` (unit-tested on a fake clock); notes/main_loop.md | P1 | ed-slopper/wren | 2026-10-17 | 81374a0 |
 | E8b | `WorldMaster` loop in `placemaker::world_master`: `Iterate` state machine (all 43 states traced on the game), `Update` / `LateUpdate` / `OnStart` / `ResetState` / `SetDirty`; systems behind `WorldSystems`; 3 rows `checked`, `Update` and the rest `ported` (fake-world tests) | P1 | ed-slopper/wren | 2026-10-17 | 62521ed |
+| E8c | `WorldMaster` save / load / new in `placemaker::world_master`: `New`, `Load` (2), `shouldBeLoading` `checked`; `GetSaveString`, `PopulateSaveData`, `NothingToLoadAtStartup`, version check `ported` (text save system behind `WorldSaves`, G3); `OnScenePostProcess` `read` | P1 | ed-slopper/wren | 2026-10-17 | 5cfa95d |
 
 ## Changes to the board
 
@@ -209,3 +209,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: split E8 into E8a–E8d; claim E8a.
 - 2026-10-17 ed-slopper/wren: E8a done; claim E8b.
 - 2026-10-17 ed-slopper/wren: E8b done; claim E8c.
+- 2026-10-17 ed-slopper/wren: E8c done; claim E8d.
