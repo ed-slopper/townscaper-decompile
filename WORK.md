@@ -29,8 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E5b | Module records: `ByteQube` (16, orientations by lookup), `SideProfile` (7), `Placemaker.Modules.OrientedModule` (12), `OutlineUv` (7) | unowned | E4f | ed-slopper/wren (2026-10-16) | Split of E5 |
-| E5c | `ModuleMath` (17: `.cctor` tables — corners, orientations, `orientationMulLookup`, side matrices, corner links, bary vectors — and the multiply / hash helpers) and `Orientation` (6) | unowned | E5b | | Split of E5 |
+| E5c | `ModuleMath` (17: `.cctor` tables — corners, orientations, `orientationMulLookup`, side matrices, corner links, bary vectors — and the multiply / hash helpers) and `Orientation` (6) | unowned | E5b | ed-slopper/wren (2026-10-16) | Split of E5 |
 | E5d | Module data: `Module` / `BaseModule` / `DecorModule` / `ModuleMesh` / `CornerLookup`, `ModuleLibrary` (`Setup`, `GetDecorOverlap`, `OnEnable`) and a `ts_data` reader of the player's module library asset | unowned | E5c | | Split of E5 |
 | E5a | `Placemaker.Modules.Processing` (`ModuleImporter`, `ProtoModule`, `DecorProfile`, `MaterialCluster`, ...): the editor-time import of module meshes; port only what the shipped game runs | unowned | E5d | | Mostly editor code [est] |
 | E6 | `WaveFunctionCollapse` (18 methods incl. `IterateDecor` 0x3D88D0, `FillQubePossibilities` 0x3D6DD0, `RemovePossibleModule` 0x3DA190, the `Propagation` queue and its `CompareTo` 0x4FC880) | unowned | E5d | | Order of the propagation queue decides the result: port exactly |
@@ -132,6 +131,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E4d | `Graph` loop: `Iterate` (corner integration, qube updates with their shadow quads, flow trimming), `IterateFocus` (hex / height bounds, border, genBounds, viewBounds, shadow-mesh bounds, ground collider), `OnStart`, `Save`, `BeginLoad` / `IterateLoad` (through `Maker`); minimal `ao_baker`, `maker`, `save_data` pieces; 9 rows `checked` (40 actions with the full update, save, load back), `OnStart` ported, `Test` read; harness `icall` | P1 | ed-slopper/wren | 2026-10-16 | 8cdba6a |
 | E4e | `Graph` sampling: `GetQubeWithContext`, `Qube.SampleNormalCoverage` / `GetNormal`, `SampleNormalCoverage` (3), `SampleNormal`, `SampleNormalDistance` / `Distance2` (float grouping from the asm); 9 rows `checked` (600 random points round a town, 400 in qubes), the transform overload `ported`, gizmos and `Qube.Test` read | P1 | ed-slopper/wren | 2026-10-16 | a6684d1 |
 | E4f | `Graph` flow: `Flow.Update` (column relax with the original's 16-bit cut, targets, quad-by-quad `FlowTwoFlows` along edges, across and up), `AddFlowTarget`, `SampleFlow`, `SetupFlowData`; 5 rows `checked` (14 frames, 30 targets, 500 samples), gizmos read. With E4a–E4e the graph section is complete: every `Placemaker.Graphs` row `checked`, `ported` or `read` with a reason | P1 | ed-slopper/wren | 2026-10-16 | 8aae05b |
+| E5b | Module records in `placemaker::modules`: `ByteQube` (turns, 48 orientations, optimal orientation, cost), `SideProfile`, `OrientedModule`, `OutlineUv`; 39 rows `checked`, the boxed `Equals` and an empty ctor `ported` | P1 | ed-slopper/wren | 2026-10-16 | 9e71164 |
 
 ## Changes to the board
 
@@ -185,3 +185,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-16 ed-slopper/wren: E4e done; claim E4f.
 - 2026-10-16 ed-slopper/wren: E4f done; the graph section E4 (E4a–E4f) is complete.
 - 2026-10-16 ed-slopper/wren: split E5 into E5b–E5d (E5a stays); claim E5b.
+- 2026-10-16 ed-slopper/wren: E5b done; claim E5c.
