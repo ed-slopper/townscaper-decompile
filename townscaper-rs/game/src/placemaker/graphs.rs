@@ -5,11 +5,13 @@
 
 use std::collections::HashMap;
 
-use crate::os::hex;
-use crate::unity::mathematics::{Int2, Int3, Int3x2};
+use crate::os::{hex, utils};
+use crate::placemaker::grid_generator::{self, GridGenerator};
+use crate::placemaker::quads::Quad;
+use crate::unity::mathematics::{f3, Float2, Float3, Int2, Int3, Int3x2};
 use crate::unity::mathf;
 use crate::unity::quaternion::Matrix4x4;
-use crate::unity::vector::{Vector2, Vector3};
+use crate::unity::vector::{v4, Vector2, Vector3};
 
 /// `Placemaker.VoxelType` (an `sbyte`): the 15 house colours, then the special kinds.
 #[repr(i8)]
@@ -101,6 +103,8 @@ pub struct Voxel {
     pub cost: i32,
     /// The transform's `localPosition` (`(0, height + 0.5, 0)` under its corner).
     pub local_position: Vector3,
+    /// The transform's parent when it is a corner (`None` in the voxel pool).
+    pub corner: Option<CornerId>,
 }
 
 impl Voxel {
@@ -176,12 +180,35 @@ pub struct FlowData {
     pub target: bool,
 }
 
+impl FlowData {
+    /// `Placemaker.Graphs.FlowData.empty` (`FlowData..cctor` 0x6CF900): no voxel, `dist = newDist = float.MaxValue`.
+    pub const EMPTY: FlowData = FlowData {
+        voxel: None,
+        neighbour_count: 0,
+        dist: f32::MAX,
+        new_dist: f32::MAX,
+        denom: 0.0,
+        dir: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        new_dir: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        target: false,
+    };
+}
+
+/// A corner's `colliderMesh` (a `WorldMeshes` pool mesh, also the `sharedMesh` of its voxels' `MeshCollider`
+/// and `MeshFilter`): the prism round the corner that hovering hits.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct ColliderMesh {
+    pub vertices: Vec<Vector3>,
+    pub triangles: Vec<i32>,
+}
+
 /// `Placemaker.Graphs.Corner`: a grid corner of the town, with the squares round it and its column of voxels
 /// (the voxels are its transform's children, kept in `voxels` in sibling order).
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct Corner {
     pub hex_pos: Int2,
     pub squares: Vec<SquareId>,
+    pub collider_mesh: Option<ColliderMesh>,
     pub blit_verts: Vec<Vector2>,
     pub flow_datas: Vec<FlowData>,
     pub in_flow_update_queue: bool,
@@ -323,7 +350,7 @@ pub struct SideCounts {
 
 /// `Placemaker.Graphs.Qube`: one cell of the voxel graph (a square at a height), filled with a module by the
 /// wave function collapse. `cornerValues` is a `ByteQube` (row E5): its 8 bytes here.
-#[derive(Clone, Debug, PartialEq, Default)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Qube {
     pub voxel_count: u8,
     pub side_variation_mask: u8,
@@ -344,6 +371,32 @@ pub struct Qube {
     pub square: Option<SquareId>,
     /// The transform's `localPosition` (`(0, height, 0)` in its square).
     pub local_position: Vector3,
+}
+
+impl Default for Qube {
+    /// `Placemaker.Graphs.Qube..ctor` 0x843780: `shadowIndex = -1`, `cornerValues = new ByteQube(18)` (all
+    /// `Empty`), a new `possibleModules` list.
+    fn default() -> Self {
+        Qube {
+            voxel_count: 0,
+            side_variation_mask: 0,
+            decor_side_variation_mask: 0,
+            shadow_index: -1,
+            possible_module_list_index: 0,
+            existance_index: 0,
+            last_fill_index: 0,
+            last_propagation: 0,
+            cost: 0.0,
+            corner_values: [VoxelType::Empty as u8; 8],
+            awaiting_rebuilding: false,
+            awaiting_grass: false,
+            awaiting_graph_update: false,
+            awaiting_module_clearing: false,
+            possible_modules: Vec::new(),
+            square: None,
+            local_position: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        }
+    }
 }
 
 impl Qube {
@@ -777,5 +830,605 @@ impl Graph {
             }
             assert!(self.square_dict.insert(sum, s).is_none(), "OnEnable: Dictionary.Add of an existing square");
         }
+    }
+}
+
+// ---- Editing (row E4c) ----
+
+/// What the graph calls on the rest of the game through `Graph.master` (its other systems). Each method names
+/// the original it stands for; the rows that port those systems implement it. The defaults do nothing.
+pub trait GraphHost {
+    /// `Placemaker.WorldMaster.KeepGoing` 0x1F9160: whether this frame's time budget is left.
+    fn keep_going(&mut self) -> bool {
+        true
+    }
+    /// `Placemaker.Sandbanker.Reset` 0x856210.
+    fn sandbanker_reset(&mut self) {}
+    /// `Placemaker.WorldMeshes.GetMesh` 0x1FA480: a pooled mesh for a corner's `colliderMesh`.
+    fn get_mesh(&mut self) {}
+    /// `Placemaker.WorldMeshes.ReturnMesh(Mesh)` 0x1FABA0: a corner's `colliderMesh` back to the pool.
+    fn return_mesh(&mut self) {}
+    /// `Placemaker.WaveFunctionCollapse.QubeRemoved` 0x3D9D10 (row E6).
+    fn qube_removed(&mut self, _graph: &mut Graph, _qube: QubeId, _side_mask: u8) {}
+    /// `Placemaker.AoBaker.GetShadowMesh` 0x7B3500, and what `RemoveVoxel` does with it: the four shadow
+    /// vertices at the index set to zero, the shadow mesh marked dirty.
+    fn clear_shadow(&mut self, _shadow_index: i32) {}
+    /// The module containers half of `Placemaker.ModuleBuilder.MarkQubeForDeconstruction` 0x330190 (each child
+    /// container to `MarkModuleContainerForDeconstruction`); the graph does the rest (`Graph::deconstruct_qube`).
+    fn mark_module_containers_for_deconstruction(&mut self, _qube: QubeId) {}
+    /// `Placemaker.ClickEffect.Click(bool, Vector2, int, VoxelType)` 0x2008A0.
+    fn click(&mut self, _add: bool, _plane_pos: Float2, _height: i32, _voxel_type: VoxelType) {}
+    /// The Fury SDK's `IPlatformSDK` achievement progress (`id`, progress 1).
+    fn achievement(&mut self, _id: &str) {}
+    /// `UnityEngine.Debug.Log`.
+    fn log(&mut self, _message: &str) {}
+    /// `UnityEngine.Debug.LogError`.
+    fn log_error(&mut self, _message: &str) {}
+}
+
+/// `Unity.Mathematics.int2.ToString`: `int2(x, y)`.
+pub fn int2_to_string(v: Int2) -> String {
+    format!("int2({}, {})", v.x, v.y)
+}
+
+/// `Transform.SetSiblingIndex` on the item at the end of `list`: a negative index leaves it there, a larger
+/// one is clamped to the end (as Unity does).
+fn set_sibling_index_of_last<T>(list: &mut Vec<T>, index: i32) {
+    if index < 0 || list.is_empty() {
+        return;
+    }
+    let item = list.pop().unwrap();
+    let i = (index as usize).min(list.len());
+    list.insert(i, item);
+}
+
+fn vec3(f: Float3) -> Vector3 {
+    Vector3 { x: f.x, y: f.y, z: f.z }
+}
+
+/// The `int2` difference `a - b` as a `Vector2` (`HexMath.GetHex2` here is a folded `float2` to `Vector2`).
+fn sub2(a: Int2, b: Int2) -> Vector2 {
+    Vector2 { x: a.x.wrapping_sub(b.x) as f32, y: a.y.wrapping_sub(b.y) as f32 }
+}
+
+impl Graph {
+    /// `Placemaker.Graphs.Graph.QubeUpdated` 0xE8B6C0: queues the qube for the graph's update once.
+    pub fn qube_updated(&mut self, qube: QubeId) {
+        if !self.qube(qube).awaiting_graph_update {
+            self.qube_update_queue.push(qube);
+            self.qube_mut(qube).awaiting_graph_update = true;
+        }
+    }
+
+    /// The world position of a voxel (its corner's position plus its local position).
+    pub fn voxel_position(&self, voxel: VoxelId) -> Vector3 {
+        let v = self.voxel(voxel);
+        let c = v.corner.map(|c| self.corner(c).local_position).unwrap_or_default();
+        Vector3 { x: c.x + v.local_position.x, y: c.y + v.local_position.y, z: c.z + v.local_position.z }
+    }
+
+    /// The corner slot (0..=3) of `corner` in `square`: `c0`, `c1`, `c2`, else 3.
+    fn corner_slot(&self, square: SquareId, corner: CornerId) -> usize {
+        let c = &self.square(square).c;
+        (0..3).find(|&k| c[k] == Some(corner)).unwrap_or(3)
+    }
+
+    fn square_corners(&self, square: SquareId) -> [CornerId; 4] {
+        self.square(square).c.map(|c| c.expect("Graph: NullReferenceException (a square corner)"))
+    }
+
+    /// Moves a qube from its square to the end of the qube pool (`Transform.SetParent(qubePool)`).
+    fn pool_qube(&mut self, qube: QubeId) {
+        if let Some(s) = self.qube(qube).square {
+            let qubes = &mut self.square_mut(s).qubes;
+            if let Some(i) = qubes.iter().position(|&q| q == qube) {
+                qubes.remove(i);
+            }
+        }
+        self.qube_mut(qube).square = None;
+        self.qube_pool.push(qube);
+    }
+
+    /// Moves a corner from `corners` to the end of the corner pool (`Transform.SetParent(cornerPool)`).
+    fn pool_corner(&mut self, corner: CornerId) {
+        if let Some(i) = self.corners.iter().position(|&c| c == corner) {
+            self.corners.remove(i);
+        }
+        self.corner_pool.push(corner);
+    }
+
+    /// The graph's half of `Placemaker.ModuleBuilder.MarkQubeForDeconstruction` 0x330190: `lastPropagation = 0`
+    /// and the qube back to `master.graph.qubePool` (this graph's).
+    pub fn deconstruct_qube(&mut self, host: &mut dyn GraphHost, qube: QubeId) {
+        host.mark_module_containers_for_deconstruction(qube);
+        self.qube_mut(qube).last_propagation = 0;
+        self.pool_qube(qube);
+    }
+
+    /// `Placemaker.Graphs.Graph.PaintVoxel` 0xE8B3E0: a new type for a voxel above the ground, written into the
+    /// corner values of the qubes above and below it round its corner (`corner`, else the voxel's parent).
+    pub fn paint_voxel(&mut self, voxel: VoxelId, new_type: VoxelType, corner: Option<CornerId>) {
+        let h = self.voxel(voxel).height as usize;
+        if h == 0 {
+            return;
+        }
+        let corner = corner.or(self.voxel(voxel).corner).expect("Graph.PaintVoxel: NullReferenceException (no corner)");
+        self.voxel_mut(voxel).voxel_type = new_type;
+        let t = new_type as u8;
+        for i in 0..self.corner(corner).squares.len() {
+            let s = self.corner(corner).squares[i];
+            let (upper, lower) = (self.square(s).qubes[h + 1], self.square(s).qubes[h]);
+            let k = self.corner_slot(s, corner);
+            self.qube_mut(lower).corner_values[4 + k] = t;
+            self.qube_mut(upper).corner_values[k] = t;
+            self.qube_updated(upper);
+            self.qube_updated(lower);
+        }
+    }
+
+    /// `Placemaker.Graphs.Graph.ApplyAction` 0xE83110: adds (from `Empty`), paints or removes (to `Empty`) the
+    /// voxel of an action, with the click effect when `play_effect` (which also integrates an added voxel's
+    /// corner at once).
+    pub fn apply_action(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost, action: Action, play_effect: bool) {
+        if action.in_type == VoxelType::Empty {
+            let v = self.add_voxel(grid, host, action.hex_pos, action.height, action.out_type, play_effect);
+            if play_effect {
+                if let Some(v) = v {
+                    let p = self.voxel_position(v);
+                    host.click(true, hex::world_to_plane(f3(p.x, p.y, p.z)), action.height as i32, action.out_type);
+                }
+            }
+            return;
+        }
+        let Some(&corner) = self.corner_dict.get(&action.hex_pos) else {
+            host.log_error(&format!("Failed to get corner at {}", int2_to_string(action.hex_pos)));
+            return;
+        };
+        let i = self.binary_tree_search_voxel(corner, action.height as i32);
+        let voxel = *usize::try_from(i).ok().and_then(|i| self.corner(corner).voxels.get(i)).expect("Graph.ApplyAction: Transform child out of bounds");
+        if action.out_type != VoxelType::Empty {
+            self.paint_voxel(voxel, action.out_type, Some(corner));
+            return;
+        }
+        if play_effect {
+            let p = self.voxel_position(voxel);
+            host.click(false, hex::world_to_plane(f3(p.x, p.y, p.z)), action.height as i32, action.in_type);
+        }
+        self.remove_voxel(host, voxel);
+    }
+
+    /// `Placemaker.Graphs.Graph.AddVoxel` 0xE829E0: a voxel (from the pool, else new) at `hex_pos` / `height`
+    /// in its corner, sorted by height. A corner's first voxel grows the hex bounds and integrates the corner
+    /// (at once when `instant_integration` and nothing waits, else through `cornerIntegrationQueue`); a later
+    /// one is integrated when the corner already is. `None` (and an error) when there is a voxel there already.
+    pub fn add_voxel(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost, hex_pos: Int2, height: u8, voxel_type: VoxelType, instant_integration: bool) -> Option<VoxelId> {
+        use crate::os::extra_math::{contains, encapsulate};
+        let corner = self.get_or_create_corner(hex_pos);
+        let i = self.binary_tree_search_voxel(corner, height as i32);
+        if i >= 0 {
+            host.log_error(&format!("Voxel already exists at {} {}", int2_to_string(hex_pos), height));
+            return None;
+        }
+        let v = match self.voxel_pool.pop() {
+            Some(v) => v,
+            None => self.get_new_voxel(),
+        };
+        self.corner_mut(corner).voxels.push(v);
+        // `int3(hexPos, height).GetHashCode()` (`math.hash`)
+        let cost = hex_pos
+            .y
+            .wrapping_mul(0x4822_A3E9)
+            .wrapping_add(hex_pos.x.wrapping_mul(0x4C7F_6DD1))
+            .wrapping_add((height as i32).wrapping_mul(-0x553C_3DA3))
+            .wrapping_sub(0x2DE2_F6BB);
+        {
+            let voxel = self.voxel_mut(v);
+            voxel.corner = Some(corner);
+            voxel.height = height;
+            voxel.voxel_type = voxel_type;
+            voxel.cost = cost;
+        }
+        set_sibling_index_of_last(&mut self.corner_mut(corner).voxels, !i);
+        self.voxel_mut(v).local_position = Vector3 { x: 0.0, y: height as f32 + 0.5, z: 0.0 };
+        if self.corner(corner).voxels.len() == 1 {
+            let h = hex::get_hex3(hex_pos);
+            if !contains(self.bounds, h) {
+                self.bounds = if self.corners.len() == 1 { Int3x2 { c0: h, c1: h } } else { encapsulate(self.bounds, h) };
+                self.bounds_updated = true;
+            }
+            if self.corner(corner).squares.is_empty() {
+                let p = hex::plane_to_world(grid_generator::hex_to_plane_i2(hex_pos), 0.0);
+                self.corner_mut(corner).local_position = vec3(p);
+            }
+            if !(instant_integration && self.corner_integration_queue.is_empty() && self.integrate_corner(grid, host, corner)) {
+                self.corner_integration_queue.push(corner);
+            }
+        } else if self.corner(corner).collider_mesh.is_some() {
+            self.integrate_voxel(host, v, corner);
+        }
+        let top = height as i32 + 1;
+        if self.bounds_height < top {
+            self.bounds_height = top;
+            self.bounds_updated = true;
+        }
+        let n = self.total_voxel_count;
+        self.total_voxel_count = n.wrapping_add(1);
+        if n == 99 {
+            host.log("Achevement: Blocks100");
+            host.achievement("Blocks100");
+        } else if n == 999 {
+            host.log("Achevement: Blocks1000");
+            host.achievement("Blocks1000");
+        }
+        Some(v)
+    }
+
+    /// `Placemaker.Graphs.Graph.IntegrateCorner` 0xE84F60: builds the squares round a corner from its grid vert
+    /// (`GridGenerator.GetVertOrIterate`): each missing square from the pool (else new) with its four corner
+    /// matrices, linked to its neighbours through `edgeDict`, its corners made and angled; then the corner's
+    /// collider prism and blit verts, and every voxel of the corner integrated. A vert that does not close
+    /// round the corner removes its voxels instead. False when the vert has no valid position.
+    pub fn integrate_corner(&mut self, grid: &mut GridGenerator, host: &mut dyn GraphHost, corner: CornerId) -> bool {
+        let hex_pos = self.corner(corner).hex_pos;
+        let vert = {
+            let mut keep_going = || host.keep_going();
+            grid.get_vert_or_iterate(hex_pos, Some(&mut keep_going))
+        };
+        if !vert.valid_position() {
+            return false;
+        }
+        if !vert.full() {
+            let mut i = self.corner(corner).voxels.len();
+            while i > 0 {
+                i -= 1;
+                let v = self.corner(corner).voxels[i];
+                self.remove_voxel(host, v);
+            }
+            host.log(&format!("Removing invalid corner at {}", int2_to_string(vert.hex_pos)));
+            return true;
+        }
+        for qi in 0..vert.quad_count as i32 {
+            let quad = vert.get_quad(qi);
+            let square = match self.square_dict.get(&quad.hex_pos_sum()) {
+                Some(&s) => s,
+                None => self.new_square(quad),
+            };
+            let m = &mut self.square_mut(square).motivations;
+            *m = m.wrapping_add(1);
+        }
+        host.get_mesh();
+        let n = vert.quad_count as i32;
+        let nn = n * 2;
+        let mut mesh = ColliderMesh::default();
+        let mut j = 1;
+        for i in 0..n {
+            let q = vert.get_quad(i);
+            let p = q.plane_pos();
+            let (dx, dz) = (p.x - vert.plane_pos.x, p.y - vert.plane_pos.y);
+            mesh.vertices.push(Vector3 { x: dx, y: -0.7, z: dz });
+            mesh.vertices.push(Vector3 { x: dx, y: 0.3, z: dz });
+            mesh.triangles.extend([(j - 1) % nn, (j + 1) % nn, j % nn, j % nn, (j + 1) % nn, (j + 2) % nn]);
+            let (a, b) = if q.v0 == hex_pos {
+                (q.p1, q.p2)
+            } else if q.v1 == hex_pos {
+                (q.p2, q.p3)
+            } else if q.v2 == hex_pos {
+                (q.p3, q.p0)
+            } else {
+                (q.p0, q.p1)
+            };
+            let blit = &mut self.corner_mut(corner).blit_verts;
+            blit.push(Vector2 { x: a.x - vert.plane_pos.x, y: a.y - vert.plane_pos.y });
+            blit.push(Vector2 { x: b.x - vert.plane_pos.x, y: b.y - vert.plane_pos.y });
+            j += 2;
+        }
+        let mut j = 3;
+        for _ in 1..n {
+            mesh.triangles.extend([0, (j + 1) % nn, (j - 1) % nn, 1, j % nn, (j + 2) % nn]);
+            j += 2;
+        }
+        self.corner_mut(corner).collider_mesh = Some(mesh);
+        let mut i = 0;
+        while i < self.corner(corner).voxels.len() {
+            let v = self.corner(corner).voxels[i];
+            self.integrate_voxel(host, v, corner);
+            i += 1;
+        }
+        true
+    }
+
+    /// The new-square part of `IntegrateCorner` 0xE84F60: a square for `quad` at its centre (kept sorted by x in
+    /// `squares`), its four corner matrices, its edges and its corners.
+    fn new_square(&mut self, quad: Quad) -> SquareId {
+        let pos = vec3(hex::plane_to_world(quad.plane_pos(), 0.0));
+        let idx = self.binary_tree_search_square(pos);
+        let s = match self.square_pool.pop() {
+            Some(s) => s,
+            None => self.get_new_square(),
+        };
+        self.squares.push(s);
+        self.square_mut(s).quad_index = quad.quad_index;
+        assert!(self.square_dict.insert(quad.hex_pos_sum(), s).is_none(), "IntegrateCorner: Dictionary.Add of an existing square");
+        self.square_mut(s).local_position = pos;
+        set_sibling_index_of_last(&mut self.squares, !idx);
+        let w = [quad.p0, quad.p1, quad.p2, quad.p3].map(|p| vec3(hex::plane_to_world(p, -0.1)));
+        let d = |a: Vector3, b: Vector3| v4(a.x - b.x, a.y - b.y, a.z - b.z, 0.0);
+        let (e01, e03, e12, e32) = (d(w[1], w[0]), d(w[3], w[0]), d(w[2], w[1]), d(w[2], w[3]));
+        let up = v4(0.0, 1.0, 0.0, 0.0);
+        let at = |p: Vector3| v4(p.x, p.y, p.z, 1.0);
+        // `transform.worldToLocalMatrix` (the squares container sits at the origin: a translation by -position)
+        let world_to_local = Matrix4x4::translate(Vector3 { x: -pos.x, y: -pos.y, z: -pos.z });
+        let base = Matrix4x4::mul(&world_to_local, &Matrix4x4::translate(Vector3 { x: 0.0, y: -0.5, z: 0.0 }));
+        let m = [
+            Matrix4x4::from_columns(e01, up, e03, at(w[0])),
+            Matrix4x4::from_columns(e01, up, e12, at(w[1])),
+            Matrix4x4::from_columns(e32, up, e12, at(w[2])),
+            Matrix4x4::from_columns(e32, up, e03, at(w[3])),
+        ];
+        for (k, m) in m.iter().enumerate() {
+            self.square_mut(s).m[k] = Matrix4x4::mul(&base, m);
+        }
+        let (mut a, mut b, mut c, mut d) = (quad.v1, quad.v0, quad.v2, quad.v3);
+        for k in 0..4i8 {
+            match self.edge_dict.get(&(a, b)).copied() {
+                Some(r) => {
+                    self.square_mut(s).set_relation(k, r.index_in_other, r.square);
+                    let other = r.square.expect("IntegrateCorner: NullReferenceException (edge square)");
+                    self.square_mut(other).set_relation(r.index_in_other, k, Some(s));
+                    self.edge_dict.remove(&(a, b));
+                }
+                None => {
+                    assert!(self.edge_dict.insert((b, a), SquareRelation::new(Some(s), k)).is_none(), "IntegrateCorner: Dictionary.Add of an existing edge");
+                }
+            }
+            let corner = self.get_or_create_corner(b);
+            self.corner_mut(corner).local_position = vec3(hex::plane_to_world(quad.get_plane_pos(k as i32), 0.0));
+            self.square_mut(s).set_corner(k, Some(corner));
+            let positions: Vec<Vector3> = self.square_arena.iter().map(|q| q.local_position).collect();
+            self.corner_mut(corner).add_square(s, |q| positions[q.0 as usize]);
+            let angle = self.corner(corner).angle;
+            self.corner_mut(corner).angle = Vector2::signed_angle(sub2(d, b), sub2(a, b)) + angle;
+            // `ExtraMath.Swap(ref b, ref a, ref c, ref d)`: on to the next edge
+            (b, a, c, d) = (a, c, d, b);
+        }
+        s
+    }
+
+    /// `Placemaker.Graphs.Graph.IntegrateVoxel` 0xE86B70: a voxel's part in the squares round its corner: flow
+    /// data and qubes up to its height (+1) made, its type written into the corner values of the qubes above and
+    /// below it (the ground as `Ground`), the counts of voxels round the corners raised, the qubes queued.
+    pub fn integrate_voxel(&mut self, host: &mut dyn GraphHost, voxel: VoxelId, corner: CornerId) {
+        // (the voxel's `MeshCollider.sharedMesh` and `MeshFilter.sharedMesh` become the corner's collider mesh)
+        let h = self.voxel(voxel).height as i32;
+        let t = if h == 0 {
+            host.sandbanker_reset();
+            VoxelType::Ground as u8
+        } else {
+            self.voxel(voxel).voxel_type as u8
+        };
+        let mut si = 0;
+        while si < self.corner(corner).squares.len() {
+            let s = self.corner(corner).squares[si];
+            let cs = self.square_corners(s);
+            for &c in &cs {
+                let fd = &mut self.corner_mut(c).flow_datas;
+                let mut j = fd.len() as i32 - 1;
+                while j <= h {
+                    fd.push(FlowData::EMPTY);
+                    j += 1;
+                }
+            }
+            let mut j = self.square(s).qubes.len() as i32;
+            while j <= h + 1 {
+                let q = match self.qube_pool.pop() {
+                    Some(q) => {
+                        let e = &mut self.qube_mut(q).existance_index;
+                        *e = e.wrapping_add(1);
+                        q
+                    }
+                    None => self.get_new_qube(),
+                };
+                self.square_mut(s).qubes.push(q);
+                {
+                    let qube = self.qube_mut(q);
+                    qube.square = Some(s);
+                    qube.last_propagation = 0;
+                    qube.voxel_count = if j != 0 { 0 } else { 0xF };
+                    let v = if j != 0 { VoxelType::Empty } else { VoxelType::Water };
+                    qube.corner_values[..4].fill(v as u8);
+                    qube.local_position = Vector3 { x: 0.0, y: j as f32, z: 0.0 };
+                }
+                if j <= h - 1 {
+                    self.qube_updated(q);
+                }
+                j += 1;
+            }
+            let (upper, lower) = (self.square(s).qubes[(h + 1) as usize], self.square(s).qubes[h as usize]);
+            let k = self.corner_slot(s, corner);
+            self.qube_mut(lower).corner_values[4 + k] = t;
+            self.qube_mut(upper).corner_values[k] = t;
+            if k < 3 {
+                self.qube_mut(upper).voxel_count ^= 1 << k;
+                self.qube_mut(lower).voxel_count ^= 0x10 << k;
+            } else {
+                // the fourth corner sets its bits (`or`) where the others flip theirs (`xor`)
+                self.qube_mut(upper).voxel_count |= 8;
+                self.qube_mut(lower).voxel_count |= 0x80;
+            }
+            if h == 0 {
+                for &c in &cs {
+                    let g = &mut self.corner_mut(c).ground_coverage;
+                    *g = g.wrapping_add(1);
+                }
+            }
+            for j in mathf::max_i32(0, h - 1)..h + 2 {
+                for &c in &cs {
+                    let n = &mut self.corner_mut(c).flow_datas[j as usize].neighbour_count;
+                    *n = n.wrapping_add(1);
+                }
+            }
+            self.qube_updated(upper);
+            self.qube_updated(lower);
+            si += 1;
+        }
+        self.corner_mut(corner).flow_datas[h as usize].voxel = Some(voxel);
+    }
+
+    /// `Placemaker.Graphs.Graph.RemoveVoxel` 0xE8B720: the voxel back to the pool and its part in the squares
+    /// round its corner undone (corner values back to `Empty`, counts lowered, corners queued for the flow); a
+    /// column left empty is taken down to its ground qube (`WaveFunctionCollapse.QubeRemoved`, its shadow
+    /// cleared, the qube deconstructed). The last voxel of a corner also lets go of the squares only it kept
+    /// (their edges back into `edgeDict`), of the corners only they used, and of the corner itself.
+    pub fn remove_voxel(&mut self, host: &mut dyn GraphHost, voxel: VoxelId) {
+        use crate::os::extra_math::on_edge;
+        let Some(corner) = self.voxel(voxel).corner else {
+            host.log_error("Trying to remove voxel without a corner");
+            return;
+        };
+        let h = self.voxel(voxel).height as i32;
+        if h == 0 {
+            host.sandbanker_reset();
+        }
+        if self.corner(corner).collider_mesh.is_some() {
+            self.corner_mut(corner).flow_datas[h as usize].voxel = None;
+        }
+        // (the voxel's `MeshCollider` and `MeshFilter` meshes cleared) and the voxel to `voxelPool`
+        let voxels = &mut self.corner_mut(corner).voxels;
+        if let Some(i) = voxels.iter().position(|&v| v == voxel) {
+            voxels.remove(i);
+        }
+        self.voxel_mut(voxel).corner = None;
+        self.voxel_pool.push(voxel);
+        let mut si = self.corner(corner).squares.len();
+        while si > 0 {
+            si -= 1;
+            let s = self.corner(corner).squares[si];
+            let (upper, lower) = (self.square(s).qubes[(h + 1) as usize], self.square(s).qubes[h as usize]);
+            let k = self.corner_slot(s, corner);
+            let empty = VoxelType::Empty as u8;
+            self.qube_mut(lower).corner_values[4 + k] = empty;
+            self.qube_mut(upper).corner_values[k] = empty;
+            self.qube_mut(upper).voxel_count ^= 1 << k;
+            self.qube_mut(lower).voxel_count ^= 0x10 << k;
+            let cs = self.square_corners(s);
+            if h == 0 {
+                for &c in &cs {
+                    let g = &mut self.corner_mut(c).ground_coverage;
+                    *g = g.wrapping_sub(1);
+                }
+            }
+            for &c in &cs {
+                if !self.corner(c).in_flow_update_queue {
+                    self.corner_mut(c).in_flow_update_queue = true;
+                    self.corner_flow_queue.push(c);
+                }
+            }
+            for j in mathf::max_i32(0, h - 1)..h + 2 {
+                for &c in &cs {
+                    let n = &mut self.corner_mut(c).flow_datas[j as usize].neighbour_count;
+                    *n = n.wrapping_sub(1);
+                }
+            }
+            if self.qube(upper).voxel_count == 0 && h + 2 == self.square(s).qubes.len() as i32 {
+                let q = &self.square(s).q;
+                let side_mask = utils::get_byte([q[0].index_in_other != -1, q[1].index_in_other != -1, q[2].index_in_other != -1, q[3].index_in_other != -1, true, false, false, false]);
+                let mut j = self.square(s).qubes.len();
+                while j > 0 {
+                    j -= 1;
+                    let qube = self.square(s).qubes[j];
+                    if self.qube(qube).voxel_count != if j == 0 { 0xF } else { 0 } {
+                        break;
+                    }
+                    host.qube_removed(self, qube, side_mask);
+                    if j == 0 && !self.qube(qube).empty() {
+                        host.sandbanker_reset();
+                    }
+                    let shadow = self.qube(qube).shadow_index;
+                    if shadow >= 0 {
+                        self.shadow_mesh_indexes.push(shadow);
+                        host.clear_shadow(shadow);
+                        self.qube_mut(qube).shadow_index = -1;
+                    }
+                    self.deconstruct_qube(host, qube);
+                    let e = &mut self.qube_mut(qube).existance_index;
+                    *e = e.wrapping_add(1);
+                }
+            }
+            self.qube_updated(upper);
+            self.qube_updated(lower);
+        }
+        if self.corner(corner).voxels.is_empty() {
+            let mut si = self.corner(corner).squares.len();
+            while si > 0 {
+                si -= 1;
+                let s = self.corner(corner).squares[si];
+                let m = &mut self.square_mut(s).motivations;
+                *m = m.wrapping_sub(1);
+                if *m == 0 {
+                    self.release_square(s, corner);
+                }
+            }
+            if self.corner(corner).collider_mesh.is_some() {
+                host.return_mesh();
+                self.corner_mut(corner).collider_mesh = None;
+                self.corner_mut(corner).blit_verts.clear();
+            }
+            if !self.recalculate_hex_bounds && on_edge(self.bounds, hex::get_hex3(self.corner(corner).hex_pos)) {
+                self.recalculate_hex_bounds = true;
+            }
+            if self.corner(corner).squares.is_empty() {
+                let hp = self.corner(corner).hex_pos;
+                self.corner_dict.remove(&hp);
+                self.corner_mut(corner).hex_pos = Int2 { x: -1, y: -1 };
+                self.pool_corner(corner);
+            }
+        }
+        self.total_voxel_count = self.total_voxel_count.wrapping_sub(1);
+        if h + 1 == self.bounds_height {
+            self.recalculate_height_bounds = true;
+        }
+    }
+
+    /// The square part of `RemoveVoxel` 0xE8B720: a square no voxel keeps any more, unlinked from its neighbours
+    /// (their edges back into `edgeDict`, its own open edges out of it) and from its corners (a corner left with
+    /// no squares, other than `removing`, to the pool), then itself to the pool.
+    fn release_square(&mut self, s: SquareId, removing: CornerId) {
+        let [mut a, mut b, mut c, mut d] = self.square_corners(s);
+        let mut sum = Int2::default();
+        for k in 0..4i8 {
+            let r = self.square(s).get_relation(k);
+            let (ah, bh) = (self.corner(a).hex_pos, self.corner(b).hex_pos);
+            sum = Int2 { x: sum.x.wrapping_add(ah.x), y: sum.y.wrapping_add(ah.y) };
+            match r.square {
+                Some(other) => {
+                    self.square_mut(s).set_relation(k, -1, None);
+                    self.square_mut(other).set_relation(r.index_in_other, -1, None);
+                    assert!(self.edge_dict.insert((bh, ah), r).is_none(), "RemoveVoxel: Dictionary.Add of an existing edge");
+                }
+                None => {
+                    self.edge_dict.remove(&(ah, bh));
+                }
+            }
+            let squares = &mut self.corner_mut(a).squares;
+            if let Some(i) = squares.iter().position(|&q| q == s) {
+                squares.remove(i);
+            }
+            if self.corner(a).squares.is_empty() && a != removing {
+                self.corner_dict.remove(&ah);
+                self.pool_corner(a);
+                self.corner_mut(a).angle = 0.0;
+            } else {
+                let dh = self.corner(d).hex_pos;
+                let angle = self.corner(a).angle;
+                self.corner_mut(a).angle = angle - Vector2::signed_angle(sub2(dh, ah), sub2(bh, ah));
+            }
+            // `ExtraMath.Swap(ref a, ref b, ref c, ref d)`: on to the next edge
+            (a, b, c, d) = (b, c, d, a);
+        }
+        self.square_dict.remove(&sum);
+        if let Some(i) = self.squares.iter().position(|&q| q == s) {
+            self.squares.remove(i);
+        }
+        self.square_pool.push(s);
     }
 }
