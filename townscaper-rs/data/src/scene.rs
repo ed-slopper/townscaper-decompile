@@ -2,7 +2,8 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::objects::{class_id as cid, AssetSet, GameObject, LoadedFile, MonoBehaviourHeader, PPtr, Transform};
+use crate::layout::{self, Value};
+use crate::objects::{class_id as cid, AssetSet, GameObject, LoadedFile, MonoBehaviourHeader, PPtr, Reader, Transform};
 
 /// Unity class names for the ids a component can have (Unity's `ClassIDReference`), as far as the build uses them.
 pub fn class_name(id: i32) -> Option<&'static str> {
@@ -56,10 +57,17 @@ pub struct Component {
     /// `MeshRenderer`, or for a MonoBehaviour its script: `Placemaker.WorldMaster`.
     pub kind: String,
     pub enabled: Option<bool>,
+    /// A MonoBehaviour's serialized fields, when its script's layout is known (F8g). Its `PPtr`s are relative
+    /// to the node's `file`.
+    pub fields: Option<Value>,
+    /// A `MeshFilter`'s mesh.
+    pub mesh: Option<PPtr>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Node {
+    /// The file the node's objects are in (their `PPtr`s resolve against it).
+    pub file: String,
     pub game_object: i64,
     pub name: String,
     pub active: bool,
@@ -103,14 +111,26 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
-fn component_kind(a: &AssetSet, f: &LoadedFile, class: i32, bytes: &[u8]) -> (String, Option<bool>) {
+fn component_kind(a: &AssetSet, f: &LoadedFile, class: i32, bytes: &[u8]) -> (String, Option<bool>, Option<Value>) {
     if class == cid::MONO_BEHAVIOUR {
         if let Ok(mb) = MonoBehaviourHeader::read(bytes) {
-            let name = a.script_of(f, &mb).map(|s| s.full_name()).unwrap_or_else(|| "MonoBehaviour(?)".into());
-            return (name, Some(mb.enabled));
+            let script = a.script_of(f, &mb);
+            let name = script.as_ref().map(|s| s.full_name()).unwrap_or_else(|| "MonoBehaviour(?)".into());
+            let fields = script.and_then(|s| {
+                let key = layout::script_key(&s.assembly_name, &s.namespace, &s.class_name);
+                layout::has_script(&key).then(|| layout::read_mono_behaviour(bytes, &mb, &key).ok()).flatten()
+            });
+            return (name, Some(mb.enabled), fields);
         }
     }
-    (class_name(class).map(str::to_string).unwrap_or_else(|| format!("class {class}")), None)
+    (class_name(class).map(str::to_string).unwrap_or_else(|| format!("class {class}")), None, None)
+}
+
+/// A `MeshFilter`'s mesh (`m_GameObject`, then `m_Mesh`).
+fn mesh_of(bytes: &[u8]) -> Option<PPtr> {
+    let mut r = Reader::new(bytes);
+    r.pptr().ok()?;
+    r.pptr().ok()
 }
 
 fn build(a: &AssetSet, f: &LoadedFile, t_ptr: PPtr, seen: &mut HashSet<i64>) -> Result<Node, Error> {
@@ -126,14 +146,16 @@ fn build(a: &AssetSet, f: &LoadedFile, t_ptr: PPtr, seen: &mut HashSet<i64>) -> 
     for p in &g.components {
         let (cf, co) = a.resolve(gf, *p).ok_or_else(|| Error::Unresolved(format!("component of {}", g.name)))?;
         let class = cf.class_id(co);
-        let (kind, enabled) = component_kind(a, cf, class, cf.bytes_of(co));
-        components.push(Component { path_id: co.path_id, class_id: class, kind, enabled });
+        let (kind, enabled, fields) = component_kind(a, cf, class, cf.bytes_of(co));
+        let mesh = (class == 33).then(|| mesh_of(cf.bytes_of(co))).flatten();
+        components.push(Component { path_id: co.path_id, class_id: class, kind, enabled, fields, mesh });
     }
     let mut children = Vec::with_capacity(transform.children.len());
     for c in &transform.children {
         children.push(build(a, tf, *c, seen)?);
     }
     Ok(Node {
+        file: gf.name.clone(),
         game_object: go.path_id,
         name: g.name,
         active: g.is_active,
@@ -143,6 +165,28 @@ fn build(a: &AssetSet, f: &LoadedFile, t_ptr: PPtr, seen: &mut HashSet<i64>) -> 
         components,
         children,
     })
+}
+
+/// The subtree of the GameObject a component (or a GameObject, or a Transform) belongs to, `ptr` relative to
+/// `file`.
+pub fn subtree(a: &AssetSet, file: &str, ptr: PPtr) -> Result<Node, Error> {
+    let f = a.file(file).ok_or_else(|| Error::Unresolved(file.into()))?;
+    let (of, o) = a.resolve(f, ptr).ok_or_else(|| Error::Unresolved(format!("{ptr:?} in {file}")))?;
+    let class = of.class_id(o);
+    let go_ptr = match class {
+        1 => PPtr { file_id: 0, path_id: o.path_id },
+        cid::MONO_BEHAVIOUR => MonoBehaviourHeader::read(of.bytes_of(o)).map_err(|e| Error::Read(e.to_string()))?.game_object,
+        _ => {
+            let mut r = Reader::new(of.bytes_of(o));
+            r.pptr().map_err(|e| Error::Read(e.to_string()))?
+        }
+    };
+    let (gf, go) = a.resolve(of, go_ptr).ok_or_else(|| Error::Unresolved("game object".into()))?;
+    let g = GameObject::read(gf.bytes_of(go)).map_err(|e| Error::Read(e.to_string()))?;
+    // the first component is the Transform
+    let t = *g.components.first().ok_or_else(|| Error::Unresolved(format!("transform of {}", g.name)))?;
+    let mut seen = HashSet::new();
+    build(a, gf, t, &mut seen)
 }
 
 /// The root GameObjects of a file (transforms without a father), in path-id order, with their subtrees.

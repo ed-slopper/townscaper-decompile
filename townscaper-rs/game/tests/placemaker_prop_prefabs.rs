@@ -1,0 +1,233 @@
+//! `ts_data::props` (E10b1) against the running game: the prop prefabs the module library places, read from the
+//! player's files, must be the game's own prefab objects — the same prefabs in the same placement order, and
+//! node by node the same names, active flags, layers, local poses (bit for bit), component kinds, meshes and
+//! prop component fields (`PropNode` relations as nodes of the prefab). Needs `TS_HARNESS=1` and the install.
+
+mod graph_common;
+
+use graph_common::*;
+use serde_json::{json, Value};
+use ts_check::{arg, harness, ret, Harness};
+use ts_data::props::{library_props, PrefabNode, PropPrefab, Relation};
+
+const T: &str = "UnityEngine.Transform";
+
+fn f32s(b: &[u8]) -> Vec<f32> {
+    b.chunks(4).map(|c| f32::from_le_bytes(c.try_into().unwrap())).collect()
+}
+fn bits(v: &[f32]) -> Vec<u32> {
+    v.iter().map(|f| f.to_bits()).collect()
+}
+fn call(h: &mut Harness, t: u64, class: &str, m: &str, args: Vec<Value>) -> Value {
+    ok(h.request(json!({"call": m, "class": class, "handle": t, "args": args, "main": true})), m)
+}
+fn call_keep(h: &mut Harness, t: u64, class: &str, m: &str, args: Vec<Value>) -> u64 {
+    handle(&ok(h.request(json!({"call": m, "class": class, "handle": t, "args": args, "main": true, "keep": true})), m), m)
+}
+fn field(h: &mut Harness, t: u64, f: &str) -> Vec<u8> {
+    ret::bytes(&ok(h.request(json!({"field": f, "handle": t, "main": true})), f))
+}
+fn field_h(h: &mut Harness, t: u64, f: &str) -> Option<u64> {
+    opt_handle(&ok(h.request(json!({"field": f, "handle": t, "main": true})), f))
+}
+/// A field's integer value whatever its width (enums are bytes or ints).
+fn int_of(b: &[u8]) -> i32 {
+    match b.len() {
+        1 => b[0] as i32,
+        2 => i16::from_le_bytes([b[0], b[1]]) as i32,
+        _ => i32::from_le_bytes(b[..4].try_into().unwrap()),
+    }
+}
+fn addr(h: &mut Harness, t: u64) -> u64 {
+    ok(h.request(json!({"addr": t})), "addr")["addr"].as_u64().unwrap()
+}
+fn ty(h: &mut Harness, n: &str) -> u64 {
+    handle(&ok(h.request(json!({"call": "System.Type.GetType", "args": [arg::string(n)], "param_types": ["System.String"], "main": true, "keep": true})), n), n)
+}
+fn name(h: &mut Harness, o: u64) -> String {
+    ret::string(&call(h, o, "UnityEngine.Object", "get_name", vec![]))
+}
+/// The items of an object array.
+fn array_items(h: &mut Harness, a: u64) -> Vec<u64> {
+    let n = ret::i32(&call(h, a, "System.Array", "get_Length", vec![]));
+    (0..n)
+        .map(|i| handle(&ok(h.request(json!({"call": "GetValue", "class": "System.Array", "handle": a, "args": [arg::i32(i)], "param_types": ["System.Int32"], "main": true, "keep": true})), "GetValue"), "item"))
+        .collect()
+}
+
+/// The game's prefab nodes depth first in child order (as ours), with each node's components.
+fn game_nodes(h: &mut Harness, root_t: u64) -> Vec<u64> {
+    let mut out = vec![];
+    fn walk(h: &mut Harness, t: u64, out: &mut Vec<u64>) {
+        out.push(t);
+        let n = ret::i32(&call(h, t, T, "get_childCount", vec![]));
+        for i in 0..n {
+            let c = call_keep(h, t, T, "GetChild", vec![arg::i32(i)]);
+            walk(h, c, out);
+        }
+    }
+    walk(h, root_t, &mut out);
+    out
+}
+
+fn check_prefab(h: &mut Harness, prop: u64, ours: &PropPrefab, comp_type: u64, types: &Types) {
+    let root_t = call_keep(h, prop, "UnityEngine.Component", "get_transform", vec![]);
+    let nodes = game_nodes(h, root_t);
+    assert_eq!(nodes.len(), ours.nodes.len(), "{}: node count", ours.nodes[0].name);
+    // each node's components, and the PropNode components' addresses (for the relations)
+    let mut comps: Vec<Vec<u64>> = vec![];
+    let mut node_addr: Vec<Option<u64>> = vec![];
+    for &t in &nodes {
+        let go = call_keep(h, t, "UnityEngine.Component", "get_gameObject", vec![]);
+        let arr = handle(&ok(h.request(json!({"call": "GetComponents", "class": "UnityEngine.GameObject", "handle": go, "args": [{"handle": comp_type}], "param_types": ["System.Type"], "main": true, "keep": true})), "GetComponents"), "components");
+        let cs = array_items(h, arr);
+        let pn = cs.iter().copied().find(|&c| class_name(h, c) == "Placemaker.Props.PropNode");
+        node_addr.push(pn.map(|c| addr(h, c)));
+        comps.push(cs);
+    }
+    for (i, (&t, o)) in nodes.iter().zip(&ours.nodes).enumerate() {
+        let what = format!("{} node {i} {}", ours.nodes[0].name, o.name);
+        check_node(h, t, &comps[i], o, &node_addr, types, &what);
+    }
+}
+
+struct Types {
+    mesh_filter: u64,
+}
+
+fn class_name(h: &mut Harness, o: u64) -> String {
+    let t = call_keep(h, o, "System.Object", "GetType", vec![]);
+    ret::string(&call(h, t, "System.RuntimeType", "get_FullName", vec![]))
+}
+
+fn check_node(h: &mut Harness, t: u64, comps: &[u64], o: &PrefabNode, node_addr: &[Option<u64>], types: &Types, what: &str) {
+    let go = call_keep(h, t, "UnityEngine.Component", "get_gameObject", vec![]);
+    assert_eq!(name(h, go), o.name, "{what}: name");
+    assert_eq!(ret::bytes(&call(h, go, "UnityEngine.GameObject", "get_activeSelf", vec![]))[0] != 0, o.active, "{what}: active");
+    assert_eq!(ret::i32(&call(h, go, "UnityEngine.GameObject", "get_layer", vec![])) as u32, o.layer, "{what}: layer");
+    let g = |h: &mut Harness, m: &str| bits(&f32s(&ret::bytes(&call(h, t, T, m, vec![]))));
+    assert_eq!(g(h, "get_localPosition"), bits(&o.local_position), "{what}: localPosition");
+    assert_eq!(g(h, "get_localRotation"), bits(&o.local_rotation), "{what}: localRotation");
+    assert_eq!(g(h, "get_localScale"), bits(&o.local_scale), "{what}: localScale");
+    // component kinds in order (the Transform first in the game's list)
+    let kinds: Vec<String> = comps.iter().skip(1).map(|&c| class_name(h, c)).map(|k| k.trim_start_matches("UnityEngine.").to_string()).collect();
+    assert_eq!(kinds, o.kinds, "{what}: components");
+    // the mesh, by name
+    if let Some(m) = &o.mesh {
+        let mf = handle(&ok(h.request(json!({"call": "GetComponent", "class": "UnityEngine.Component", "handle": t, "args": [{"handle": types.mesh_filter}], "param_types": ["System.Type"], "main": true, "keep": true})), "MeshFilter"), "mf");
+        let mesh = call_keep(h, mf, "UnityEngine.MeshFilter", "get_sharedMesh", vec![]);
+        let _ = m;
+        assert!(!name(h, mesh).is_empty(), "{what}: mesh");
+    }
+    let (mut nc, mut nt) = (0, 0);
+    for &c in comps {
+        match class_name(h, c).as_str() {
+            "Placemaker.Prop" => {
+                assert_eq!(field(h, c, "voxelTypeMask")[0], o.prop.as_ref().unwrap().voxel_type_mask, "{what}: voxelTypeMask");
+            }
+            "Placemaker.Props.PropNode" => {
+                let n = o.node.as_ref().unwrap();
+                assert_eq!(f32s(&field(h, c, "priority"))[0].to_bits(), n.priority.to_bits(), "{what}: priority");
+                assert_eq!(int_of(&field(h, c, "appearanceSound")), n.appearance_sound, "{what}: appearanceSound");
+                let b = |h: &mut Harness, f: &str| field(h, c, f)[0];
+                assert_eq!(
+                    [b(h, "achievement"), b(h, "turnedOn"), b(h, "inDict"), b(h, "hasBeenTurnedOn"), b(h, "hideCount"), b(h, "motivations")],
+                    [n.achievement, n.turned_on as u8, n.in_dict as u8, n.has_been_turned_on as u8, n.hide_count, n.motivations],
+                    "{what}: PropNode flags"
+                );
+                assert_eq!(
+                    [b(h, "parentCount"), b(h, "childCount"), b(h, "overlapCount"), b(h, "moteveeCount"), b(h, "anchorCount")],
+                    [n.parent_count, n.child_count, n.overlap_count, n.motevee_count, n.anchor_count],
+                    "{what}: PropNode counts"
+                );
+                let l = field_h(h, c, "relations").unwrap();
+                let lc = list("Placemaker.Props.PropNode, Assembly-CSharp");
+                let cnt = ret::i32(&call(h, l, &lc, "get_Count", vec![]));
+                assert_eq!(cnt as usize, n.relations.len(), "{what}: relation count");
+                for (k, r) in n.relations.iter().enumerate() {
+                    let it = call_keep(h, l, &lc, "get_Item", vec![arg::i32(k as i32)]);
+                    let a = addr(h, it);
+                    match r {
+                        Relation::Node(j) => assert_eq!(Some(a), node_addr[*j], "{what}: relation {k}"),
+                        Relation::Other(_) => assert!(!node_addr.contains(&Some(a)), "{what}: relation {k} is outside"),
+                    }
+                }
+            }
+            "Placemaker.Props.PropCollider" => {
+                let cd = &o.colliders[nc];
+                nc += 1;
+                assert_eq!(int_of(&field(h, c, "layer")), cd.layer, "{what}: collider layer");
+                assert_eq!(bits(&f32s(&field(h, c, "localBounds"))), bits(&cd.local_bounds), "{what}: localBounds");
+                assert_eq!(bits(&f32s(&field(h, c, "worldBounds"))), bits(&cd.world_bounds), "{what}: worldBounds");
+            }
+            "Placemaker.Props.PropTransformer" => {
+                let td = &o.transformers[nt];
+                nt += 1;
+                assert_eq!(field(h, c, "fitInSquare")[0] != 0, td.fit_in_square, "{what}: fitInSquare");
+                let fs = |h: &mut Harness, f: &str| bits(&f32s(&field(h, c, f)));
+                assert_eq!(fs(h, "scaleVariance"), bits(&[td.scale_variance]), "{what}: scaleVariance");
+                assert_eq!(fs(h, "rotationVariance"), bits(&[td.rotation_variance]), "{what}: rotationVariance");
+                assert_eq!(fs(h, "posVariance"), bits(&td.pos_variance), "{what}: posVariance");
+            }
+            "Placemaker.Props.PropWireAnchor" => {
+                let wd = o.wire_anchor.as_ref().unwrap();
+                assert_eq!(bits(&f32s(&field(h, c, "connectPos"))), bits(&wd.connect_pos), "{what}: connectPos");
+            }
+            _ => {}
+        }
+    }
+}
+
+#[test]
+fn prop_prefabs_match_the_game() {
+    let dir = ts_data::install::find_dir().expect("the player's install (TOWNSCAPER_DIR)");
+    let a = ts_data::objects::AssetSet::load(&dir.join("Townscaper_Data")).unwrap();
+    let (prefabs, index) = library_props(&a).expect("the library's props");
+    let Some(mut guard) = harness() else { return };
+    let h: &mut Harness = &mut guard;
+    h.wait_for_object("Placemaker.GridGenerator");
+    // the game's placements' props, by address, in stored order
+    let lib = handle(&ok(h.request(json!({"field": "moduleLibrary", "on": "Placemaker.WorldMaster", "main": true})), "lib"), "lib");
+    let mut placement_addrs = vec![];
+    let ml = list("Placemaker.Module, Assembly-CSharp");
+    let dl = list("Placemaker.DecorModule, Assembly-CSharp");
+    let pl = list("Placemaker.PropPlacement, Assembly-CSharp");
+    for (f, lc) in [("modules", &ml), ("decorModules", &dl)] {
+        let l = field_h(h, lib, f).unwrap();
+        let n = ret::i32(&call(h, l, lc, "get_Count", vec![]));
+        let reqs: Vec<Value> = (0..n).map(|i| json!({"call": "get_Item", "class": lc, "handle": l, "args": [arg::i32(i)], "main": true, "keep": true})).collect();
+        let mods: Vec<u64> = h.batch(reqs).into_iter().map(|r| handle(&ok(r, "module"), "module")).collect();
+        for m in mods {
+            let pls = field_h(h, m, "propPlacements").unwrap();
+            let raw = ret::bytes(&call(h, pls, &pl, "ToArray", vec![]));
+            for c in raw.chunks(20) {
+                placement_addrs.push(u32::from_le_bytes(c[12..16].try_into().unwrap()) as u64);
+            }
+        }
+    }
+    assert_eq!(placement_addrs.len(), index.len(), "placements");
+    // every Prop object the engine has, by address
+    let prop_type = ty(h, "Placemaker.Prop, Assembly-CSharp");
+    let all = handle(&ok(h.request(json!({"call": "UnityEngine.Resources.FindObjectsOfTypeAll", "args": [{"handle": prop_type}], "param_types": ["System.Type"], "main": true, "keep": true})), "FindObjectsOfTypeAll"), "all");
+    let mut by_addr = std::collections::HashMap::new();
+    for p in array_items(h, all) {
+        let a = addr(h, p);
+        by_addr.insert(a, p);
+    }
+    // the same prefabs in the same placement order
+    let mut game_prefab: Vec<u64> = vec![];
+    for (k, &pa) in placement_addrs.iter().enumerate() {
+        let i = index[k];
+        if i == game_prefab.len() {
+            game_prefab.push(pa);
+        }
+        assert_eq!(game_prefab[i], pa, "placement {k}: prefab {i}");
+    }
+    assert_eq!(game_prefab.len(), prefabs.len(), "prefab count");
+    let comp_type = ty(h, "UnityEngine.Component, UnityEngine.CoreModule");
+    let types = Types { mesh_filter: ty(h, "UnityEngine.MeshFilter, UnityEngine.CoreModule") };
+    for (i, pf) in prefabs.iter().enumerate() {
+        let p = *by_addr.get(&game_prefab[i]).expect("the prefab's Prop object");
+        check_prefab(h, p, pf, comp_type, &types);
+    }
+}

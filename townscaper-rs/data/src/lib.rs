@@ -9,6 +9,7 @@ pub mod layout;
 pub mod mesh;
 pub mod modules;
 pub mod objects;
+pub mod props;
 pub mod scene;
 pub mod serialized;
 pub mod texture;
