@@ -30,10 +30,9 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
 | E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | Split: E10a–E10d |
-| E10b | `PropPlacer` placement (22): `PlacePropsInQube` 0x70A800, `RecursivePropNodeSetup`, `RecursiveCheck`, `GetProp` / `ReturnProp`, colliders, hide counts, deconstruction, `GetChunkMatrix`; the prop prefabs read from the player's files | unowned | E10a, E11 | | Split of E10. Blocked on E11: PlacePropsInQube reads the engine's transform math back mid-placement (prop instances' worldToLocal / localToWorld matrices, lossyScale, rotation and localScale round trips) |
+| E10b | `PropPlacer` placement (22): `PlacePropsInQube` 0x70A800, `RecursivePropNodeSetup`, `RecursiveCheck`, `GetProp` / `ReturnProp`, colliders, hide counts, deconstruction, `GetChunkMatrix`; the prop prefabs read from the player's files | unowned | E10a, E11 | ed-slopper/wren (2026-10-17) | Split of E10 (E11 done: placement reads the transform math back) |
 | E10c | Prop modifiers and meshes: `PropTransformer`, `PropNgonScaler`, `PropReference`, `PropMeshReference`, `PropColoredMesh`, `PropMeshOutline`, `ShiftingMesh`, `PropMeshAnimator`, `GetMeshWithVoxelType`, `AddSmoothTangentsToMesh` | unowned | E10b, E11 | | Split of E10 |
 | E10d | Animated props: `Window` (+`Timer`), `PropPropeller`, `WindVane`, `PropWire` / anchors / flag and Italian meshes, `PropAchievements`, `PropRadiusIterator` | unowned | E10b, E11 | | Split of E10 |
-| E11 | `ts_game::unity::transform`: Unity's `Transform` hierarchy math the game reads back (`position`/`rotation`/`lossyScale` from the parent chain, `TransformPoint`, `InverseTransformPoint`, `TransformDirection`, `localToWorldMatrix`, `SetParent` keeping world pose), exact (native code in UnityPlayer.dll), checked with the harness on real scene transforms | unowned | F11b | ed-slopper/wren (2026-10-17) | Gap of F11f |
 | E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
 | E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | | Gap of F11f; needed by G3/G3a |
 
@@ -147,6 +146,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E9c | Sandbanks and shore water in `placemaker::sandbanker`: `Iterate`'s five states and `UpdateShadeUvs` `checked` (a fresh sandbanker stepped Reset to Done on the scene town, lists and both meshes bit-exact), 6 rows `ported`, `OnDrawGizmos` `read` | P1 | ed-slopper/wren | 2026-10-17 | 944f27f |
 | E9d | `BorderDrawer` in `placemaker::border_drawer` (6 rows `ported`, over the checked `PopulateBorderMesh`); `DrawPlane` `read` (a development aid in none of the game's scenes); E9 complete | P1 | ed-slopper/wren | 2026-10-17 | f36d843 |
 | E10a | Prop data in `placemaker::props`: `PropPlacement` (rotation, matrix) and `PropNode` (relation runs, ordering, the game's exceptions) `checked` (22 rows), `Prop` / `PropNode..ctor` `ported`; the prefab reader moved to E10b; notes/props.md | P1 | ed-slopper/wren | 2026-10-17 | 55be482 |
+| E11 | Transform math in `unity::transform` (+ `unity::sse`): the engine's hand-vectorised routines transcribed (global position / rotation / matrices / `lossyScale`, `TransformPoint` / `Direction` and inverses, the setters, `SetParent` keeping the world pose), bit-exact on random hierarchies and the scene's transforms; `rcpps` is the CPU's own; notes/unity.md | P1 | ed-slopper/wren | 2026-10-17 | 79969e6 |
 
 ## Changes to the board
 
@@ -227,3 +227,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: E10a done; claim E10b.
 - 2026-10-17 ed-slopper/wren: E10b unclaimed: blocked on E11 (placement reads the engine's transform math back); E10c, E10d wait on it too.
 - 2026-10-17 ed-slopper/wren: claim E11 (needed by E10b).
+- 2026-10-17 ed-slopper/wren: E11 done; claim E10b again.
