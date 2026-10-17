@@ -12,5 +12,6 @@ pub mod module_builder;
 pub mod modules;
 pub mod quads;
 pub mod save_data;
+pub mod timing;
 pub mod wfc;
 pub mod world_meshes;

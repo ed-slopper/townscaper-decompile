@@ -13,4 +13,5 @@ Names, signatures, addresses and constants only: no pasted decompiler output.
 | [modules.md](modules.md) | Modules (E5): the records, `Orientation` and `ModuleMath`'s tables |
 | [wfc.md](wfc.md) | The wave function collapse (E6): queues and their order, filling a qube, the loops |
 | [meshes.md](meshes.md) | Mesh building (E7): module geometry, big meshes, the module builder |
+| [main_loop.md](main_loop.md) | Boot and the main loop (E8): frame budget, time, the world master's iterate order |
 | [graph.md](graph.md) | The voxel graph (E4): objects and containers, editing, the update loop, saving and loading, sampling, the flow field |

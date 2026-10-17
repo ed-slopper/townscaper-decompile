@@ -403,21 +403,21 @@ rva,va,namespace,type,method,signature,status,notes
 0x44F9D0,0x1044F9D0,Placemaker,DrawPlane,SetToHoverData,public void SetToHoverData(),dumped,
 0x44FD10,0x1044FD10,Placemaker,DrawPlane,Update,private void Update(),dumped,
 0x44FE10,0x1044FE10,Placemaker,DrawPlane,.ctor,public void .ctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,FastCoroutineUpdater,.ctor,public void .ctor(),dumped,
-0x6CE500,0x106CE500,Placemaker,FastCoroutineUpdater,Update,private void Update(),dumped,
-0x6CE550,0x106CE550,Placemaker,FastCoroutines,FastCoroutine,"private static IEnumerator FastCoroutine(IEnumerator<bool> enumerator, int milliseconds)",dumped,
-0x6CE5B0,0x106CE5B0,Placemaker,FastCoroutines,FastIterate,public static bool FastIterate(int milliseconds),dumped,
-0x6CE830,0x106CE830,Placemaker,FastCoroutines,KeepGoing,public static bool KeepGoing(),dumped,
-0x6CE8C0,0x106CE8C0,Placemaker,FastCoroutines,Queue,public static void Queue(Action action),dumped,
-0x6CE960,0x106CE960,Placemaker,FastCoroutines,Queue,public static void Queue(IEnumerator enumerator),dumped,
-0x6CEA00,0x106CEA00,Placemaker,FastCoroutines,StartFastCoroutine,"public static void StartFastCoroutine(MonoBehaviour monoBehaviour, IEnumerator<bool> enumerator, int milliseconds = 6)",dumped,
-0x6CEAB0,0x106CEAB0,Placemaker,FastCoroutines,.cctor,private static void .cctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,FastCoroutines.<FastCoroutine>d__9,.ctor,public void .ctor(int <>1__state),dumped,
-0x1EFAF0,0x101EFAF0,Placemaker,FastCoroutines.<FastCoroutine>d__9,MoveNext,private bool MoveNext(),dumped,
-0x1EFC10,0x101EFC10,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
+0x1F53D0,0x101F53D0,Placemaker,FastCoroutineUpdater,.ctor,public void .ctor(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE500,0x106CE500,Placemaker,FastCoroutineUpdater,Update,private void Update(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE550,0x106CE550,Placemaker,FastCoroutines,FastCoroutine,"private static IEnumerator FastCoroutine(IEnumerator<bool> enumerator, int milliseconds)",ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE5B0,0x106CE5B0,Placemaker,FastCoroutines,FastIterate,public static bool FastIterate(int milliseconds),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE830,0x106CE830,Placemaker,FastCoroutines,KeepGoing,public static bool KeepGoing(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE8C0,0x106CE8C0,Placemaker,FastCoroutines,Queue,public static void Queue(Action action),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CE960,0x106CE960,Placemaker,FastCoroutines,Queue,public static void Queue(IEnumerator enumerator),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CEA00,0x106CEA00,Placemaker,FastCoroutines,StartFastCoroutine,"public static void StartFastCoroutine(MonoBehaviour monoBehaviour, IEnumerator<bool> enumerator, int milliseconds = 6)",ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x6CEAB0,0x106CEAB0,Placemaker,FastCoroutines,.cctor,private static void .cctor(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1D4430,0x101D4430,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1E4050,0x101E4050,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1E4050,0x101E4050,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1EEF60,0x101EEF60,Placemaker,FastCoroutines.<FastCoroutine>d__9,.ctor,public void .ctor(int <>1__state),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1EFAF0,0x101EFAF0,Placemaker,FastCoroutines.<FastCoroutine>d__9,MoveNext,private bool MoveNext(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x1EFC10,0x101EFC10,Placemaker,FastCoroutines.<FastCoroutine>d__9,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
 0xE285F0,0x10E285F0,Placemaker,GridBit,.ctor,public void .ctor(),checked,grid_generator::GridBit; tests/placemaker_bits.rs
 0xE28660,0x10E28660,Placemaker,GridBit,get_done,public bool get_done(),checked,grid_generator::GridBit; tests/placemaker_bits.rs
 0xE289A0,0x10E289A0,Placemaker,GridGenerator,AppendQuadList,"public bool AppendQuadList(List<Quad> nodes, Vector2 planeCameraDir, ref int hoverIndex, int steps)",checked,grid_generator::GridGenerator queries; tests/placemaker_bits.rs (grid_queries); notes/grid.md
@@ -518,7 +518,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x3E2770,0x103E2770,Placemaker,HoverHightlight,<Draw>g__AddQube|6_0,"private void <Draw>g__AddQube|6_0(Qube qube, Square square, int corner, int oppositeCorner, int upCorner, ref HoverHightlight.<>c__DisplayClass6_0 )",dumped,
 0x3E34B0,0x103E34B0,Placemaker,HoverHightlight,Update,private void Update(),dumped,
 0x3E34F0,0x103E34F0,Placemaker,HoverHightlight,.cctor,private static void .cctor(),dumped,
-0x478690,0x10478690,Placemaker,LayerMaster,.cctor,private static void .cctor(),dumped,
+0x478690,0x10478690,Placemaker,LayerMaster,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
 0x1D4430,0x101D4430,Placemaker,Maker,OnEnable,public void OnEnable(),dumped,
 0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),checked,tests/placemaker_graph_loop.rs
 0x328D60,0x10328D60,Placemaker,Maker,AddAction,"public Action AddAction(int2 hexPos, byte height, VoxelType inType, VoxelType outType)",checked,tests/placemaker_graph_loop.rs
@@ -566,7 +566,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker,MetaSave.<>c,<.ctor>b__32_1,internal void <.ctor>b__32_1(int <p0>),dumped,
 0x1E73E0,0x101E73E0,Placemaker,MetaSave.<>c,.ctor,public void .ctor(),dumped,
 0x1F2D10,0x101F2D10,Placemaker,MetaSave.<>c,.cctor,private static void .cctor(),dumped,
-0x3208C0,0x103208C0,Placemaker,MiscReferences,.ctor,public void .ctor(),dumped,
+0x3208C0,0x103208C0,Placemaker,MiscReferences,.ctor,public void .ctor(),ported,placemaker::timing (Default)
 0x334420,0x10334420,Placemaker,Module,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x32D340,0x1032D340,Placemaker,ModuleBuilder,ApplyDecor,public void ApplyDecor(Qube qube),checked,tests/placemaker_wfc.rs (the fence doubling not reached)
 0x32E5F0,0x1032E5F0,Placemaker,ModuleBuilder,ApplyModule,"public void ApplyModule(Qube qube, OrientedModuleSides possibleModule)",checked,tests/placemaker_wfc.rs (the fence doubling not reached)
@@ -768,7 +768,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x9717E0,0x109717E0,Placemaker,ScreenshotCamera,OnStart,public void OnStart(),dumped,
 0x971880,0x10971880,Placemaker,ScreenshotCamera,SaveImageToPath,"public void SaveImageToPath(Texture2D image, string path)",dumped,
 0x973460,0x10973460,Placemaker,SettingsData,.ctor,public void .ctor(),dumped,
-0x973750,0x10973750,Placemaker,ShaderIds,.cctor,private static void .cctor(),dumped,
+0x973750,0x10973750,Placemaker,ShaderIds,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
 0x974500,0x10974500,Placemaker,ShadowBaker,BakeShadow,public void BakeShadow(),dumped,
 0x974520,0x10974520,Placemaker,ShadowBaker,GetQuaternion,private static Quaternion GetQuaternion(Vector2 value),dumped,
 0x9745A0,0x109745A0,Placemaker,ShadowBaker,LateUpdate,public void LateUpdate(),dumped,
@@ -915,22 +915,22 @@ rva,va,namespace,type,method,signature,status,notes
 0x31FA70,0x1031FA70,Placemaker,TexturePngMaster,.ctor,public void .ctor(),dumped,
 0x1E73E0,0x101E73E0,Placemaker,TexturePngMaster.PngTexture,.ctor,public void .ctor(),dumped,
 0x4FC810,0x104FC810,Placemaker,TexturePngMaster.PngTexture,get_tex,public Texture2D get_tex(),dumped,
-0x3209D0,0x103209D0,Placemaker,TimeManager,SetDimScale,public static void SetDimScale(float scale),dumped,
-0x320A70,0x10320A70,Placemaker,TimeManager,SetRecordingScale,public static void SetRecordingScale(float scale),dumped,
-0x320B10,0x10320B10,Placemaker,TimeManager,UpdateTime,private static void UpdateTime(),dumped,
-0x320BE0,0x10320BE0,Placemaker,TimeManager,.cctor,private static void .cctor(),dumped,
-0x320C20,0x10320C20,Placemaker,TimeManager,get_dimScale,public static float get_dimScale(),dumped,
-0x320C70,0x10320C70,Placemaker,TimeManager,get_slowmoScale,public static float get_slowmoScale(),dumped,
-0x320CD0,0x10320CD0,Placemaker,TimeManager,get_slowmo,public static bool get_slowmo(),dumped,
-0x320D20,0x10320D20,Placemaker,TimeManager,set_dimScale,public static void set_dimScale(float value),dumped,
-0x320D80,0x10320D80,Placemaker,TimeManager,set_slowmo,public static void set_slowmo(bool value),dumped,
+0x3209D0,0x103209D0,Placemaker,TimeManager,SetDimScale,public static void SetDimScale(float scale),checked,tests/placemaker_timing.rs
+0x320A70,0x10320A70,Placemaker,TimeManager,SetRecordingScale,public static void SetRecordingScale(float scale),checked,tests/placemaker_timing.rs
+0x320B10,0x10320B10,Placemaker,TimeManager,UpdateTime,private static void UpdateTime(),checked,tests/placemaker_timing.rs
+0x320BE0,0x10320BE0,Placemaker,TimeManager,.cctor,private static void .cctor(),ported,placemaker::timing (Default)
+0x320C20,0x10320C20,Placemaker,TimeManager,get_dimScale,public static float get_dimScale(),checked,tests/placemaker_timing.rs
+0x320C70,0x10320C70,Placemaker,TimeManager,get_slowmoScale,public static float get_slowmoScale(),checked,tests/placemaker_timing.rs
+0x320CD0,0x10320CD0,Placemaker,TimeManager,get_slowmo,public static bool get_slowmo(),checked,tests/placemaker_timing.rs
+0x320D20,0x10320D20,Placemaker,TimeManager,set_dimScale,public static void set_dimScale(float value),checked,tests/placemaker_timing.rs
+0x320D80,0x10320D80,Placemaker,TimeManager,set_slowmo,public static void set_slowmo(bool value),checked,tests/placemaker_timing.rs
 0x1F53D0,0x101F53D0,Placemaker,UiAudio,.ctor,public void .ctor(),dumped,
 0x3C9480,0x103C9480,Placemaker,UiAudio,GetAudioSource,public AudioSource GetAudioSource(),dumped,
 0x3C9510,0x103C9510,Placemaker,UiAudio,Play,"public AudioSource Play(AudioClip clip, bool randomizePitch = True)",dumped,
 0x3C9600,0x103C9600,Placemaker,UiAudio,Start,private void Start(),dumped,
-0x3CCFB0,0x103CCFB0,Placemaker,UniversalStopwatch,KeepGoing,public static bool KeepGoing(),dumped,
-0x3CD020,0x103CD020,Placemaker,UniversalStopwatch,StartCounting,public static bool StartCounting(),dumped,
-0x3CD0D0,0x103CD0D0,Placemaker,UniversalStopwatch,.cctor,private static void .cctor(),dumped,
+0x3CCFB0,0x103CCFB0,Placemaker,UniversalStopwatch,KeepGoing,public static bool KeepGoing(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
+0x3CD020,0x103CD020,Placemaker,UniversalStopwatch,StartCounting,public static bool StartCounting(),checked,tests/placemaker_timing.rs
+0x3CD0D0,0x103CD0D0,Placemaker,UniversalStopwatch,.cctor,private static void .cctor(),ported,placemaker::timing (Default)
 0x1F53D0,0x101F53D0,Placemaker,Voxel,.ctor,public void .ctor(),ported,placemaker::graphs; tests/placemaker_graphs.rs
 0x3D5A30,0x103D5A30,Placemaker,Voxel,System.IComparable<Placemaker.Voxel>.CompareTo,private int System.IComparable<Placemaker.Voxel>.CompareTo(Voxel other),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x1F53D0,0x101F53D0,Placemaker,VoxelBobEffect,.ctor,public void .ctor(),dumped,
