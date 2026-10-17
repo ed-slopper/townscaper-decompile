@@ -122,3 +122,17 @@ Squares are only translated, so `TransformPoint` is `p + position` (exact here).
 game's `Iterate` from `Reset` to `Done`, ours replaying each step (`Gather` as far as the game's frame went): the
 lists after every state, the water mesh (vertices, UVs, triangles) and the sand mesh (vertices, triangles,
 tangents) bit-exact, and `_SandUv`.
+
+## Border and draw plane (E9d)
+
+- `BorderDrawer` (`placemaker::border_drawer`, ported): `Draw` 0x7C2A40 fills its mesh with
+  `GridGenerator.PopulateBorderMesh(hoverData.srcVert, mesh)` (E3, checked) and draws it with
+  `Graphics.DrawMesh(mesh, identity, material, layer 0, no camera, submesh 0, block)`; the block's `_MainTex` is
+  `aoBaker.marchingSquaresTex` (`SetupBlock`, from `OnEnable` once the texture exists and from `OnStart`, which
+  also makes the mesh). `BoundsUpdated` is empty.
+- `DrawPlane` (read, not ported): a development aid that is in none of the game's scenes (the harness finds no
+  instance). With right shift held it starts a strip of quads at the hovered vert (`SetToHoverData`: the vert's
+  quad on the hovered side and the next, turned to start at the vert), grows it with
+  `GridGenerator.AppendQuadList` along the camera's plane direction (`IterateUpdate`, `AllowedQuad`: quads
+  facing away from `camDir`, the camera's forward turned 90° on the plane), and meshes each quad as four corners
+  at y = 0 / -1 plus a centre. Nothing in the game reads it.

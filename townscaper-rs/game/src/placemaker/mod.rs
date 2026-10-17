@@ -5,6 +5,7 @@
 pub mod ao_baker;
 pub mod big_mesh;
 pub mod boot;
+pub mod border_drawer;
 pub mod graphs;
 pub mod grid_generator;
 pub mod maker;

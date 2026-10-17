@@ -363,12 +363,12 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F2FE0,0x101F2FE0,Placemaker,BootMaster.<UserBootRoutine>d__14,MoveNext,private bool MoveNext(),ported,placemaker::boot (step order on a recording host; boot already ran in the game; _AaLineBoth checked on the harness)
 0x1F34A0,0x101F34A0,Placemaker,BootMaster.<UserBootRoutine>d__14,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),ported,placemaker::boot (step order on a recording host; boot already ran in the game; _AaLineBoth checked on the harness)
 0x1F34D0,0x101F34D0,Placemaker,BootMaster.<UserBootRoutine>d__14,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),ported,placemaker::boot (step order on a recording host; boot already ran in the game; _AaLineBoth checked on the harness)
-0x1D4430,0x101D4430,Placemaker,BorderDrawer,BoundsUpdated,public void BoundsUpdated(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,BorderDrawer,.ctor,public void .ctor(),dumped,
-0x7C2A40,0x107C2A40,Placemaker,BorderDrawer,Draw,public void Draw(),dumped,
-0x7C2B50,0x107C2B50,Placemaker,BorderDrawer,OnEnable,private void OnEnable(),dumped,
-0x7C2BD0,0x107C2BD0,Placemaker,BorderDrawer,OnStart,public void OnStart(),dumped,
-0x7C2C20,0x107C2C20,Placemaker,BorderDrawer,SetupBlock,private void SetupBlock(),dumped,
+0x1D4430,0x101D4430,Placemaker,BorderDrawer,BoundsUpdated,public void BoundsUpdated(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
+0x1F53D0,0x101F53D0,Placemaker,BorderDrawer,.ctor,public void .ctor(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
+0x7C2A40,0x107C2A40,Placemaker,BorderDrawer,Draw,public void Draw(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
+0x7C2B50,0x107C2B50,Placemaker,BorderDrawer,OnEnable,private void OnEnable(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
+0x7C2BD0,0x107C2BD0,Placemaker,BorderDrawer,OnStart,public void OnStart(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
+0x7C2C20,0x107C2C20,Placemaker,BorderDrawer,SetupBlock,private void SetupBlock(),ported,"placemaker::border_drawer (Draw fills its mesh with GridGenerator.PopulateBorderMesh, checked in E3; the draw call is BorderDraw, needs the shaders (C3))"
 0x1FCAC0,0x101FCAC0,Placemaker,ByteQube,Equals,public override bool Equals(object obj),ported,placemaker::modules (boxed Equals(object): op_Equality / eq_cs)
 0x1FCB60,0x101FCB60,Placemaker,ByteQube,get_cost,public int get_cost(),checked,tests/placemaker_modules.rs
 0x1FCB60,0x101FCB60,Placemaker,ByteQube,GetHashCode,public override int GetHashCode(),checked,tests/placemaker_modules.rs
@@ -396,13 +396,13 @@ rva,va,namespace,type,method,signature,status,notes
 0x201C60,0x10201C60,Placemaker,ClickParticleSound,OnParticleTrigger,private void OnParticleTrigger(),dumped,
 0x201EA0,0x10201EA0,Placemaker,ClickParticleSound,.ctor,public void .ctor(),dumped,
 0x44C1F0,0x1044C1F0,Placemaker,DecorModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
-0x44E7B0,0x1044E7B0,Placemaker,DrawPlane,AllowedQuad,private bool AllowedQuad(Quad quad),dumped,
-0x44E840,0x1044E840,Placemaker,DrawPlane,Awake,private void Awake(),dumped,
-0x44E890,0x1044E890,Placemaker,DrawPlane,IterateUpdate,private void IterateUpdate(),dumped,
-0x44F200,0x1044F200,Placemaker,DrawPlane,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x44F9D0,0x1044F9D0,Placemaker,DrawPlane,SetToHoverData,public void SetToHoverData(),dumped,
-0x44FD10,0x1044FD10,Placemaker,DrawPlane,Update,private void Update(),dumped,
-0x44FE10,0x1044FE10,Placemaker,DrawPlane,.ctor,public void .ctor(),dumped,
+0x44E7B0,0x1044E7B0,Placemaker,DrawPlane,AllowedQuad,private bool AllowedQuad(Quad quad),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44E840,0x1044E840,Placemaker,DrawPlane,Awake,private void Awake(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44E890,0x1044E890,Placemaker,DrawPlane,IterateUpdate,private void IterateUpdate(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44F200,0x1044F200,Placemaker,DrawPlane,OnDrawGizmos,private void OnDrawGizmos(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44F9D0,0x1044F9D0,Placemaker,DrawPlane,SetToHoverData,public void SetToHoverData(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44FD10,0x1044FD10,Placemaker,DrawPlane,Update,private void Update(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
+0x44FE10,0x1044FE10,Placemaker,DrawPlane,.ctor,public void .ctor(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
 0x1F53D0,0x101F53D0,Placemaker,FastCoroutineUpdater,.ctor,public void .ctor(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
 0x6CE500,0x106CE500,Placemaker,FastCoroutineUpdater,Update,private void Update(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
 0x6CE550,0x106CE550,Placemaker,FastCoroutines,FastCoroutine,"private static IEnumerator FastCoroutine(IEnumerator<bool> enumerator, int milliseconds)",ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
