@@ -54,3 +54,21 @@ Functions:
 - `MultiplyPoint` / `MultiplyVector` (int3 and SbyteFloat3, w 1 / 0, SbyteFloat3 cut to low bytes),
   `MultiplyBounds` (both corners as points, then min / max). `GetSideTransform0/1` map sides 0..=3 through the
   table, return 4 and 5 as they are, throw otherwise.
+
+## The module library (E5d, proven)
+
+`ts_data::modules::module_library` reads the one `ModuleLibrary` asset (`sharedassets1.assets`) with the
+generic layout reader; `game/tests/module_common` turns it into `ts_game::placemaker::modules::ModuleLibrary`.
+`game/tests/placemaker_module_library.rs` compares it with the library the running game has loaded, field by
+field: `waterSides`, `decorOverlaps`, all 14,519 `sideLookups`, the ground uvs, every one of the 2,072 modules
+and 128 decor modules (cost, corner links, profile indexes, oriented meshes, decor references, prop
+placements), all 4,769 corner lookups and all 892 meshes (verts, normals, tangents, concavity, uvs, tris,
+material type, corner; outline uvs counted for all and read for every 8th mesh). Material and prop references
+are kept as asset pointers (`AssetRef`, STANDIN); they map one to one onto the game's objects.
+
+- `Setup` and `OnEnable` are one function (0x330C00): `cornerDict` = each corner lookup's `values` → its
+  index (`Dictionary.Add`, so a repeated key would throw; the build's lookups are distinct).
+- `GetDecorOverlap` 0x330B40 = `ModuleMath.GetBidirectionalHash` inlined, then `decorOverlaps.BinarySearch`
+  (the list is sorted). Checked on overlapping pairs of the decor the modules reference and on random pairs.
+- The constructors only make empty lists (`Default` here); `ModuleLibrary..ctor` leaves `waterSides` null.
+- `PropPlacement` is kept as a record here; its methods are row E10.

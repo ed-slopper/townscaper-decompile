@@ -128,7 +128,7 @@ impl<'a> Reader<'a> {
 }
 
 /// A reference to an object: `file_id` 0 = the same file, n > 0 = that file's `externals[n - 1]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct PPtr {
     pub file_id: i32,
     pub path_id: i64,

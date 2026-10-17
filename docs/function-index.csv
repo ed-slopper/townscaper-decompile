@@ -303,7 +303,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x7B50E0,0x107B50E0,Placemaker,AudioSourcePool,GetAudioSource,public AudioSource GetAudioSource(),dumped,
 0x7B51A0,0x107B51A0,Placemaker,AudioSourcePool,Start,private void Start(),dumped,
 0x7B5250,0x107B5250,Placemaker,AudioSourcePool,.ctor,public void .ctor(),dumped,
-0x7B5A90,0x107B5A90,Placemaker,BaseModule,.ctor,public void .ctor(),dumped,
+0x7B5A90,0x107B5A90,Placemaker,BaseModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x7B9D10,0x107B9D10,Placemaker,BigMesh,Clear,public void Clear(),dumped,
 0x7B9E10,0x107B9E10,Placemaker,BigMesh,SetDirty,public void SetDirty(),dumped,
 0x7B9E20,0x107B9E20,Placemaker,BigMesh,.ctor,public void .ctor(),dumped,
@@ -395,7 +395,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x201940,0x10201940,Placemaker,ClickParticleSound,OnParticleCollision,public void OnParticleCollision(GameObject other),dumped,
 0x201C60,0x10201C60,Placemaker,ClickParticleSound,OnParticleTrigger,private void OnParticleTrigger(),dumped,
 0x201EA0,0x10201EA0,Placemaker,ClickParticleSound,.ctor,public void .ctor(),dumped,
-0x44C1F0,0x1044C1F0,Placemaker,DecorModule,.ctor,public void .ctor(),dumped,
+0x44C1F0,0x1044C1F0,Placemaker,DecorModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x44E7B0,0x1044E7B0,Placemaker,DrawPlane,AllowedQuad,private bool AllowedQuad(Quad quad),dumped,
 0x44E840,0x1044E840,Placemaker,DrawPlane,Awake,private void Awake(),dumped,
 0x44E890,0x1044E890,Placemaker,DrawPlane,IterateUpdate,private void IterateUpdate(),dumped,
@@ -567,7 +567,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x1E73E0,0x101E73E0,Placemaker,MetaSave.<>c,.ctor,public void .ctor(),dumped,
 0x1F2D10,0x101F2D10,Placemaker,MetaSave.<>c,.cctor,private static void .cctor(),dumped,
 0x3208C0,0x103208C0,Placemaker,MiscReferences,.ctor,public void .ctor(),dumped,
-0x334420,0x10334420,Placemaker,Module,.ctor,public void .ctor(),dumped,
+0x334420,0x10334420,Placemaker,Module,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x32D340,0x1032D340,Placemaker,ModuleBuilder,ApplyDecor,public void ApplyDecor(Qube qube),dumped,
 0x32E5F0,0x1032E5F0,Placemaker,ModuleBuilder,ApplyModule,"public void ApplyModule(Qube qube, OrientedModuleSides possibleModule)",dumped,
 0x32FB90,0x1032FB90,Placemaker,ModuleBuilder,DeconstructModuleContainer,public void DeconstructModuleContainer(ModuleContainer container),dumped,
@@ -601,7 +601,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x331760,0x10331760,Placemaker,ModuleMath,MultiplyVector,"public static SbyteFloat3 MultiplyVector(int4x4 m, SbyteFloat3 p)",checked,tests/placemaker_modules.rs
 0x3317F0,0x103317F0,Placemaker,ModuleMath,MultiplyVector,"public static int3 MultiplyVector(int4x4 m, int3 p)",checked,tests/placemaker_modules.rs
 0x331880,0x10331880,Placemaker,ModuleMath,.cctor,private static void .cctor(),checked,tests/placemaker_modules.rs
-0x3342C0,0x103342C0,Placemaker,ModuleMesh,.ctor,public void .ctor(),dumped,
+0x3342C0,0x103342C0,Placemaker,ModuleMesh,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x6FBFA0,0x106FBFA0,Placemaker,Orientation,GetSideTransform0,public byte GetSideTransform0(int index),checked,tests/placemaker_modules.rs
 0x6FC030,0x106FC030,Placemaker,Orientation,GetSideTransform1,public byte GetSideTransform1(int index),checked,tests/placemaker_modules.rs
 0x6FC0C0,0x106FC0C0,Placemaker,Orientation,MultiplyBounds,public int3x2 MultiplyBounds(int3x2 bounds),checked,tests/placemaker_modules.rs
@@ -1151,11 +1151,11 @@ rva,va,namespace,type,method,signature,status,notes
 0x1FBAB0,0x101FBAB0,Placemaker.Life,ButterflyLanding,OnDrawGizmos,private void OnDrawGizmos(),dumped,
 0x1FBD20,0x101FBD20,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnDisable,private void Placemaker.Props.IPropEnable.OnDisable(WorldMaster master),dumped,
 0x1FBD50,0x101FBD50,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnEnable,private void Placemaker.Props.IPropEnable.OnEnable(WorldMaster master),dumped,
-0x443F10,0x10443F10,Placemaker.Modules,CornerLookup,.ctor,public void .ctor(),dumped,
-0x330B40,0x10330B40,Placemaker.Modules,ModuleLibrary,GetDecorOverlap,"public bool GetDecorOverlap(OrientedModule decor0, OrientedModule decor1)",dumped,
-0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,OnEnable,private void OnEnable(),dumped,
-0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,Setup,public void Setup(),dumped,
-0x330D00,0x10330D00,Placemaker.Modules,ModuleLibrary,.ctor,public void .ctor(),dumped,
+0x443F10,0x10443F10,Placemaker.Modules,CornerLookup,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
+0x330B40,0x10330B40,Placemaker.Modules,ModuleLibrary,GetDecorOverlap,"public bool GetDecorOverlap(OrientedModule decor0, OrientedModule decor1)",checked,tests/placemaker_module_library.rs
+0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,OnEnable,private void OnEnable(),checked,tests/placemaker_module_library.rs
+0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,Setup,public void Setup(),checked,tests/placemaker_module_library.rs
+0x330D00,0x10330D00,Placemaker.Modules,ModuleLibrary,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x6FC580,0x106FC580,Placemaker.Modules,OrientedModule,Equals,public override bool Equals(object obj),ported,placemaker::modules (boxed Equals(object): op_Equality / eq_cs)
 0x6FC630,0x106FC630,Placemaker.Modules,OrientedModule,GetHashCode,public override int GetHashCode(),checked,tests/placemaker_modules.rs
 0x6FC650,0x106FC650,Placemaker.Modules,OrientedModule,ToString,public override string ToString(),checked,tests/placemaker_modules.rs

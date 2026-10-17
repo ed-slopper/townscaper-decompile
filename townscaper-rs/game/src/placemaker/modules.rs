@@ -1,13 +1,15 @@
 //! The modules (row E5): the building pieces the wave function collapse places in the qubes. `Placemaker`'s
 //! `ByteQube`, `SideProfile`, `ModuleMath`, `Orientation` and module classes, and `Placemaker.Modules`
 //! (`OrientedModule`, `OutlineUv`, `CornerLookup`, `ModuleLibrary`). Row E5b: the records; row E5c:
-//! `Orientation` and `ModuleMath`. Checked against the running game by `tests/placemaker_modules.rs`
-//! (`TS_HARNESS=1`).
+//! `Orientation` and `ModuleMath`; row E5d: the module data and `ModuleLibrary`. Checked against the running
+//! game by `tests/placemaker_modules.rs` (`TS_HARNESS=1`).
 
+use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use crate::os::hex;
-use crate::os::utils::{self, SbyteFloat3};
+use crate::os::utils::{self, ByteFloat, ByteFloat2, ByteFloat3, SbyteFloat3};
+use crate::placemaker::graphs::MaterialType;
 use crate::placemaker::grid_generator;
 use crate::unity::mathematics::{self as math, f4, Float2, Float4, Float4x4, Int3, Int3x2, Int4, Int4x4};
 use crate::unity::quaternion::{Matrix4x4, Quaternion};
@@ -742,4 +744,113 @@ impl ModuleMath {
 /// An index into the 8-wide tables (`IndexOutOfRangeException` otherwise).
 fn ix8(i: i32) -> usize {
     usize::try_from(i).ok().filter(|&i| i < 8).unwrap_or_else(|| panic!("IndexOutOfRangeException: {i}"))
+}
+
+// ---- Module data and the library (row E5d) ----
+
+/// STANDIN: a reference to a Unity object the module data points at (a `Material`, a `Prop` component), as the
+/// asset stores it: `file_id` 0 = the library's own file, n > 0 = that file's n-th external. The game holds
+/// the object itself; the renderer (Bevy) resolves these.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub struct AssetRef {
+    pub file_id: i32,
+    pub path_id: i64,
+}
+
+/// `Placemaker.PropPlacement`: a prop on a module (its methods are row E10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct PropPlacement {
+    pub pos: SbyteFloat3,
+    pub scale: ByteFloat3,
+    pub rotation_byte: ByteFloat3,
+    pub prop: AssetRef,
+    pub corner: i8,
+    pub prio_add: u8,
+}
+
+/// `Placemaker.BaseModule` (`..ctor` 0x7B5A90: empty lists).
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct BaseModule {
+    pub cost: i16,
+    /// Into `ModuleLibrary.sideLookups`.
+    pub profile_indexes: Vec<u16>,
+    /// Into `ModuleLibrary.moduleMeshes`, each with its orientation.
+    pub oriented_module_meshes: Vec<OrientedModule>,
+    pub prop_placements: Vec<PropPlacement>,
+}
+
+/// `Placemaker.Module` (`..ctor` 0x334420): a building piece the wave function collapse places.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct Module {
+    pub base: BaseModule,
+    /// Into `ModuleLibrary.decorModules`.
+    pub decor_modules: Vec<OrientedModule>,
+    /// Bits by `ModuleMath.GetCornerLinkIndex`.
+    pub corner_links: i32,
+}
+
+/// `Placemaker.DecorModule` (`..ctor` 0x44C1F0): nothing beyond `BaseModule`.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct DecorModule {
+    pub base: BaseModule,
+}
+
+/// `Placemaker.ModuleMesh` (`..ctor` 0x3342C0): one corner's piece of geometry in packed form.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct ModuleMesh {
+    pub material: AssetRef,
+    pub verts: Vec<SbyteFloat3>,
+    pub normals: Vec<SbyteFloat3>,
+    pub tangents: Vec<SbyteFloat3>,
+    pub concavity: Vec<ByteFloat>,
+    pub uvs: Vec<ByteFloat2>,
+    pub outline_uvs: Vec<OutlineUv>,
+    pub tris: Vec<u8>,
+    pub material_type: MaterialType,
+    pub corner: u8,
+}
+
+/// `Placemaker.Modules.CornerLookup` (`..ctor` 0x443F10): the modules that fit one set of corner values.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct CornerLookup {
+    pub values: ByteQube,
+    pub oriented_modules: Vec<OrientedModule>,
+}
+
+/// `Placemaker.Modules.ModuleLibrary` (a `ScriptableObject`; `..ctor` 0x330D00 makes every list but
+/// `waterSides` empty).
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct ModuleLibrary {
+    pub water_sides: Vec<u32>,
+    pub modules: Vec<Module>,
+    pub decor_modules: Vec<DecorModule>,
+    pub corner_lookups: Vec<CornerLookup>,
+    pub side_lookups: Vec<SideProfile>,
+    pub module_meshes: Vec<ModuleMesh>,
+    /// Sorted bidirectional hashes of the decor pairs that overlap.
+    pub decor_overlaps: Vec<i32>,
+    pub ground_uv0: ByteFloat2,
+    pub ground_uv1: ByteFloat2,
+    /// `cornerDict`: corner values → index into `corner_lookups` (built by `setup`).
+    pub corner_dict: HashMap<ByteQube, i32>,
+}
+
+impl ModuleLibrary {
+    /// `Placemaker.Modules.ModuleLibrary.Setup` / `OnEnable` 0x330C00 (one function): `cornerDict` from
+    /// `cornerLookups`, each lookup's values to its index (`Dictionary.Add`: a repeated key throws).
+    pub fn setup(&mut self) {
+        let mut d = HashMap::with_capacity(self.corner_lookups.len());
+        for (i, c) in self.corner_lookups.iter().enumerate() {
+            if d.insert(c.values, i as i32).is_some() {
+                panic!("ArgumentException: An item with the same key has already been added. Key: {}", c.values.to_string_cs());
+            }
+        }
+        self.corner_dict = d;
+    }
+
+    /// `Placemaker.Modules.ModuleLibrary.GetDecorOverlap` 0x330B40: `ModuleMath.GetBidirectionalHash` inlined,
+    /// looked up by `List.BinarySearch` in `decorOverlaps`.
+    pub fn get_decor_overlap(&self, decor0: OrientedModule, decor1: OrientedModule) -> bool {
+        self.decor_overlaps.binary_search(&ModuleMath::get_bidirectional_hash(decor0, decor1)).is_ok()
+    }
 }
