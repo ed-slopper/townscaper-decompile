@@ -519,33 +519,33 @@ rva,va,namespace,type,method,signature,status,notes
 0x3E34B0,0x103E34B0,Placemaker,HoverHightlight,Update,private void Update(),dumped,
 0x3E34F0,0x103E34F0,Placemaker,HoverHightlight,.cctor,private static void .cctor(),dumped,
 0x478690,0x10478690,Placemaker,LayerMaster,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
-0x1D4430,0x101D4430,Placemaker,Maker,OnEnable,public void OnEnable(),dumped,
-0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),checked,tests/placemaker_graph_loop.rs
-0x328D60,0x10328D60,Placemaker,Maker,AddAction,"public Action AddAction(int2 hexPos, byte height, VoxelType inType, VoxelType outType)",checked,tests/placemaker_graph_loop.rs
-0x328DE0,0x10328DE0,Placemaker,Maker,AddClick,"public Voxel AddClick(HoverData hover, VoxelType voxelType)",dumped,
-0x328F90,0x10328F90,Placemaker,Maker,BeginNewAction,public void BeginNewAction(),dumped,
-0x329140,0x10329140,Placemaker,Maker,CanClear,public bool CanClear(),dumped,
-0x329170,0x10329170,Placemaker,Maker,CanRedo,public bool CanRedo(),dumped,
-0x3291B0,0x103291B0,Placemaker,Maker,CanUndo,public bool CanUndo(),dumped,
-0x3291C0,0x103291C0,Placemaker,Maker,ClearCommand,public void ClearCommand(),dumped,
+0x1D4430,0x101D4430,Placemaker,Maker,OnEnable,public void OnEnable(),ported,empty body (shared stub)
+0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x328D60,0x10328D60,Placemaker,Maker,AddAction,"public Action AddAction(int2 hexPos, byte height, VoxelType inType, VoxelType outType)",checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x328DE0,0x10328DE0,Placemaker,Maker,AddClick,"public Voxel AddClick(HoverData hover, VoxelType voxelType)",checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x328F90,0x10328F90,Placemaker,Maker,BeginNewAction,public void BeginNewAction(),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x329140,0x10329140,Placemaker,Maker,CanClear,public bool CanClear(),ported,placemaker::maker (notes/building.md)
+0x329170,0x10329170,Placemaker,Maker,CanRedo,public bool CanRedo(),ported,placemaker::maker (notes/building.md)
+0x3291B0,0x103291B0,Placemaker,Maker,CanUndo,public bool CanUndo(),ported,placemaker::maker (notes/building.md)
+0x3291C0,0x103291C0,Placemaker,Maker,ClearCommand,public void ClearCommand(),ported,placemaker::maker (notes/building.md)
 0x3291D0,0x103291D0,Placemaker,Maker,ClearUndoQueue,public void ClearUndoQueue(),checked,tests/placemaker_graph_loop.rs
-0x329270,0x10329270,Placemaker,Maker,Clear,public bool Clear(),dumped,
-0x329480,0x10329480,Placemaker,Maker,EndAction,public void EndAction(),dumped,
-0x3294B0,0x103294B0,Placemaker,Maker,HoldRedo,public bool HoldRedo(),dumped,
-0x329510,0x10329510,Placemaker,Maker,HoldUndo,public bool HoldUndo(),dumped,
-0x329570,0x10329570,Placemaker,Maker,PaintClick,"public void PaintClick(HoverData hover, VoxelType voxelType)",dumped,
-0x329640,0x10329640,Placemaker,Maker,RedoCommand,public bool RedoCommand(),dumped,
-0x329680,0x10329680,Placemaker,Maker,Redo,public bool Redo(),dumped,
-0x329800,0x10329800,Placemaker,Maker,RemoveClick,public Voxel RemoveClick(HoverData hover),dumped,
-0x3298C0,0x103298C0,Placemaker,Maker,TrimActionList,public void TrimActionList(),dumped,
-0x3299F0,0x103299F0,Placemaker,Maker,UndoCommand,public bool UndoCommand(),dumped,
-0x329A30,0x10329A30,Placemaker,Maker,Undo,public bool Undo(),dumped,
-0x329BB0,0x10329BB0,Placemaker,Maker,.ctor,public void .ctor(),dumped,
-0x329D10,0x10329D10,Placemaker,Maker,get_graph,private Graph get_graph(),dumped,
-0x329D30,0x10329D30,Placemaker,Maker,get_grid,private GridGenerator get_grid(),dumped,
-0x1D4430,0x101D4430,Placemaker,Maker.<>c,<.ctor>b__38_0,"internal void <.ctor>b__38_0(int <p0>, int <p1>)",dumped,
-0x1E73E0,0x101E73E0,Placemaker,Maker.<>c,.ctor,public void .ctor(),dumped,
-0x1F2DB0,0x101F2DB0,Placemaker,Maker.<>c,.cctor,private static void .cctor(),dumped,
+0x329270,0x10329270,Placemaker,Maker,Clear,public bool Clear(),ported,placemaker::maker (notes/building.md)
+0x329480,0x10329480,Placemaker,Maker,EndAction,public void EndAction(),ported,placemaker::maker (notes/building.md)
+0x3294B0,0x103294B0,Placemaker,Maker,HoldRedo,public bool HoldRedo(),ported,placemaker::maker (notes/building.md)
+0x329510,0x10329510,Placemaker,Maker,HoldUndo,public bool HoldUndo(),ported,placemaker::maker (notes/building.md)
+0x329570,0x10329570,Placemaker,Maker,PaintClick,"public void PaintClick(HoverData hover, VoxelType voxelType)",checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x329640,0x10329640,Placemaker,Maker,RedoCommand,public bool RedoCommand(),ported,placemaker::maker (notes/building.md)
+0x329680,0x10329680,Placemaker,Maker,Redo,public bool Redo(),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x329800,0x10329800,Placemaker,Maker,RemoveClick,public Voxel RemoveClick(HoverData hover),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x3298C0,0x103298C0,Placemaker,Maker,TrimActionList,public void TrimActionList(),ported,placemaker::maker (notes/building.md)
+0x3299F0,0x103299F0,Placemaker,Maker,UndoCommand,public bool UndoCommand(),ported,placemaker::maker (notes/building.md)
+0x329A30,0x10329A30,Placemaker,Maker,Undo,public bool Undo(),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
+0x329BB0,0x10329BB0,Placemaker,Maker,.ctor,public void .ctor(),ported,placemaker::maker (notes/building.md)
+0x329D10,0x10329D10,Placemaker,Maker,get_graph,private Graph get_graph(),ported,placemaker::maker (notes/building.md)
+0x329D30,0x10329D30,Placemaker,Maker,get_grid,private GridGenerator get_grid(),ported,placemaker::maker (notes/building.md)
+0x1D4430,0x101D4430,Placemaker,Maker.<>c,<.ctor>b__38_0,"internal void <.ctor>b__38_0(int <p0>, int <p1>)",ported,empty body (shared stub)
+0x1E73E0,0x101E73E0,Placemaker,Maker.<>c,.ctor,public void .ctor(),ported,compiler-generated lambda holder (the no-op onQueueChange)
+0x1F2DB0,0x101F2DB0,Placemaker,Maker.<>c,.cctor,private static void .cctor(),ported,compiler-generated lambda holder (the no-op onQueueChange)
 0x32C7C0,0x1032C7C0,Placemaker,MaterialMaster,CreatePaletteTexture,public Texture2D CreatePaletteTexture(),checked,tests/placemaker_materials.rs
 0x32C900,0x1032C900,Placemaker,MaterialMaster,OnStart,public void OnStart(),checked,tests/placemaker_materials.rs
 0x32C980,0x1032C980,Placemaker,MaterialMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),checked,tests/placemaker_materials.rs

@@ -43,3 +43,27 @@ the hit point and normal through row E12's stand-in hull planes, bit-exact on 29
   the camera looks steeply (`|forward.y|` above 0.3 for vertical hovers, 0.8 for side ones), else facing the
   flattened forward with the destination's vert refreshed; the destination becomes the source.
 - `GamepadAddMove` (the gamepad's hover walk) is left to row G1c.
+
+## Placing: `Maker` (G1b, proven)
+
+`placemaker::maker`, checked against the stand-in master's `Maker` (`tests/placemaker_maker.rs`: hovers at the
+same screen points, then the same add / paint / remove / undo / redo / clear on both sides; the whole graph, the
+action list, the counters and `lastActionPos` compared).
+
+- One click is one **action id**: `BeginNewAction` 0x328F90 first trims the list (while more than 998 ids are
+  kept the oldest id's actions go; then the redo tail past `actionIndex`), resets the world
+  (`WorldMaster.ResetState`), steps the collapse's propagation counter, and sets `actionCount++`, `actionId++`,
+  `actionRedoMax = actionCount`; `onQueueChange(count, redoMax - count)` tells the undo / redo buttons.
+- `AddClick(hover, type)` 0x328DE0: the stopwatch restarts; the hover's destination vert (refreshed through
+  `GetVertOrIterate` when not full; nothing unless it closes round its corner and `IsCoordinateAllowed`); a new
+  action; `Graph.AddVoxel(…, instantIntegration: true)` with `Ground` at height 0; `lastAddedVoxel`,
+  `lastActionPos = hover.GetDstPos()`; the action (`Empty` → type) recorded; `SetDirty`.
+- `PaintClick` 0x329570: nothing if the hovered voxel already has the type; else a new action, the action at the
+  hover's source (old type → new), `Graph.PaintVoxel`, `SetDirty`. `RemoveClick` 0x329800: a new action,
+  `lastActionPos = hover.GetSrcPos()`, the action (type → `Empty`), `Graph.RemoveVoxel`, `SetDirty`.
+- `Clear` 0x329270 (with any voxels): one action id removing everything, corners from the last child, each
+  corner's voxels from the top.
+- `Undo` 0x329A30 / `Redo` 0x329680: the hover cleared, the world reset, the propagation counter stepped; the
+  last (next) id's actions applied through `Graph.ApplyAction(…, playEffect: true)`, reversed newest first for
+  undo; `actionCount` down (up). `CanUndo`: `actionCount > 0`; `CanRedo`: `actionIndex != actions.Count`.
+  The `…Command` forms play the UI sound first; `HoldUndo` / `HoldRedo` wait for `RapidButton.Press(1)` (G1c).
