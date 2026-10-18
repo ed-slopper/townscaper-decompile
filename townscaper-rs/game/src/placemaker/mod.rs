@@ -23,6 +23,7 @@ pub mod rapid_button;
 pub mod quads;
 pub mod sandbanker;
 pub mod text_save_system;
+pub mod texture_png_master;
 pub mod save_binary;
 pub mod save_camera;
 pub mod save_data;

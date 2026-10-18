@@ -36,8 +36,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
-| G3d | `TexturePngMaster` (the palette's baked PNG cache in `Textures/`: `BakePalette`, `ReadOrWriteTexture`, `ReadAllFromDisk`, `CleanTexture`, focus and enable hooks) | unowned | G3 | ed-slopper/wren (2026-10-18)
-| G4 | Undo / redo: find where it lives (`Graph` actions? `UndoRedoFeedback`, `UndoRedoButtons`), port it | unowned | E4 | | |
+| G4 | Undo / redo: find where it lives (`Graph` actions? `UndoRedoFeedback`, `UndoRedoButtons`), port it | unowned | E4 | ed-slopper/wren (2026-10-18)
 | G5 | Life: `BirdFlock` (17), `Bird`, `BirdLanding`, `BirdSpot`, `ButterflyFlock`, `Butterfly`, `ButterflyLanding` | unowned | E8d | | |
 | G6 | Audio: `AmbientSound`, `AudioSnapshotManager`, `AudioSourcePool`, `ClickParticleSound`, `WaterSound`, `UiAudio`, `Beatbox`, `ManySound`/`ManySoundsManager`, `MenuMusic` | unowned | E8d | | |
 | G7 | UI (`Placemaker.Ui`, 174 types, 963 methods): split before claiming | unowned | E8, F7 | | Split: G7a–G7f |
@@ -155,6 +154,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G3a | The town as text in `placemaker::text_save_system`: `TextSaveSystem.SaveToString` / `LoadFromString` (header widths, offset-coded start, type table, column steps, ground flag, height gaps and end marker, six bits a letter of `TextSaveAlphabet`; the shared, growing bit array as state) `checked`: the player's 5 saves' strings reproduced and read back, 150 random towns written as the game does, 539 random / damaged / foreign strings read with the same result, lists and throws; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | 48e6069 |
 | G3b | The save system in `placemaker::save_system`: `SaveSystem` (boot, refresh, meta pool and container, load / save / delete / duplicate, settings timing, unique names, sorting) and `MetaSave` (state flags, order) `ported`; the boot on the player's folder `checked` against the harness game's (order, paths, states, write times, counts, current, settings), `GetUniqueSaveName` `checked`; storage through a host `StorageContainer` (the Fury SDK's, middleware); `StorageUtils` / `SaveCardsHandler` (in no scene or asset) `read`; `TexturePngMaster` split to G3d; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | b6cedb1 |
 | G3c | `.binscape` files in `placemaker::save_binary`: MS-NRBF reader (general records) and writer of `SaveData` (ids in the order met, structs inline, `List<T>` arrays at their capacity) `checked`: 120 random save data byte-identical to the game's `BinaryFormatter`, read both ways; the save system uses it for `isBin` metas; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | 2db96f2 |
+| G3d | The editable texture PNGs in `placemaker::texture_png_master`: `TexturePngMaster` (write when missing, read when newer, shader globals, palette colours, the `_BakedTex` bake, reset, focus) `ported`, with a fake-folder test and the harness game's post-enable state as the check; PNG coding and the blit are the host's; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | |
 
 ## Changes to the board
 
@@ -253,3 +253,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: G3a done; claim G3b.
 - 2026-10-18 ed-slopper/wren: G3b done; TexturePngMaster split to G3d; claim G3c.
 - 2026-10-18 ed-slopper/wren: G3c done; claim G3d.
+- 2026-10-18 ed-slopper/wren: G3d done; claim G4.

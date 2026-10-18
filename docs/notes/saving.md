@@ -110,3 +110,22 @@ reads ours, written with other list capacities, to the same data).
   root that is not `SaveData` reads as null (the game's `as`), an unreadable stream throws (the meta stays loading).
 - Writing takes the capacities as grown by `Add`s; the game's could differ after other list operations (a gap
   only for a `.binscape` written back, which PC saves never are).
+
+## The texture PNGs (G3d, ported)
+
+`placemaker::texture_png_master` (`tests/placemaker_texture_png_master.rs` on a fake folder; the harness game's
+state after its enable on the player's files is what the port gives for them: all three read into copies,
+stamped, the bake dirty).
+
+- `Textures\TownColor.png` (house texture, `diskName` + `.png`), `TownMaterial.png` (type texture),
+  `TownPalette.png` (the palette, made by `MaterialMaster.CreatePaletteTexture` when the scene has none).
+- `ReadOrWriteTexture`: a file newer (`GetLastWriteTimeUtc`) than the texture's last read is loaded into a copy
+  of the game's texture and set as its shader global (the palette also re-applies `AoBaker.ApplyMaterialColors`):
+  true. A missing file is written from the game's texture (`EncodeToPNG`; the folder made) and the game's
+  texture set as the global: false. Read times are `DateTime.UtcNow`.
+- On enable (and on regaining focus while enabled): all three; a changed house or palette texture sets
+  `bakeDirty`, which is never cleared, so later reads re-bake too: `_BakedTex` is a render texture 4× the house
+  texture with mip maps, the house texture blitted into it through `bakeShader` (row C3 draws with it).
+- `ResetColorAndMaterial` (the settings menu) deletes the house and type files and reads again (so they are
+  written afresh). In the built scene the component starts disabled (`OnScenePostProcess`).
+- PNG writing is Unity's encoder (the host's): our files need not have the same bytes, only the same pixels.

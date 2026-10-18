@@ -904,17 +904,17 @@ rva,va,namespace,type,method,signature,status,notes
 0x31E000,0x1031E000,Placemaker,TextSaveSystem,ReadValue,"public static int ReadValue(BitArray bitArray, ref int index, int bitCount)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
 0x31E2F0,0x1031E2F0,Placemaker,TextSaveSystem,SaveToString,"public static string SaveToString(List<SaveData.C> corners, List<SaveData.V> voxels)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
 0x31F0F0,0x1031F0F0,Placemaker,TextSaveSystem,.cctor,private static void .cctor(),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
-0x31F190,0x1031F190,Placemaker,TexturePngMaster,BakePalette,private void BakePalette(),dumped,
-0x31F350,0x1031F350,Placemaker,TexturePngMaster,CleanTexture,private void CleanTexture(TexturePngMaster.PngTexture pngTexture),dumped,
-0x31F490,0x1031F490,Placemaker,TexturePngMaster,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,
-0x31F4C0,0x1031F4C0,Placemaker,TexturePngMaster,Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess,"private void Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess(bool isBuild, TargetPlatformFlags platform)",dumped,
-0x31F4E0,0x1031F4E0,Placemaker,TexturePngMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),dumped,
-0x31F620,0x1031F620,Placemaker,TexturePngMaster,ReadAllFromDisk,private void ReadAllFromDisk(),dumped,
-0x31F680,0x1031F680,Placemaker,TexturePngMaster,ReadOrWriteTexture,private bool ReadOrWriteTexture(TexturePngMaster.PngTexture pngTexture),dumped,
-0x31FA00,0x1031FA00,Placemaker,TexturePngMaster,ResetColorAndMaterial,public void ResetColorAndMaterial(),dumped,
-0x31FA70,0x1031FA70,Placemaker,TexturePngMaster,.ctor,public void .ctor(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,TexturePngMaster.PngTexture,.ctor,public void .ctor(),dumped,
-0x4FC810,0x104FC810,Placemaker,TexturePngMaster.PngTexture,get_tex,public Texture2D get_tex(),dumped,
+0x31F190,0x1031F190,Placemaker,TexturePngMaster,BakePalette,private void BakePalette(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F350,0x1031F350,Placemaker,TexturePngMaster,CleanTexture,private void CleanTexture(TexturePngMaster.PngTexture pngTexture),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F490,0x1031F490,Placemaker,TexturePngMaster,OnApplicationFocus,private void OnApplicationFocus(bool focus),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F4C0,0x1031F4C0,Placemaker,TexturePngMaster,Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess,"private void Placemaker.SceneProcessing.IOnScenePostProcess.OnScenePostProcess(bool isBuild, TargetPlatformFlags platform)",ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F4E0,0x1031F4E0,Placemaker,TexturePngMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F620,0x1031F620,Placemaker,TexturePngMaster,ReadAllFromDisk,private void ReadAllFromDisk(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31F680,0x1031F680,Placemaker,TexturePngMaster,ReadOrWriteTexture,private bool ReadOrWriteTexture(TexturePngMaster.PngTexture pngTexture),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31FA00,0x1031FA00,Placemaker,TexturePngMaster,ResetColorAndMaterial,public void ResetColorAndMaterial(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x31FA70,0x1031FA70,Placemaker,TexturePngMaster,.ctor,public void .ctor(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x1E73E0,0x101E73E0,Placemaker,TexturePngMaster.PngTexture,.ctor,public void .ctor(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
+0x4FC810,0x104FC810,Placemaker,TexturePngMaster.PngTexture,get_tex,public Texture2D get_tex(),ported,placemaker::texture_png_master (tests/placemaker_texture_png_master.rs; notes/saving.md)
 0x3209D0,0x103209D0,Placemaker,TimeManager,SetDimScale,public static void SetDimScale(float scale),checked,tests/placemaker_timing.rs
 0x320A70,0x10320A70,Placemaker,TimeManager,SetRecordingScale,public static void SetRecordingScale(float scale),checked,tests/placemaker_timing.rs
 0x320B10,0x10320B10,Placemaker,TimeManager,UpdateTime,private static void UpdateTime(),checked,tests/placemaker_timing.rs
