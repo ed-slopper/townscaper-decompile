@@ -1138,19 +1138,19 @@ rva,va,namespace,type,method,signature,status,notes
 0x7C1550,0x107C1550,Placemaker.Life,BirdLanding,get_pos,public Vector3 get_pos(),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
 0x7C15A0,0x107C15A0,Placemaker.Life,BirdLanding,get_sortPos,public Vector3 get_sortPos(),ported,placemaker::life::bird_flock (notes/life.md)
 0x7C1670,0x107C1670,Placemaker.Life,BirdLanding,get_targetPos,public Vector3 get_targetPos(),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
-0x7C5420,0x107C5420,Placemaker.Life,Butterfly,.ctor,public void .ctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Life,ButterflyFlock,.ctor,public void .ctor(),dumped,
-0x7C2D80,0x107C2D80,Placemaker.Life,ButterflyFlock,AddLanding,public void AddLanding(ButterflyLanding landing),dumped,
-0x7C3190,0x107C3190,Placemaker.Life,ButterflyFlock,OnReset,public void OnReset(),dumped,
-0x7C3200,0x107C3200,Placemaker.Life,ButterflyFlock,OnUpdate,public void OnUpdate(),dumped,
-0x7C5090,0x107C5090,Placemaker.Life,ButterflyFlock,RemoveLanding,public void RemoveLanding(ButterflyLanding landing),dumped,
-0x7C5220,0x107C5220,Placemaker.Life,ButterflyFlock,SetButterfly,"private void SetButterfly(ButterflyLanding landing, Butterfly butterfly)",dumped,
-0x7C5330,0x107C5330,Placemaker.Life,ButterflyFlock,SetLanding,"private void SetLanding(Butterfly butterfly, ButterflyLanding landing)",dumped,
-0x1D4430,0x101D4430,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnFirstEnable,private void Placemaker.Props.IPropEnable.OnFirstEnable(WorldMaster master),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Life,ButterflyLanding,.ctor,public void .ctor(),dumped,
-0x1FBAB0,0x101FBAB0,Placemaker.Life,ButterflyLanding,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x1FBD20,0x101FBD20,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnDisable,private void Placemaker.Props.IPropEnable.OnDisable(WorldMaster master),dumped,
-0x1FBD50,0x101FBD50,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnEnable,private void Placemaker.Props.IPropEnable.OnEnable(WorldMaster master),dumped,
+0x7C5420,0x107C5420,Placemaker.Life,Butterfly,.ctor,public void .ctor(),ported,placemaker::life::butterfly_flock (instantiate: both rotations identity; notes/life.md)
+0x1F53D0,0x101F53D0,Placemaker.Life,ButterflyFlock,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x7C2D80,0x107C2D80,Placemaker.Life,ButterflyFlock,AddLanding,public void AddLanding(ButterflyLanding landing),checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x7C3190,0x107C3190,Placemaker.Life,ButterflyFlock,OnReset,public void OnReset(),checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x7C3200,0x107C3200,Placemaker.Life,ButterflyFlock,OnUpdate,public void OnUpdate(),checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x7C5090,0x107C5090,Placemaker.Life,ButterflyFlock,RemoveLanding,public void RemoveLanding(ButterflyLanding landing),checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x7C5220,0x107C5220,Placemaker.Life,ButterflyFlock,SetButterfly,"private void SetButterfly(ButterflyLanding landing, Butterfly butterfly)",checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x7C5330,0x107C5330,Placemaker.Life,ButterflyFlock,SetLanding,"private void SetLanding(Butterfly butterfly, ButterflyLanding landing)",checked,placemaker::life::butterfly_flock (tests/placemaker_butterflies.rs; notes/life.md)
+0x1D4430,0x101D4430,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnFirstEnable,private void Placemaker.Props.IPropEnable.OnFirstEnable(WorldMaster master),read,an empty shared body: nothing on first enable
+0x1F53D0,0x101F53D0,Placemaker.Life,ButterflyLanding,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x1FBAB0,0x101FBAB0,Placemaker.Life,ButterflyLanding,OnDrawGizmos,private void OnDrawGizmos(),read,"editor aid (gizmos), not ported"
+0x1FBD20,0x101FBD20,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnDisable,private void Placemaker.Props.IPropEnable.OnDisable(WorldMaster master),ported,placemaker::life::butterfly_flock: add_landing / remove_landing (notes/life.md)
+0x1FBD50,0x101FBD50,Placemaker.Life,ButterflyLanding,Placemaker.Props.IPropEnable.OnEnable,private void Placemaker.Props.IPropEnable.OnEnable(WorldMaster master),ported,placemaker::life::butterfly_flock: add_landing / remove_landing (notes/life.md)
 0x443F10,0x10443F10,Placemaker.Modules,CornerLookup,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x330B40,0x10330B40,Placemaker.Modules,ModuleLibrary,GetDecorOverlap,"public bool GetDecorOverlap(OrientedModule decor0, OrientedModule decor1)",checked,tests/placemaker_module_library.rs
 0x330C00,0x10330C00,Placemaker.Modules,ModuleLibrary,OnEnable,private void OnEnable(),checked,tests/placemaker_module_library.rs

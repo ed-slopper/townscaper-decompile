@@ -245,6 +245,38 @@ pub struct BirdFlock {
     pub time_since_last_shake: f32,
 }
 
+/// The perches (colliders with the landing component, `ColliderRef::landing`) within `sq_radius` of `pos`
+/// (squared) on turned-on props, in the game's search order: the prop grid's cells round `pos` by `radius`
+/// (`GetSearchCoordinates`; `PropRadiusIterator<T>` walks the same cells), z, then y, then x; each cell's list
+/// from the end; only colliders inside their own cell.
+pub fn perches_in_grid(colliders: &dyn Fn(Int3) -> Option<Vec<ColliderRef>>, pos: Vector3, radius: f32, sq_radius: f32) -> Vec<(LandingId, Vector3)> {
+    let (min, max) = BirdFlock::get_search_coordinates(pos, radius);
+    let mut out = vec![];
+    for z in min.z..max.z {
+        for y in min.y..max.y {
+            for x in min.x..max.x {
+                let Some(list) = colliders(Int3 { x, y, z }) else { continue };
+                let lo = v3(x as f32 + x as f32, y as f32 + y as f32, z as f32 + z as f32);
+                let hi = v3((x + 1) as f32 + (x + 1) as f32, (y + 1) as f32 + (y + 1) as f32, (z + 1) as f32 + (z + 1) as f32);
+                for c in list.iter().rev() {
+                    let p = c.position;
+                    if lo.x <= p.x && lo.y <= p.y && lo.z <= p.z && p.x < hi.x && p.y < hi.y && p.z < hi.z {
+                        let d = v3(pos.x - p.x, pos.y - p.y, pos.z - p.z);
+                        if d.sqr_magnitude() <= sq_radius {
+                            if let Some(l) = c.landing {
+                                if c.turned_on {
+                                    out.push((l, p));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
 impl BirdFlock {
     /// `BirdFlock..ctor` 0x7C1110 with the scene's containers (at the origin) and values.
     pub fn new(prefab: BirdPrefab) -> BirdFlock {
@@ -320,34 +352,9 @@ impl BirdFlock {
         (min, max)
     }
 
-    /// The perches within `sq_radius` of `pos` (squared) on turned-on props, in the game's search order (cells
-    /// z, y, x; each cell's list from the end; only colliders inside their own cell).
+    /// The perches within `sq_radius` of `pos` (squared) on turned-on props, in the game's search order.
     fn perches_near(world: &dyn BirdWorld, pos: Vector3, radius: f32, sq_radius: f32) -> Vec<(LandingId, Vector3)> {
-        let (min, max) = Self::get_search_coordinates(pos, radius);
-        let mut out = vec![];
-        for z in min.z..max.z {
-            for y in min.y..max.y {
-                for x in min.x..max.x {
-                    let Some(list) = world.colliders(Int3 { x, y, z }) else { continue };
-                    let lo = v3(x as f32 + x as f32, y as f32 + y as f32, z as f32 + z as f32);
-                    let hi = v3((x + 1) as f32 + (x + 1) as f32, (y + 1) as f32 + (y + 1) as f32, (z + 1) as f32 + (z + 1) as f32);
-                    for c in list.iter().rev() {
-                        let p = c.position;
-                        if lo.x <= p.x && lo.y <= p.y && lo.z <= p.z && p.x < hi.x && p.y < hi.y && p.z < hi.z {
-                            let d = v3(pos.x - p.x, pos.y - p.y, pos.z - p.z);
-                            if d.sqr_magnitude() <= sq_radius {
-                                if let Some(l) = c.landing {
-                                    if c.turned_on {
-                                        out.push((l, p));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        out
+        perches_in_grid(&|c| world.colliders(c), pos, radius, sq_radius)
     }
 
     /// `BirdLanding.get_sortPos` 0x7C15A0: `normal * 0.1 + position`.

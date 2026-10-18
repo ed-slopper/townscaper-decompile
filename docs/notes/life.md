@@ -35,7 +35,6 @@ generator's state after, the bird's fields and the flock's take-off record to th
   (`ExtraMath.BinarySearch`), every bird within the radius until one is past `pos.x + radius`.
 - `SetState` stamps `lastActionTime = Time.time + Random.value` (logging "No landing" when landing without a
   perch); `SetLanding` stamps `Time.time`.
-- Butterflies are G5c.
 
 ## Birds: the flight update (G5b)
 
@@ -101,3 +100,52 @@ departures.
   - Mesh scales: while `mf0` is shown, `mf0` shrinks by `1 - t³` and `mf1` grows by `1 - (1-t)³`.
   - Finally a nonzero take-off count is reset.
 - `flapAudioClips`, `audioSource0/1`, `lastAudioTime` and the shake fields are never read in this build.
+
+## Butterflies (G5c)
+
+`placemaker::life::butterfly_flock`, checked with `tests/placemaker_butterflies.rs`. A fresh flock gets the scene's
+master, meshes and `srcButterfly`, plus 24 test flowers in the prop grid: three clusters far out and one by a
+perch of the town, for the ground push. One simulation runs on both sides for 300 rounds. Each round disturbs
+some butterflies, changes the flower count, turns flowers off and on, and adds or removes a flower or resets
+the flock, with `Random` in a known state. Every round matches to the bit: up to 12 butterflies, about 1,800
+butterfly-steps, settlings, flower changes, take-offs and ground pushes. The compared state is the generator,
+every butterfly's fields, mesh and pose, the two containers' child order and the flowers.
+
+- A butterfly belongs to a flower (`ButterflyLanding`, a prop, `IPropEnable`: `OnEnable` → `AddLanding`,
+  `OnDisable` → `RemoveLanding`; nothing on first enable) and lives under `activeButterflies` or
+  `disabledButterflies`, whose child order the flock walks.
+- `AddLanding`: one more flower. Below `Min(32, RoundToInt(n × 0.05 × 0.9))` active butterflies, one comes to it.
+  - It is the first disabled one, else a new `Instantiate(srcButterfly)` scaled `Range(0.8, 1.2)`.
+  - It goes under the active ones, at the flower's position and rotation, still.
+  - Its clock is `Time.time - RandomRangeInt(0, 2)`.
+  - Half of them sit (`Random.value ≥ 0.5`): sit, or sit-flap when a second draw is below 0.2. The rest flap.
+  - `SetLanding` links it to the flower; `SetButterfly` logs when a flower already has one.
+- `RemoveLanding`: one fewer. Within `RoundToInt(n × 0.05 × 1.1)` active butterflies, the flower's butterfly
+  lets go and flies (a sitting one flaps). Above that, its butterfly (or the first active one) is put away and
+  keeps its flower link. `OnReset` puts every active one away (from the last).
+- `OnUpdate`: the active ones from the last; a due one (`Time.time > time + 0.3`) takes one step. It moves
+  `posMid` by its velocity, keeps that velocity as the previous one, its rotation as `rotation0`, and its clock
+  +0.3.
+  - Sitting: still. With 0.4% it flies off along `TransformVector(0, 0.4, 0.2)`, flapping.
+  - Flying or landing without a flower: it takes the last free flower (turned on, within 0.8 of the point ahead
+    raised 0.4, `PropRadiusIterator<ButterflyLanding>`). With none it is put away and the count drops for the
+    placing below.
+  - With its flower: the velocity × 0.7. The goal is `p = TransformPoint(0, 0.01, 0)` plus
+    `TransformVector(0, 0.3, 0)`; landing scales that offset by the squared distance to `p`, so the goal sinks as
+    it nears.
+    - Landing within `√0.02` of the goal: it sits and moves to `p`. It faces `LookRotation(flower.up, forward +
+      up × 0.2 + insideUnitSphere × 0.5) × Euler(90, 0, 0)`, sitting (20%) or sit-flapping, and that is its step.
+    - Landing farther: 10% of the way to the goal.
+    - Flying: beyond `√0.5` it is pulled by `(d² - 0.5)/2`. It flutters by Perlin noise
+      (`PerlinNoise(posMid.y | z | x, time × 0.01 + 0.5412 | 4.1235 | 9.8441) - 0.5`, × 0.4). A ground coverage
+      above 0.3 at the next point less 0.1 pushes by `2 (coverage - 0.3) × normal` (not normalised).
+  - Then an `insideUnitSphere` is drawn and not used. The velocity goes 30% of the way to its own direction ×
+    0.2 (a speed of about 0.2 per step). A NaN is logged and resets it onto its flower. Landing averages the
+    velocity with the goal offset.
+  - Facing: its velocity with the climb halved, else its body's level heading (both only above `0.001²`).
+  - Flying: 0.4% start landing. Else 5% look for another free flower within 0.8 of 0.4 below it, the smallest
+    `d² + Random.value` (one draw per free flower).
+- Placing: every active one on the birds' Bézier between its steps, rotation `Quaternion.Lerp(rotation0,
+  rotation1, t)`.
+- `Transform.TransformVector` (engine `TransformVector` 0x1065FDF0) is now in `unity::transform`: the node's and
+  each ancestor's scale and rotation, the `TransformPoint` routine without the translation.

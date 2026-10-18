@@ -266,6 +266,19 @@ impl Transforms {
         xv3(self.point_up(Some(id), v3x(p)))
     }
 
+    /// `TransformVector` (UnityPlayer 0x1065FDF0, `Transform.TransformVector` via `Transform::TransformVector`
+    /// 0x1065FF00): scaled and rotated by the node and each ancestor (no translation).
+    pub fn transform_vector(&self, id: TransformId, v: Vector3) -> Vector3 {
+        let mut res = v3x(v);
+        let mut p = Some(id);
+        while let Some(pi) = p {
+            let n = &self.nodes[pi];
+            res = rotate(n.r, n.s.mul(res));
+            p = n.parent;
+        }
+        xv3(res)
+    }
+
     /// `TransformDirection` (UnityPlayer 0x1065FAF0): rotated by the node, then for each ancestor mirrored where
     /// its scale is negative and rotated (no scaling).
     pub fn transform_direction(&self, id: TransformId, d: Vector3) -> Vector3 {
