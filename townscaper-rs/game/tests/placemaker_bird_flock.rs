@@ -7,7 +7,7 @@
 use serde_json::{json, Value};
 use ts_check::{arg, harness, ret, Harness};
 use ts_game::placemaker::life::bird_flock::{BirdFlock, BirdPrefab, BirdWorld, ColliderRef, LandingId};
-use ts_game::unity::mathematics::Int3;
+use ts_game::unity::mathematics::{Int3, Int3x2};
 use ts_game::unity::quaternion::Quaternion;
 use ts_game::unity::random::Rand;
 use ts_game::unity::vector::{v3, Vector3};
@@ -96,6 +96,21 @@ impl BirdWorld for Far {
     }
     fn play_sound(&mut self, _s: i32, _p: Vector3) {}
     fn feathers(&mut self, _p: Vector3, _r: Quaternion) {}
+    fn delta_time(&self) -> f32 {
+        0.0
+    }
+    fn graph_bounds(&self) -> Int3x2 {
+        Int3x2::default()
+    }
+    fn graph_bounds_height(&self) -> i32 {
+        0
+    }
+    fn sample_normal_coverage(&self, _p: Vector3) -> (Vector3, f32) {
+        (Vector3::ZERO, 0.0)
+    }
+    fn world_to_viewport_point(&self, _p: Vector3) -> Vector3 {
+        Vector3::ZERO
+    }
 }
 
 #[test]
@@ -233,6 +248,8 @@ fn flock_helpers_match_the_game() {
             mf1: root,
             mesh0: Default::default(),
             mesh1: Default::default(),
+            mf0_active: true,
+            shade_active: true,
             rotation0: Quaternion::IDENTITY,
             rotation1: Quaternion::IDENTITY,
             pos_mid: Vector3::ZERO,

@@ -240,3 +240,15 @@ impl SbyteFloat3 {
         self.z as i32 * 0xC9D + self.y as i32 * 0xC95 + self.x as i32 * 0xC91
     }
 }
+
+// ---- UnityFunctions ----
+
+/// `Os.Utils.UnityFunctions.InView` 0x3CCEF0 after `camera.WorldToViewportPoint(worldPos)` (`viewport`, the
+/// host's): in front of the camera and inside the viewport widened by `margin` on every side.
+pub fn in_view(viewport: Vector3, margin: f32) -> bool {
+    if !(0.0 < viewport.z) {
+        return false;
+    }
+    let neg = -margin;
+    neg < viewport.x && neg < viewport.y && viewport.x < margin + 1.0 && viewport.y < margin + 1.0
+}

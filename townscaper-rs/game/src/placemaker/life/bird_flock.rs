@@ -12,12 +12,16 @@
 
 use std::collections::HashMap;
 
-use crate::unity::mathematics::Int3;
+use crate::os::extra_math;
+use crate::os::hex;
+use crate::os::utils;
+use crate::placemaker::grid_generator;
+use crate::unity::mathematics::{f3, Int3, Int3x2};
 use crate::unity::mathf;
 use crate::unity::quaternion::Quaternion;
 use crate::unity::random::Rand;
 use crate::unity::transform::{Node, TransformId, Transforms};
-use crate::unity::vector::{v3, Vector3};
+use crate::unity::vector::{sqrt_f64, v3, Vector3};
 
 /// `BirdFlock.State`.
 pub mod bird_state {
@@ -90,6 +94,9 @@ pub struct Bird {
     pub mf1: TransformId,
     pub mesh0: BirdMesh,
     pub mesh1: BirdMesh,
+    /// `mf0.gameObject.activeSelf`, `shade.gameObject.activeSelf`.
+    pub mf0_active: bool,
+    pub shade_active: bool,
     pub rotation0: Quaternion,
     pub rotation1: Quaternion,
     pub pos_mid: Vector3,
@@ -160,6 +167,26 @@ pub trait BirdWorld {
     fn play_sound(&mut self, sound: i32, position: Vector3);
     /// `featherEffect` moved, turned and played.
     fn feathers(&mut self, position: Vector3, rotation: Quaternion);
+    /// `Time.deltaTime`.
+    fn delta_time(&self) -> f32;
+    /// `master.graph.bounds`, `master.graph.boundsHeight`.
+    fn graph_bounds(&self) -> Int3x2;
+    fn graph_bounds_height(&self) -> i32;
+    /// `master.graph.SampleNormalCoverage(worldPos)`.
+    fn sample_normal_coverage(&self, world_pos: Vector3) -> (Vector3, f32);
+    /// `Camera.main.WorldToViewportPoint(worldPos)`.
+    fn world_to_viewport_point(&self, world_pos: Vector3) -> Vector3;
+}
+
+/// What a bird's step did (`OnUpdate`'s loop body).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Step {
+    /// Went on to the mesh swap (`mf0` shown while the two meshes differ).
+    Show,
+    /// Went straight to the next bird.
+    Done,
+    /// Left the flock (`birds[i]` removed).
+    Removed,
 }
 
 /// The scene's `srcBird`'s local poses (root, shade, body, mesh 0, mesh 1).
@@ -569,7 +596,7 @@ impl BirdFlock {
     }
 
     /// A new bird object from the prefab under `activeBirds` (`Object.Instantiate(srcBird, activeBirds)`).
-    fn instantiate_bird(&mut self) -> BirdId {
+    pub fn instantiate_bird(&mut self) -> BirdId {
         let pf = self.prefab.locals;
         let node = |t: &mut Transforms, parent: TransformId, (p, q, s): (Vector3, Quaternion, Vector3)| {
             let id = t.add(Node { parent: Some(parent), ..Default::default() });
@@ -592,6 +619,8 @@ impl BirdFlock {
             mf1,
             mesh0: BirdMesh::None,
             mesh1: BirdMesh::None,
+            mf0_active: true,
+            shade_active: true,
             rotation0: Quaternion::IDENTITY,
             rotation1: Quaternion::IDENTITY,
             pos_mid: Vector3::ZERO,
@@ -691,6 +720,478 @@ impl BirdFlock {
             world.play_sound(7, self.all_birds[b].pos);
         }
         true
+    }
+
+    /// `BirdFlock.GetLanding(bird)` 0x7BA960: the free perch ahead of a flying bird (within 1 of `posMid +
+    /// velocityNext`) whose target lies within about 37° of its heading (`dot >= 0.8`), the best by `dot +
+    /// 0.1 × neighbourCount` (the first of equals).
+    pub fn get_landing(&self, world: &dyn BirdWorld, b: BirdId) -> Option<LandingId> {
+        let bird = &self.all_birds[b];
+        let (pm, vn) = (bird.pos_mid, bird.velocity_next);
+        let ahead = v3(pm.x + vn.x, pm.y + vn.y, pm.z + vn.z);
+        let heading = vn.normalized();
+        let mut best = -f32::MAX;
+        let mut found = None;
+        for (l, _) in Self::perches_near(world, ahead, 1.1, 1.0) {
+            let s = self.landings.get(&l).copied().unwrap_or_default();
+            if s.bird.is_some() {
+                continue;
+            }
+            let tp = self.target_pos(world, l);
+            let to = v3(tp.x - pm.x, tp.y - pm.y, tp.z - pm.z).normalized();
+            let dot = Vector3::dot(heading, to);
+            if 0.8 <= dot {
+                let score = s.neighbour_count as f32 * 0.1 + dot;
+                if best < score {
+                    best = score;
+                    found = Some(l);
+                }
+            }
+        }
+        found
+    }
+
+    /// `BirdFlock.OnUpdate` 0x7BC490: leaving birds come back below the minimum; the orbit point moves (a new
+    /// random target every 8..20 s); the x-sorted list gets one bubble pass; every bird whose 0.3 s step is
+    /// due steps (one step per frame); then every bird is placed between its steps.
+    pub fn on_update(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str)) {
+        let mut count = self.birds.len();
+        self.calculate_optimal_landings();
+        if self.active_birds_count < self.min_bird_count {
+            for i in 0..count {
+                let b = self.birds[i];
+                if self.all_birds[b].state_next == st::LEAVING {
+                    self.all_birds[b].state_next = st::BOIDING;
+                    let t = world.time();
+                    let r = random.value();
+                    self.all_birds[b].last_action_time = r + t;
+                    self.active_birds_count = self.active_birds_count.wrapping_add(1);
+                    if self.ideal_bird_count <= self.active_birds_count {
+                        break;
+                    }
+                }
+            }
+        }
+        if 0 < self.bird_landing_count {
+            if self.last_orbit_time < world.time() {
+                let now = world.time();
+                let k = random.range_int(8, 20);
+                self.last_orbit_time = k as f32 + now;
+                let perch = if random.value() < 0.5 { Self::try_get_random_landing(world, random) } else { None };
+                let t = match perch {
+                    Some(l) => self.target_pos(world, l),
+                    None => {
+                        // a random point over the graph's bounds (8 cells wider), at a random height
+                        let bd = world.graph_bounds();
+                        let x = random.range(bd.c0.x as f32 - 8.0, bd.c1.x as f32 + 8.0);
+                        let y = random.range(bd.c0.y as f32 - 8.0, bd.c1.y as f32 + 8.0);
+                        let z = random.range(bd.c0.z as f32 - 8.0, bd.c1.z as f32 + 8.0);
+                        let p = grid_generator::hex_to_plane(f3(x, y, z));
+                        let h = random.range_int(0, world.graph_bounds_height());
+                        let w = hex::plane_to_world(p, h as f32);
+                        v3(w.x, w.y, w.z)
+                    }
+                };
+                let s = random.inside_unit_sphere();
+                let r = random.range(0.0, 7.0);
+                self.orbit_target = v3(s.x * r + t.x, r * s.y + t.y, r * s.z + t.z);
+                self.orbit_target.y = mathf::max(self.orbit_target.y, 0.4);
+            }
+            let d = world.delta_time();
+            self.orbit_pos = Vector3::move_towards(self.orbit_pos, self.orbit_target, d * 10.0);
+        }
+        if 1 < count {
+            let mut prev = self.birds[0];
+            for i in 1..count {
+                let cur = self.birds[i];
+                if self.all_birds[cur].pos.x < self.all_birds[prev].pos.x {
+                    self.birds[i] = prev;
+                    self.birds[i - 1] = cur;
+                } else {
+                    prev = cur;
+                }
+            }
+        }
+        let mut i = 0;
+        while i < count {
+            let b = self.birds[i];
+            if self.all_birds[b].time + 0.3 < world.time() && self.step_bird(world, random, log_error, i, b) == Step::Removed {
+                count -= 1;
+                continue;
+            }
+            i += 1;
+        }
+        let one = v3(1.0, 1.0, 1.0);
+        for i in 0..count {
+            let b = self.birds[i];
+            let now = world.time();
+            let bird = &mut self.all_birds[b];
+            let (pm, vp, vn) = (bird.pos_mid, bird.velocity_prev, bird.velocity_next);
+            // a quadratic Bézier through the step's mid point, from half the previous velocity behind it to
+            // half the next one ahead
+            let p0 = v3(pm.x - vp.x * 0.5, pm.y - vp.y * 0.5, pm.z - vp.z * 0.5);
+            let p2 = v3(vn.x * 0.5 + pm.x, vn.y * 0.5 + pm.y, vn.z * 0.5 + pm.z);
+            let t = mathf::inverse_lerp(bird.time, bird.time + 0.3, now);
+            let u = 1.0 - t;
+            let u2 = u * u;
+            let k = (u + u) * t;
+            let t2 = t * t;
+            bird.pos = v3(u2 * p0.x + k * pm.x + t2 * p2.x, u2 * p0.y + k * pm.y + t2 * p2.y, u2 * p0.z + k * pm.z + t2 * p2.z);
+            if bird.state_prev == st::STOPPED || bird.state_next == st::STOPPED {
+                let mut a = if bird.state_prev == st::STOPPED { 1.0 } else { 0.0 };
+                let mut c = if bird.state_next == st::STOPPED { 1.0 } else { 0.0 };
+                if bird.mesh0 == BirdMesh::Stand {
+                    a *= 0.7;
+                }
+                if bird.mesh1 == BirdMesh::Stand {
+                    c *= 0.7;
+                }
+                let s = mathf::lerp(a, c, t);
+                self.transforms.set_local_scale(bird.shade, v3(s * one.x * 0.22, s * one.y * 0.22, s * one.z * 0.22));
+                bird.shade_active = true;
+            } else {
+                bird.shade_active = false;
+            }
+            self.transforms.set_position(bird.body, bird.pos);
+            self.transforms.set_rotation(bird.body, Quaternion::lerp(bird.rotation0, bird.rotation1, t));
+            if bird.mf0_active {
+                let f0 = 1.0 - t2 * t;
+                self.transforms.set_local_scale(bird.mf0, v3(one.x * f0, one.y * f0, one.z * f0));
+                let f1 = 1.0 - u2 * u;
+                self.transforms.set_local_scale(bird.mf1, v3(one.x * f1, one.y * f1, one.z * f1));
+            }
+        }
+        if 0 < self.take_off_count {
+            self.take_off_count = 0;
+        }
+    }
+
+    /// One 0.3 s step of the bird at `birds[i]` (`OnUpdate`'s loop body).
+    fn step_bird(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str), i: usize, b: BirdId) -> Step {
+        let bird = &mut self.all_birds[b];
+        let vn = bird.velocity_next;
+        bird.pos_mid = v3(vn.x + bird.pos_mid.x, vn.y + bird.pos_mid.y, vn.z + bird.pos_mid.z);
+        bird.velocity_prev = vn;
+        bird.time += 0.3;
+        bird.state_prev = bird.state_next;
+        bird.mesh0 = bird.mesh1;
+        bird.rotation0 = bird.rotation1;
+        let dt = world.time() - bird.last_action_time;
+        let step = match bird.state_next {
+            st::BOIDING | st::LEAVING => self.step_flying(world, random, log_error, i, b, dt),
+            st::LANDING => self.step_landing(world, random, log_error, b),
+            st::STOPPING => self.step_stopping(world, random, log_error, b),
+            st::STOPPED => self.step_stopped(world, random, log_error, b, dt),
+            _ => Step::Show,
+        };
+        if step == Step::Show {
+            let bird = &mut self.all_birds[b];
+            if bird.mesh0 != bird.mesh1 {
+                bird.mf0_active = true;
+            } else {
+                bird.mf0_active = false;
+                self.transforms.set_local_scale(bird.mf1, v3(1.0, 1.0, 1.0));
+            }
+        }
+        step
+    }
+
+    /// The flying step (boiding or leaving): too many birds sends one away; towards its perch, or else on with
+    /// the orbit (leaving: on level); the neighbours ahead pull it along; leaving out of sight ends it; the
+    /// ground pushes it up; a perch ahead is taken; flapping when it climbs or turns.
+    fn step_flying(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str), i: usize, b: BirdId, dt: f32) -> Step {
+        if self.all_birds[b].state_next == st::BOIDING && self.max_bird_count < self.active_birds_count {
+            self.active_birds_count = self.active_birds_count.wrapping_sub(1);
+            self.all_birds[b].state_next = st::LEAVING;
+            let t = world.time();
+            let r = random.value();
+            self.all_birds[b].last_action_time = r + t;
+        }
+        if let Some(l) = self.all_birds[b].landing {
+            if 9.0 < dt {
+                self.set_landing(world, log_error, b, None);
+            } else {
+                let tp = self.target_pos(world, l);
+                let pm = self.all_birds[b].pos_mid;
+                let mut d = v3(tp.x - pm.x, tp.y - pm.y, tp.z - pm.z);
+                let m = d.magnitude();
+                if 1.0 < m {
+                    d = v3(d.x / m, d.y / m, d.z / m);
+                }
+                d = v3(d.x * 2.0, d.y + d.y, d.z + d.z);
+                let t = mathf::lerp(0.1, 0.8, mathf::inverse_lerp(6.0, 9.0, dt));
+                let bird = &mut self.all_birds[b];
+                bird.velocity_next = Vector3::lerp(bird.velocity_next, d, t);
+                if m < 1.5 {
+                    self.set_state(world, random, log_error, b, st::LANDING);
+                    return Step::Done;
+                }
+            }
+        } else {
+            let orbit = self.orbit_pos;
+            let bird = &mut self.all_birds[b];
+            bird.velocity_next.y *= 0.7;
+            let pm = bird.pos_mid;
+            let dir = if bird.state_next == st::LEAVING {
+                let vp = bird.velocity_prev;
+                v3(vp.x, 0.0, vp.z)
+            } else {
+                v3(orbit.x - pm.x, orbit.y - pm.y, orbit.z - pm.z)
+            };
+            bird.velocity_next = Vector3::lerp(bird.velocity_next, dir.normalized(), 0.2);
+            bird.velocity_next = bird.velocity_next.normalized();
+        }
+        self.boid(world, i, b);
+        if self.all_birds[b].state_next == st::LEAVING {
+            let pm = self.all_birds[b].pos_mid;
+            // (the game asks twice)
+            let mut stays = utils::in_view(world.world_to_viewport_point(pm), 0.2);
+            if stays {
+                let g = world.graph_bounds();
+                let wide = Int3x2 {
+                    c0: Int3 { x: g.c0.x.wrapping_sub(400), y: g.c0.y.wrapping_sub(400), z: g.c0.z.wrapping_sub(400) },
+                    c1: Int3 { x: g.c1.x.wrapping_add(400), y: g.c1.y.wrapping_add(400), z: g.c1.z.wrapping_add(400) },
+                };
+                stays = extra_math::contains_f(wide, grid_generator::plane_to_hex(hex::world_to_plane(f3(pm.x, pm.y, pm.z))));
+            }
+            if !stays {
+                let root = self.all_birds[b].root;
+                self.transforms.set_parent(root, Some(self.disabled_birds), true);
+                self.birds.remove(i);
+                return Step::Removed;
+            }
+        }
+        // the ground: the first point along twice the velocity (in steps of at most 0.5) the graph covers pushes up
+        let vn = self.all_birds[b].velocity_next;
+        let m = vn.magnitude();
+        if 0.0 < m {
+            let n = mathf::ceil_to_int(m * 2.0) + 1;
+            let step = 1.0 / n as f32;
+            for k in 1..=n {
+                let f = k as f32 * step;
+                let a = v3(vn.x * f, vn.y * f, vn.z * f);
+                let pm = self.all_birds[b].pos_mid;
+                let p = v3(a.x + a.x + pm.x, a.y + a.y + pm.y, a.z + a.z + pm.z);
+                let (normal, coverage) = world.sample_normal_coverage(p);
+                if 0.0 < coverage {
+                    let nn = normal.normalized();
+                    let c2 = coverage + coverage;
+                    self.all_birds[b].velocity_next = v3(vn.x + nn.x * c2, vn.y + nn.y * c2, vn.z + nn.z * c2);
+                    break;
+                }
+            }
+        }
+        if self.all_birds[b].state_next == st::BOIDING && 8.0 < dt {
+            if let Some(l) = self.get_landing(world, b) {
+                self.set_landing(world, log_error, b, Some(l));
+                self.set_state(world, random, log_error, b, st::LANDING);
+                let tp = self.target_pos(world, l);
+                let bird = &mut self.all_birds[b];
+                let pm = bird.pos_mid;
+                let d = extra_math::clamped_magnitude(v3(tp.x - pm.x, tp.y - pm.y, tp.z - pm.z), 0.7);
+                bird.velocity_next = Vector3::move_towards(bird.velocity_next, d, 0.5);
+            }
+        }
+        let bird = &mut self.all_birds[b];
+        let (vp, vn) = (bird.velocity_prev, bird.velocity_next);
+        let up = v3((vn.x - vp.x) + 0.0, (vn.y - vp.y) + 0.5, (vn.z - vp.z) + 0.0);
+        let c = (up.magnitude() - vn.magnitude()) + 0.2;
+        let t = mathf::inverse_lerp(1.0, 0.7, c);
+        bird.mesh1 = if 0.6 < c { BirdMesh::Flap } else { BirdMesh::Fly };
+        bird.rotation1 = Quaternion::look_rotation_up(v3(vn.x, t * vn.y, vn.z), up);
+        Step::Show
+    }
+
+    /// The neighbours' pull on the bird at `birds[i]`: up to 7 flying birds within 2 of its position, met
+    /// alternately ahead and behind in the x-sorted list (a bird behind ends that side unless it is 2 or more
+    /// ahead in x, so in practice only those ahead count). Each, weighted by `w = 1 - d/4`: pushed away when
+    /// closer than 1.6 and pulled in beyond (`w - 0.6`), and its current velocity matched.
+    fn boid(&mut self, world: &dyn BirdWorld, i: usize, b: BirdId) {
+        let count = self.birds.len();
+        let me = self.all_birds[b].pos;
+        let mut sum = Vector3::ZERO;
+        let mut weight = 0.0f32;
+        let mut n = 0;
+        let (mut ahead, mut behind) = (i + 1, i as i32 - 1);
+        let (mut ahead_left, mut behind_left) = (ahead < count, 0 <= behind);
+        let mut forward = true;
+        while ahead_left || behind_left {
+            let this_forward = forward;
+            forward = !forward;
+            let idx = if this_forward {
+                if !ahead_left {
+                    continue;
+                }
+                ahead += 1;
+                ahead_left = ahead < count;
+                ahead - 1
+            } else {
+                if !behind_left {
+                    continue;
+                }
+                behind -= 1;
+                behind_left = 0 <= behind;
+                (behind + 1) as usize
+            };
+            let o = self.all_birds[self.birds[idx]];
+            let d = v3(o.pos.x - me.x, o.pos.y - me.y, o.pos.z - me.z);
+            if this_forward {
+                if 2.0 < d.x {
+                    ahead_left = false;
+                    continue;
+                }
+            } else if 2.0 > d.x {
+                behind_left = false;
+                continue;
+            }
+            if o.state_next != st::BOIDING && o.state_next != st::LEAVING {
+                continue;
+            }
+            let sq = d.sqr_magnitude();
+            if sq >= 4.0 {
+                continue;
+            }
+            let dist = sqrt_f64(sq);
+            let w = 1.0 - dist * 0.25;
+            let w2 = w * w;
+            let k = w - 0.6;
+            sum = v3(sum.x - d.x / dist * k * w2 * w, sum.y - d.y / dist * k * w2 * w, sum.z - d.z / dist * k * w2 * w);
+            let tt = mathf::inverse_lerp(o.time, o.time + 0.3, world.time());
+            let ov = Vector3::lerp(o.velocity_prev, o.velocity_next, tt);
+            let vn = self.all_birds[b].velocity_next;
+            sum = v3((ov.x - vn.x) * w2 * w + sum.x, (ov.y - vn.y) * w2 * w + sum.y, (ov.z - vn.z) * w2 * w + sum.z);
+            weight = w2 + weight;
+            n += 1;
+            if n > 6 {
+                break;
+            }
+        }
+        if 0.0 < weight {
+            let inv = 1.0 / weight;
+            let bird = &mut self.all_birds[b];
+            let vn = bird.velocity_next;
+            bird.velocity_next = v3(sum.x * inv + vn.x, sum.y * inv + vn.y, sum.z * inv + vn.z);
+        }
+    }
+
+    /// The facing a bird settles to on its perch: away from the perch's up, levelled (`flat_y` of the perch's
+    /// up kept), along the normal's level part (`normal_weight`).
+    fn perch_look(&self, world: &dyn BirdWorld, l: LandingId, normal_weight: f32, flat_y: f32) -> Vector3 {
+        let up = world.landing_up(l);
+        let n = self.landings.get(&l).map_or(Vector3::ZERO, |s| s.normal);
+        let sy = v3(n.x, 0.0, n.z);
+        v3(sy.x * normal_weight + -up.x, (sy.y * normal_weight + -up.y) * flat_y, sy.z * normal_weight + -up.z)
+    }
+
+    /// The landing step: towards the perch (closing on its target point, turning to the perch's facing);
+    /// within 0.3 it lands (stopping).
+    fn step_landing(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str), b: BirdId) -> Step {
+        let lp = self.get_landing_pos(world, b);
+        let pm = self.all_birds[b].pos_mid;
+        let d = v3(lp.x - pm.x, lp.y - pm.y, lp.z - pm.z);
+        let m = d.magnitude();
+        self.all_birds[b].mesh1 = BirdMesh::Land;
+        let l = self.all_birds[b].landing.expect("landing without a perch");
+        let q = Quaternion::look_rotation(self.perch_look(world, l, 0.7, 0.0));
+        if m < 0.3 {
+            let bird = &mut self.all_birds[b];
+            bird.velocity_next = d;
+            bird.rotation1 = Quaternion::lerp(bird.rotation0, q, 0.3);
+            self.set_state(world, random, log_error, b, st::STOPPING);
+        } else {
+            let tp = self.target_pos(world, l);
+            let v = Vector3::lerp(lp, tp, m + 0.1);
+            let bird = &mut self.all_birds[b];
+            let dd = extra_math::clamped_magnitude(v3(v.x - pm.x, v.y - pm.y, v.z - pm.z), 0.7);
+            bird.velocity_next = Vector3::move_towards(bird.velocity_next, dd, 0.8);
+            let (vp, vn) = (bird.velocity_prev, bird.velocity_next);
+            let up = v3((vn.x - vp.x) + 0.0, (vn.y - vp.y) + 0.5, (vn.z - vp.z) + 0.0);
+            let r = Quaternion::look_rotation_up(vn, up);
+            bird.rotation1 = Quaternion::lerp(r, q, 0.1);
+        }
+        Step::Show
+    }
+
+    /// The stopping step: still, stopped, half-sitting; its shade on the perch; facing off the perch with a
+    /// random turn of up to 20°.
+    fn step_stopping(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str), b: BirdId) -> Step {
+        self.all_birds[b].velocity_next = Vector3::ZERO;
+        self.set_state(world, random, log_error, b, st::STOPPED);
+        self.all_birds[b].mesh1 = BirdMesh::HalfSit;
+        let l = self.all_birds[b].landing.expect("stopping without a perch");
+        let shade = self.all_birds[b].shade;
+        self.transforms.set_position(shade, world.landing_position(l));
+        let lr = world.landing_rotation(l);
+        self.transforms.set_rotation(shade, Quaternion::mul(lr, Quaternion::euler(-90.0, 90.0, 0.0)));
+        let look = self.perch_look(world, l, 1.0, 0.4);
+        let turn = random.range_int(-20, 20);
+        self.all_birds[b].rotation1 = Quaternion::mul(Quaternion::euler(0.0, turn as f32, 0.0), Quaternion::look_rotation(look));
+        Step::Show
+    }
+
+    /// The stopped step: still; past 3 s since its last action, it acts: 10% hop to the best free perch within
+    /// 0.8 (by neighbours × 0.3 - squared distance + a random 0.2, against staying), 27% change pose (on a
+    /// level perch: stand up, a little higher, or sit; else sit or half-sit), else turn (up to 40° on a level
+    /// perch, 20° else).
+    fn step_stopped(&mut self, world: &mut dyn BirdWorld, random: &mut Rand, log_error: &mut dyn FnMut(&str), b: BirdId, dt: f32) -> Step {
+        self.all_birds[b].velocity_next = Vector3::ZERO;
+        if !(3.0 < dt) {
+            return Step::Show;
+        }
+        self.all_birds[b].last_action_time = world.time();
+        let l = self.all_birds[b].landing.expect("stopped without a perch");
+        let s = self.landings.get(&l).copied().unwrap_or_default();
+        let level = 0.95 < s.normal.y;
+        if random.value() < 0.1 {
+            let r = random.value();
+            let mut best = s.neighbour_count as f32 * 0.3 + r * 0.2;
+            let mut found = None;
+            let here = world.landing_position(l);
+            for (c, p) in Self::perches_near(world, here, 0.90000004, 0.64000005) {
+                let cs = self.landings.get(&c).copied().unwrap_or_default();
+                if cs.bird.is_some() {
+                    continue;
+                }
+                let sq = v3(here.x - p.x, here.y - p.y, here.z - p.z).sqr_magnitude();
+                let r = random.value();
+                let score = (cs.neighbour_count as f32 * 0.3 - sq) + r * 0.2;
+                if best <= score {
+                    best = score;
+                    found = Some(c);
+                }
+            }
+            if let Some(c) = found {
+                self.set_landing(world, log_error, b, None);
+                self.set_landing(world, log_error, b, Some(c));
+                let lp = self.get_landing_pos(world, b);
+                let bird = &mut self.all_birds[b];
+                let pm = bird.pos_mid;
+                bird.velocity_next = v3(lp.x - pm.x, lp.y - pm.y, lp.z - pm.z);
+                bird.mesh1 = BirdMesh::Land;
+                // facing the hop's level part
+                let vn = bird.velocity_next;
+                bird.rotation1 = Quaternion::look_rotation(v3(vn.x, 0.0, vn.z));
+                self.set_state(world, random, log_error, b, st::STOPPING);
+            }
+        } else if random.value() < 0.3 {
+            if !level {
+                self.all_birds[b].mesh1 = if 0.5 <= random.value() { BirdMesh::Sit } else { BirdMesh::HalfSit };
+            } else {
+                let lp = self.get_landing_pos(world, b);
+                let mesh = if 0.5 <= random.value() { BirdMesh::Sit } else { BirdMesh::Stand };
+                self.all_birds[b].mesh1 = mesh;
+                let y = if mesh == BirdMesh::Stand { self.transforms.local_scale(self.all_birds[b].root).y * 0.01 + lp.y } else { lp.y };
+                let bird = &mut self.all_birds[b];
+                let pm = bird.pos_mid;
+                bird.velocity_next = v3(lp.x - pm.x, y - pm.y, lp.z - pm.z);
+            }
+        } else {
+            let look = self.perch_look(world, l, 1.0, 0.4);
+            let a = if level { 40.0 } else { 20.0 };
+            let turn = random.range(-a, a);
+            self.all_birds[b].rotation1 = Quaternion::mul(Quaternion::euler(0.0, turn, 0.0), Quaternion::look_rotation(look));
+        }
+        Step::Show
     }
 
     /// `birds.Add(bird)`, as the list's order is kept by the update's sort (G5b): appended.

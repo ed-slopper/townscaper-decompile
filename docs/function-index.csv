@@ -268,7 +268,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x3CCDD0,0x103CCDD0,Os.Utils,UnityEvent_Int,.ctor,public void .ctor(),dumped,
 0x3CCE10,0x103CCE10,Os.Utils,UnityFunctions,EnumerateHirearchy,"public static IEnumerable<Transform> EnumerateHirearchy(Transform t, bool includeInactive)",dumped,
 0x3CCE80,0x103CCE80,Os.Utils,UnityFunctions,GetNewGameObject,"public static GameObject GetNewGameObject(string name, Transform parent)",dumped,
-0x3CCEF0,0x103CCEF0,Os.Utils,UnityFunctions,InView,"public static bool InView(Camera camera, Vector3 worldPos, float margin = 0)",dumped,
+0x3CCEF0,0x103CCEF0,Os.Utils,UnityFunctions,InView,"public static bool InView(Camera camera, Vector3 worldPos, float margin = 0)",checked,"os::utils::in_view (tests/placemaker_bird_update.rs, the leaving birds)"
 0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,get_Current,public Transform get_Current(),dumped,
 0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
 0x42D9E0,0x1042D9E0,Os.Utils,UnityFunctions.HirearchyEnumerator,Dispose,public void Dispose(),dumped,
@@ -1110,15 +1110,15 @@ rva,va,namespace,type,method,signature,status,notes
 0x7C1B00,0x107C1B00,Placemaker.Life,Bird,.ctor,public void .ctor(),read,a component with no members of its own
 0x7BA100,0x107BA100,Placemaker.Life,BirdFlock,AddOrRemoveLanding,"public void AddOrRemoveLanding(BirdLanding landing, bool landingAdded)",ported,placemaker::life::bird_flock (notes/life.md)
 0x7BA790,0x107BA790,Placemaker.Life,BirdFlock,CalculateOptimalLandings,public void CalculateOptimalLandings(),checked,placemaker::life::bird_flock (tests/placemaker_bird_flock.rs; notes/life.md)
-0x7BA8A0,0x107BA8A0,Placemaker.Life,BirdFlock,GetLandingPos,private Vector3 GetLandingPos(Bird bird),ported,placemaker::life::bird_flock (notes/life.md)
-0x7BA960,0x107BA960,Placemaker.Life,BirdFlock,GetLanding,private BirdLanding GetLanding(Bird bird),dumped,
+0x7BA8A0,0x107BA8A0,Placemaker.Life,BirdFlock,GetLandingPos,private Vector3 GetLandingPos(Bird bird),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
+0x7BA960,0x107BA960,Placemaker.Life,BirdFlock,GetLanding,private BirdLanding GetLanding(Bird bird),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
 0x7BB060,0x107BB060,Placemaker.Life,BirdFlock,GetSearchCoordinates,"private ValueTuple<int3, int3> GetSearchCoordinates(Vector3 pos, float radius)",checked,placemaker::life::bird_flock (tests/placemaker_bird_flock.rs; notes/life.md)
 0x7BB220,0x107BB220,Placemaker.Life,BirdFlock,IterateBirdCreation,public bool IterateBirdCreation(),ported,placemaker::life::bird_flock (notes/life.md)
 0x7BBEC0,0x107BBEC0,Placemaker.Life,BirdFlock,OnDrawGizmos,private void OnDrawGizmos(),read,"editor aid (gizmos), not ported"
 0x7BC360,0x107BC360,Placemaker.Life,BirdFlock,OnReset,public void OnReset(),ported,placemaker::life::bird_flock (notes/life.md)
-0x7BC490,0x107BC490,Placemaker.Life,BirdFlock,OnUpdate,public void OnUpdate(),dumped,
-0x7C00E0,0x107C00E0,Placemaker.Life,BirdFlock,SetBird,"private void SetBird(BirdLanding landing, Bird bird)",ported,placemaker::life::bird_flock (notes/life.md)
-0x7C0610,0x107C0610,Placemaker.Life,BirdFlock,SetLanding,"private void SetLanding(Bird bird, BirdLanding landing)",ported,placemaker::life::bird_flock (notes/life.md)
+0x7BC490,0x107BC490,Placemaker.Life,BirdFlock,OnUpdate,public void OnUpdate(),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
+0x7C00E0,0x107C00E0,Placemaker.Life,BirdFlock,SetBird,"private void SetBird(BirdLanding landing, Bird bird)",checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
+0x7C0610,0x107C0610,Placemaker.Life,BirdFlock,SetLanding,"private void SetLanding(Bird bird, BirdLanding landing)",checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
 0x7C0720,0x107C0720,Placemaker.Life,BirdFlock,SetState,"private void SetState(Bird bird, BirdFlock.State state)",checked,placemaker::life::bird_flock (tests/placemaker_bird_flock.rs; notes/life.md)
 0x7C0810,0x107C0810,Placemaker.Life,BirdFlock,TryGetRandomLanding,private bool TryGetRandomLanding(out BirdLanding landing),ported,placemaker::life::bird_flock (notes/life.md)
 0x7C09B0,0x107C09B0,Placemaker.Life,BirdFlock,UprootAllBirds,private void UprootAllBirds(),ported,placemaker::life::bird_flock (notes/life.md)
@@ -1135,9 +1135,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x7C1490,0x107C1490,Placemaker.Life,BirdLanding,RemoveNeighbour,public void RemoveNeighbour(BirdLanding landing),ported,placemaker::life::bird_flock (notes/life.md)
 0x7C14A0,0x107C14A0,Placemaker.Life,BirdLanding,System.IComparable<Placemaker.Life.BirdLanding>.CompareTo,private int System.IComparable<Placemaker.Life.BirdLanding>.CompareTo(BirdLanding other),ported,placemaker::life::bird_flock (notes/life.md)
 0x7C1500,0x107C1500,Placemaker.Life,BirdLanding,System.IComparable<UnityEngine.Vector3>.CompareTo,private int System.IComparable<UnityEngine.Vector3>.CompareTo(Vector3 other),ported,placemaker::life::bird_flock (notes/life.md)
-0x7C1550,0x107C1550,Placemaker.Life,BirdLanding,get_pos,public Vector3 get_pos(),ported,placemaker::life::bird_flock (notes/life.md)
+0x7C1550,0x107C1550,Placemaker.Life,BirdLanding,get_pos,public Vector3 get_pos(),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
 0x7C15A0,0x107C15A0,Placemaker.Life,BirdLanding,get_sortPos,public Vector3 get_sortPos(),ported,placemaker::life::bird_flock (notes/life.md)
-0x7C1670,0x107C1670,Placemaker.Life,BirdLanding,get_targetPos,public Vector3 get_targetPos(),ported,placemaker::life::bird_flock (notes/life.md)
+0x7C1670,0x107C1670,Placemaker.Life,BirdLanding,get_targetPos,public Vector3 get_targetPos(),checked,placemaker::life::bird_flock (tests/placemaker_bird_update.rs; notes/life.md)
 0x7C5420,0x107C5420,Placemaker.Life,Butterfly,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker.Life,ButterflyFlock,.ctor,public void .ctor(),dumped,
 0x7C2D80,0x107C2D80,Placemaker.Life,ButterflyFlock,AddLanding,public void AddLanding(ButterflyLanding landing),dumped,
