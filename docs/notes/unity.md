@@ -232,3 +232,30 @@ every ray, 161 of 163 hits bit-exact, the rest within 2e-6):
   scale-up), each face's plane is fitted as quickhull's `computeNormalAndCentroid` does (a fixed first edge from
   the longest of the first three, crossed with each later vertex's offset; centroid offset). The face's starting
   vertex is our guess (lowest index), which accounts for the last ulp on about 1% of hits.
+
+## .NET text (E13, proven)
+
+`unity::dotnet`, checked against the game's own BCL (`tests/unity_dotnet.rs`). Where the game's text reaches
+files: `float.ToString("F6", en-US)` (the OBJ export), `DateTime.ToString("yyyyMMddHHmmss")` →
+`long.Parse` (`SaveSystem.GetDateTimeLong`, save times), `"yyyy-MM-dd HH-mm-ss"` (screenshot names),
+`DateTime.Now.GetHashCode()` (the seed of `GetUniqueSaveName`'s xorshift), `int.ToString` / `int.Parse`,
+`String.Format` with plain `{n}` items (paths and OBJ lines). No string-keyed hashing and no `StringBuilder` in the
+game's code.
+
+- `float` formatting is Mono's managed `NumberFormatter` (`Number.FormatSingle` 0xDB7730 calls it), not the
+  .NET Core shortest-round-trip one: the float (as a double) times a 64-bit table entry gives a 17-digit
+  approximation (the dropped 32-bit half rounds it), which is rounded half up to 7 significant digits, then
+  half up again to the format's decimals (`RoundBits` 0xDB6D60 on packed BCD). So `16777217f` → `16777220.000000`
+  and `123456789f` → `123456800.000000`. A value that rounds to nothing loses its sign (`-0.0000004f` →
+  `0.000000`). NaN / `Infinity` / `-Infinity` as en-US spells them.
+- The table (`MantissaBitsTable` / `TensExponentTable`, 2048 entries, in the runtime's data): entry `e` is
+  `floor(2^(e-1075) / 10^t · 2^64)` with `t` the least power of ten above `2^(e-1075)`, except 16 exponents where
+  Mono's generator took the next power (2, 198, 291, …, 2045; for floats only 972 and 1168 matter). Computed at
+  first use (exact big-integer arithmetic) and compared entry by entry with the player's `GameAssembly.dll`.
+- `Parse` (`NumberStyles.Integer`): white space (`' '`, `\t`..`\r`) round an optional sign and ASCII digits;
+  otherwise `FormatException`, out of range `OverflowException` (both checked, with full-width digits refused).
+- `DateTime`: `dateData` (ticks + kind in the top two bits); `GetHashCode` = low word xor high word of the ticks;
+  the Gregorian date by the reference source's 400/100/4/1-year split; custom formats `y`, `M`, `d`, `H`, `h`,
+  `m`, `s` runs and literals. `Now` is the host's clock plus the local UTC offset (`TimeZoneInfo.Local`).
+  Checked: 1,562 dates (random, round leap years, both ends of the range) in both formats, the hash and
+  `GetDateTimeLong`.
