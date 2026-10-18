@@ -121,3 +121,28 @@ reached from the caller-less bucket tool; `SetColorPickColor` has no callers: re
   `v = cur·-0.6 + vel; vel = v·0.4; cur += v`, and stops below `|vel| + |cur| < 0.001`. `SetPressed` holds it
   (the clicker sinks it), `StopPressing(v)` releases with a velocity, `ClickBobEffect` kicks ±0.4. Checked: 300
   springs stepped by the game's own `Update`.
+
+## The hover outline: `HoverHightlight` (G1f, proven)
+
+`placemaker::hover_hightlight`, checked against a fresh game `HoverHightlight` on the stand-in master
+(`tests/placemaker_hover_hightlight.rs`: every qube given the same random house module and orientation on both
+sides, then hovers through the scene camera; `_HoverPos` and the whole mesh compared to the bit).
+
+- `Draw` 0x3E18F0 (called by the clicker's `LateUpdate`; `Update` switches the object off on a frame it was not
+  drawn): `_HoverPos = (srcVert.planePos, 0, 0)`, the mesh cleared, and nothing more when the source vert is not
+  full or the hover is outside the borders.
+- A top / bottom hover (`side == -1`): for each quad round the source vert (its square from `squareDict`), from the
+  quad corner that is the vert: at height `(dst > src) + srcHeight` 0 a flat quad at `y = 0` (the quad's corners
+  from the vert, normals up, uvs `(0,0) (1,0) (1,1) (0,1)`, second uvs `(0, 1)`); above, that height's qube
+  (`AddQube` with corners `a + u`, `b + u`, `((u + 1) & 3) + a`, `a`/`b` = 4/0 when adding, 0/4 when removing).
+- A side hover: the two quads at `side` and `side + 1`, both layers (heights `srcHeight` and one up): `AddQube`
+  with the vert's corner (top layer first), the corner across (`((k != 0)·2 + 3 + u) & 3`) and the one above /
+  below.
+- `AddQube` 0x3E2770: the qube's `possibleModules[0]`; the frame `Matrix4x4.LookAt(corner, opposite, up - corner)`
+  of three qube corners (`ModuleMath.corners + 0.5`) and its inverse; each of the module's meshes with the house
+  material, under the product of the module's and mesh's orientations: per vertex `p` the uv `(inverse·p).xy`, the
+  second uv `((inverse·p).z, (inverse·t).z · 2)` where `t` is the vertex's **tangent** (the game reads field 0x14,
+  `tangents`, for the "normal"); a vertex whose uv is `(0, 0)` sets the `zOffset` later taken off every second uv;
+  the world vertex `qube position + ModuleBuilder.MultiplyPoint(square, GetTs(p), p)` and normal
+  `MultiplyVector(…, t)`; the triangles reversed unless the orientation is inverted.
+- Bounds: centre 0, size `float.MaxValue` (never culled).

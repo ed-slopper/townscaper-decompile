@@ -512,12 +512,12 @@ rva,va,namespace,type,method,signature,status,notes
 0x3E1890,0x103E1890,Placemaker,HoverData,get_srcHexPosHeight,public int3 get_srcHexPosHeight(),ported,placemaker::hover_data (notes/building.md)
 0x3E18C0,0x103E18C0,Placemaker,HoverData,get_srcHexPos,public int2 get_srcHexPos(),ported,placemaker::hover_data (notes/building.md)
 0x3E18D0,0x103E18D0,Placemaker,HoverData,get_vertical,public bool get_vertical(),ported,placemaker::hover_data (notes/building.md)
-0x1F53D0,0x101F53D0,Placemaker,HoverHightlight,.ctor,public void .ctor(),dumped,
-0x3E18F0,0x103E18F0,Placemaker,HoverHightlight,Draw,public void Draw(),dumped,
-0x3E2700,0x103E2700,Placemaker,HoverHightlight,OnStart,public void OnStart(),dumped,
-0x3E2770,0x103E2770,Placemaker,HoverHightlight,<Draw>g__AddQube|6_0,"private void <Draw>g__AddQube|6_0(Qube qube, Square square, int corner, int oppositeCorner, int upCorner, ref HoverHightlight.<>c__DisplayClass6_0 )",dumped,
-0x3E34B0,0x103E34B0,Placemaker,HoverHightlight,Update,private void Update(),dumped,
-0x3E34F0,0x103E34F0,Placemaker,HoverHightlight,.cctor,private static void .cctor(),dumped,
+0x1F53D0,0x101F53D0,Placemaker,HoverHightlight,.ctor,public void .ctor(),ported,empty body (shared stub)
+0x3E18F0,0x103E18F0,Placemaker,HoverHightlight,Draw,public void Draw(),checked,"placemaker::hover_hightlight (tests/placemaker_hover_hightlight.rs: 150 draws, whole mesh)"
+0x3E2700,0x103E2700,Placemaker,HoverHightlight,OnStart,public void OnStart(),ported,placemaker::hover_hightlight
+0x3E2770,0x103E2770,Placemaker,HoverHightlight,<Draw>g__AddQube|6_0,"private void <Draw>g__AddQube|6_0(Qube qube, Square square, int corner, int oppositeCorner, int upCorner, ref HoverHightlight.<>c__DisplayClass6_0 )",checked,"placemaker::hover_hightlight (tests/placemaker_hover_hightlight.rs: 150 draws, whole mesh)"
+0x3E34B0,0x103E34B0,Placemaker,HoverHightlight,Update,private void Update(),ported,placemaker::hover_hightlight
+0x3E34F0,0x103E34F0,Placemaker,HoverHightlight,.cctor,private static void .cctor(),ported,placemaker::hover_hightlight
 0x478690,0x10478690,Placemaker,LayerMaster,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
 0x1D4430,0x101D4430,Placemaker,Maker,OnEnable,public void OnEnable(),ported,empty body (shared stub)
 0x328D10,0x10328D10,Placemaker,Maker,ActionQueueChanged,public void ActionQueueChanged(),checked,"placemaker::maker (tests/placemaker_maker.rs: 77 edits on a stand-in town, graph + actions + counters)"
