@@ -17,3 +17,4 @@ Names, signatures, addresses and constants only: no pasted decompiler output.
 | [bakes.md](bakes.md) | Lighting and ground bakes (E9): the sun and its shadow camera, AO, sandbanks, the draw plane and border |
 | [props.md](props.md) | Props (E10): placements, prop nodes and their relations, placing props on modules |
 | [graph.md](graph.md) | The voxel graph (E4): objects and containers, editing, the update loop, saving and loading, sampling, the flow field |
+| [saving.md](saving.md) | Saving (G3): the save folder, the town and settings files (XmlSerializer form), the save system |

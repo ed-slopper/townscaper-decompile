@@ -206,7 +206,7 @@ fn loop_save_and_load_match_the_game() {
     ours.save(&mut host, &mut again);
     assert_eq!(again, save, "a loaded town saves as it was saved");
     // an empty save: the bounds move to its single corner
-    let empty = SaveData { corners: vec![SaveCorner { x: verts[0].x, y: verts[0].y, count: 0 }], voxels: Vec::<SaveVoxel>::new() };
+    let empty = SaveData { corners: vec![SaveCorner { x: verts[0].x, y: verts[0].y, count: 0 }], voxels: Vec::<SaveVoxel>::new(), ..SaveData::default() };
     let l = handle(&ok(g.h.request(Game::field(sd, "corners")), "corners"), "corners");
     ok(g.h.request(Game::call(l, &list("Placemaker.SaveData+C, Assembly-CSharp"), "Clear", vec![], false)), "Clear");
     ok(g.h.request(Game::call(l, &list("Placemaker.SaveData+C, Assembly-CSharp"), "Add", vec![arg::raw(&bytes(&empty.corners[0]))], false)), "Add");

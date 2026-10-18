@@ -388,14 +388,6 @@ pub trait WorldSaves {
     fn log(&mut self, _message: &str) {}
 }
 
-/// What a save keeps beyond the town in this port so far: the text and the write time (`SaveData.saveString`,
-/// `lastWriteTime`; the rest of `SaveData` is row G3).
-#[derive(Clone, Debug, PartialEq, Default)]
-pub struct SaveStamp {
-    pub save_string: String,
-    pub last_write_time: i64,
-}
-
 /// `settingsData.lastRunVersion` and the settings' dirty flag (`SaveSystem.SetSettingsDirty`), row G3.
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct VersionSettings {
@@ -403,10 +395,9 @@ pub struct VersionSettings {
     pub dirty: bool,
 }
 
-/// `SaveData.Clear` as far as the town goes (row G3 clears the rest).
+/// `SaveData.Clear`.
 fn clear_town(save: &mut SaveData) {
-    save.corners.clear();
-    save.voxels.clear();
+    save.clear();
 }
 
 impl WorldMaster {
@@ -472,14 +463,15 @@ impl WorldMaster {
 
     /// `Placemaker.WorldMaster.PopulateSaveData` 0x1F9900 (`metaSave` unused): camera, shadows, save camera and
     /// graph into the save, the write time (UTC ticks) and the text.
-    pub fn populate_save_data(&mut self, saves: &mut dyn WorldSaves, save: &mut SaveData, stamp: &mut SaveStamp) {
+    pub fn populate_save_data(&mut self, saves: &mut dyn WorldSaves, save: &mut SaveData) {
         saves.on_camera_save(save);
         saves.shadow_baker_save(save);
         saves.save_camera_save(save);
         saves.graph_save(save);
-        stamp.last_write_time = saves.utc_now_ticks();
-        stamp.save_string = saves.save_to_string(save);
-        self.last_save_string = stamp.save_string.clone();
+        save.last_write_time = saves.utc_now_ticks();
+        let s = saves.save_to_string(save);
+        save.save_string = Some(s.clone());
+        self.last_save_string = s;
     }
 
     /// `Placemaker.WorldMaster.MaybeUpdateGameVersionInSettingsData` 0x1F92F0: a new `Application.version` is

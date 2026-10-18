@@ -692,11 +692,11 @@ rva,va,namespace,type,method,signature,status,notes
 0x1EEF60,0x101EEF60,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,.ctor,public void .ctor(int <>1__state),dumped,
 0x4FE390,0x104FE390,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,MoveNext,private bool MoveNext(),dumped,
 0x4FE6A0,0x104FE6A0,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x967850,0x10967850,Placemaker,SaveData,Clear,public void Clear(),dumped,
-0x9678D0,0x109678D0,Placemaker,SaveData,CopyFrom,public void CopyFrom(SaveData other),dumped,
-0x967A10,0x10967A10,Placemaker,SaveData,ReadNonImageDataFrom,public void ReadNonImageDataFrom(SaveData other),dumped,
-0x967AE0,0x10967AE0,Placemaker,SaveData,.ctor,public void .ctor(),dumped,
-0x4FAD70,0x104FAD70,Placemaker,SaveData.C,ToString,public override string ToString(),dumped,
+0x967850,0x10967850,Placemaker,SaveData,Clear,public void Clear(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
+0x9678D0,0x109678D0,Placemaker,SaveData,CopyFrom,public void CopyFrom(SaveData other),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
+0x967A10,0x10967A10,Placemaker,SaveData,ReadNonImageDataFrom,public void ReadNonImageDataFrom(SaveData other),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
+0x967AE0,0x10967AE0,Placemaker,SaveData,.ctor,public void .ctor(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
+0x4FAD70,0x104FAD70,Placemaker,SaveData.C,ToString,public override string ToString(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x3208C0,0x103208C0,Placemaker,SaveDataScripableObject,.ctor,public void .ctor(),dumped,
 0x1D4430,0x101D4430,Placemaker,SaveSystem,MaybeFixWrongDirectory,private void MaybeFixWrongDirectory(),dumped,
 0x1D4430,0x101D4430,Placemaker,SaveSystem,LogTime,private void LogTime(),dumped,
@@ -767,7 +767,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x970700,0x10970700,Placemaker,ScreenshotCamera,Capture,"public Texture2D Capture(RectTransform rt, int width, int height, int screenWidth, int screenHeight, Camera refCamera, Camera refSkyboxCam)",dumped,
 0x9717E0,0x109717E0,Placemaker,ScreenshotCamera,OnStart,public void OnStart(),dumped,
 0x971880,0x10971880,Placemaker,ScreenshotCamera,SaveImageToPath,"public void SaveImageToPath(Texture2D image, string path)",dumped,
-0x973460,0x10973460,Placemaker,SettingsData,.ctor,public void .ctor(),dumped,
+0x973460,0x10973460,Placemaker,SettingsData,.ctor,public void .ctor(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x973750,0x10973750,Placemaker,ShaderIds,.cctor,private static void .cctor(),checked,tests/placemaker_timing.rs
 0x974500,0x10974500,Placemaker,ShadowBaker,BakeShadow,public void BakeShadow(),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"
 0x974520,0x10974520,Placemaker,ShadowBaker,GetQuaternion,private static Quaternion GetQuaternion(Vector2 value),checked,"placemaker::shadow_baker (tests/placemaker_shadow_baker.rs: 300 angle/save/load steps and 40 LateUpdate frames with the framing around the scene town, bit-exact)"

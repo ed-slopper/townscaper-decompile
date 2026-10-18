@@ -24,6 +24,7 @@ pub mod quads;
 pub mod sandbanker;
 pub mod save_camera;
 pub mod save_data;
+pub mod save_xml;
 pub mod shadow_baker;
 pub mod timing;
 pub mod wfc;
