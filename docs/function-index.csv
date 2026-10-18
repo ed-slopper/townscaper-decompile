@@ -893,17 +893,17 @@ rva,va,namespace,type,method,signature,status,notes
 0x501070,0x10501070,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
 0x5010A0,0x105010A0,Placemaker,StorageUtils.<SaveToPath>d__23,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
 0x501100,0x10501100,Placemaker,StorageUtils.<SaveToPath>d__23,<>m__Finally1,private void <>m__Finally1(),dumped,
-0x31CD00,0x1031CD00,Placemaker,TextSaveAlphabet,.cctor,private static void .cctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,TextSaveSystem,.ctor,public void .ctor(),dumped,
-0x31D1F0,0x1031D1F0,Placemaker,TextSaveSystem,AddValue,"public static void AddValue(List<int> values, int value, int bitCount)",dumped,
-0x31D250,0x1031D250,Placemaker,TextSaveSystem,GetBitCount,private static int GetBitCount(int biggestValue),dumped,
-0x31D270,0x1031D270,Placemaker,TextSaveSystem,GetBitsPerCharacter,private static int GetBitsPerCharacter(),dumped,
-0x31D290,0x1031D290,Placemaker,TextSaveSystem,GetSpacedString,public static string GetSpacedString(string srcString),dumped,
-0x31D450,0x1031D450,Placemaker,TextSaveSystem,LoadFromString,"public static bool LoadFromString(string saveString, List<SaveData.C> corners, List<SaveData.V> voxels)",dumped,
-0x31DF00,0x1031DF00,Placemaker,TextSaveSystem,LogBitArray,private void LogBitArray(int bitCount),dumped,
-0x31E000,0x1031E000,Placemaker,TextSaveSystem,ReadValue,"public static int ReadValue(BitArray bitArray, ref int index, int bitCount)",dumped,
-0x31E2F0,0x1031E2F0,Placemaker,TextSaveSystem,SaveToString,"public static string SaveToString(List<SaveData.C> corners, List<SaveData.V> voxels)",dumped,
-0x31F0F0,0x1031F0F0,Placemaker,TextSaveSystem,.cctor,private static void .cctor(),dumped,
+0x31CD00,0x1031CD00,Placemaker,TextSaveAlphabet,.cctor,private static void .cctor(),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x1F53D0,0x101F53D0,Placemaker,TextSaveSystem,.ctor,public void .ctor(),read,a component with no members of its own; not ported
+0x31D1F0,0x1031D1F0,Placemaker,TextSaveSystem,AddValue,"public static void AddValue(List<int> values, int value, int bitCount)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31D250,0x1031D250,Placemaker,TextSaveSystem,GetBitCount,private static int GetBitCount(int biggestValue),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31D270,0x1031D270,Placemaker,TextSaveSystem,GetBitsPerCharacter,private static int GetBitsPerCharacter(),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31D290,0x1031D290,Placemaker,TextSaveSystem,GetSpacedString,public static string GetSpacedString(string srcString),read,"no caller in the build (CallerCount 0), not ported"
+0x31D450,0x1031D450,Placemaker,TextSaveSystem,LoadFromString,"public static bool LoadFromString(string saveString, List<SaveData.C> corners, List<SaveData.V> voxels)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31DF00,0x1031DF00,Placemaker,TextSaveSystem,LogBitArray,private void LogBitArray(int bitCount),read,"no caller in the build (CallerCount 0), not ported"
+0x31E000,0x1031E000,Placemaker,TextSaveSystem,ReadValue,"public static int ReadValue(BitArray bitArray, ref int index, int bitCount)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31E2F0,0x1031E2F0,Placemaker,TextSaveSystem,SaveToString,"public static string SaveToString(List<SaveData.C> corners, List<SaveData.V> voxels)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
+0x31F0F0,0x1031F0F0,Placemaker,TextSaveSystem,.cctor,private static void .cctor(),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
 0x31F190,0x1031F190,Placemaker,TexturePngMaster,BakePalette,private void BakePalette(),dumped,
 0x31F350,0x1031F350,Placemaker,TexturePngMaster,CleanTexture,private void CleanTexture(TexturePngMaster.PngTexture pngTexture),dumped,
 0x31F490,0x1031F490,Placemaker,TexturePngMaster,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,

@@ -29,3 +29,28 @@ them back as the game's reader does).
 - `SettingsData` (`..ctor` 0x973460): `version`, `lastSave` (a file name), `currentColor`, `audioVolume` (255),
   `antiAliasing` (true), `axis` (two inversions), `vSync`, `fullscreen` (true), `language` (empty),
   `screenshot` (path, 2048 × 2048), `objExport` (path), `uiSizePercentage` (100), `lastRunVersion` ("1.0.0").
+
+## The town as text (G3a, proven)
+
+`placemaker::text_save_system`, checked on the player's saves (each file's `saveString` is our text of its
+corners and voxels, and reads back to them) and against the game (`tests/placemaker_text_save.rs`: 150 random
+towns written the same; 539 random, damaged and foreign strings read with the same result, lists, rejection or
+throw).
+
+- `TextSaveSystem.SaveToString` 0x31E2F0 / `LoadFromString` 0x31D450. Values are packed least significant bit
+  first into one static `BitArray`, six bits per letter of `TextSaveAlphabet.alphabet`
+  (`ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyzw0123456789_-`: note `uvxyzw`).
+- Header: three 5-bit widths (positions, x steps, y offsets); the first corner's x and the lowest y, each plus
+  half the position range (`1 << (posBits - 1)`, the range being twice the bigger of `|x first|` and
+  `|y lowest|`). Then the types used (4-bit count, 4 bits each, in type order 0..14; only voxels above the ground
+  count). A voxel is stored as its type's index + 1 in `GetBitCount(typeCount + 1)` bits; 0 is an empty height;
+  all ones ends a column.
+- Columns in save order: from the second on, 1 bit "x moved" and then the step; y above the lowest; 1 bit for a
+  ground voxel (height 0; its type is not kept and reads back as 15); then heights from 1 up (gaps as zeros)
+  and the end marker, which is left out when a column reaches height 256 (and reading stops a column at 255).
+- Reading trims `\r` and `\n` from both ends, needs at least 20 bits, refuses letters outside the alphabet,
+  ignores the zero bits after the last set one (a string of only `A`s makes the game throw: `BitArray.Get(-1)`),
+  and fails on a type index out of range. Reads are bounded by the bit array's whole length, which only grows
+  and keeps bits from earlier calls: our `BitArray` carries that state, so damaged strings read the same
+  leftovers. What a failed read appended stays in the lists. Messages as the game logs them.
+- `GetSpacedString` and `LogBitArray` have no callers.
