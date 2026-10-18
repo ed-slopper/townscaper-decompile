@@ -27,7 +27,8 @@ use ts_game::placemaker::grid_generator::{GridBitState, GridGenerator};
 use ts_game::placemaker::maker::Maker;
 use ts_game::placemaker::module_builder::{ContainerId, ModuleBuilder, ModuleBuilderHost, ModuleContainer};
 use ts_game::placemaker::modules::{ModuleLibrary, OrientedModule};
-use ts_game::placemaker::prop_placer::{EnableCall, EnableKind, MeshClone, MeshId, PlaceContext, PropHost, PropPlacer, PropPrefab, PropScene};
+use ts_game::placemaker::prop_mesh_animator::{AnimatorHost, MeshFilterPool, PropMeshAnimator};
+use ts_game::placemaker::prop_placer::{EnableCall, EnableKind, MeshClone, MeshId, MeshRefItem, PlaceContext, PropHost, PropPlacer, PropPrefab, PropScene};
 use ts_game::placemaker::wfc::{WaveFunctionCollapse, WfcHost};
 use ts_game::unity::mathematics::{f2, Int2, Int3};
 use ts_game::unity::transform::{Node, TransformId};
@@ -36,7 +37,8 @@ use ts_game::unity::vector::Vector3;
 const WFC: &str = "Placemaker.WaveFunctionCollapse";
 const PP: &str = "Placemaker.PropPlacer";
 const T: &str = "UnityEngine.Transform";
-const NEG_ID: ts_game::unity::sse::X = ts_game::unity::sse::X([0x8000_0000, 0x8000_0000, 0x8000_0000, 0x3F80_0000]);
+const V3T: &str = "UnityEngine.Vector3, UnityEngine.CoreModule";
+const V2T: &str = "UnityEngine.Vector2, UnityEngine.CoreModule";
 
 #[derive(Default)]
 struct Host {
@@ -66,19 +68,54 @@ impl GraphHost for Host {
     }
 }
 
-/// What our placer calls outside: errors kept, the rest dropped (the game side's go to its stand-ins).
+/// What our placer calls outside: errors kept, the mesh references to our animator (the stand-in's is dimmed, at
+/// state 0), the rest dropped (the game side's go to its stand-ins).
 #[derive(Default)]
 struct Calls {
     errors: Vec<String>,
     enables: usize,
     wires: usize,
+    animator: Option<PropMeshAnimator>,
+}
+/// The stand-in animator's master: dimmed, state 0; the big meshes not compared here.
+struct Dimmed;
+impl AnimatorHost for Dimmed {
+    fn is_dimmed(&self) -> bool {
+        true
+    }
+    fn state(&self) -> u8 {
+        0
+    }
+    fn viewport_point(&mut self, _p: Vector3) -> Option<Vector3> {
+        None
+    }
+    fn time(&self) -> f32 {
+        0.0
+    }
+    fn exp_t_fast(&self) -> f32 {
+        1.0
+    }
+    fn exp_t_faster(&self) -> f32 {
+        1.0
+    }
+    fn big_mesh_add(&mut self, _scene: &PropScene, _item: &MeshRefItem, _material: Option<ts_game::placemaker::prop_placer::MaterialId>) {}
+    fn big_mesh_return(&mut self, _scene: &PropScene, _item: &MeshRefItem) {}
 }
 impl PropHost for Calls {
-    fn prop_enable(&mut self, _scene: &mut PropScene, _obj: TransformId, _kind: EnableKind, _call: EnableCall) {
+    fn prop_enable(&mut self, scene: &mut PropScene, obj: TransformId, kind: EnableKind, call: EnableCall) {
         self.enables += 1;
+        if kind == EnableKind::MeshReference {
+            let a = self.animator.as_ref().unwrap();
+            match call {
+                EnableCall::OnEnable => a.on_turned_on(scene, &mut Dimmed, obj),
+                EnableCall::OnDisable => a.on_turned_off(scene, &mut Dimmed, obj),
+                EnableCall::OnFirstEnable => {}
+            }
+        }
     }
-    fn wire_setup(&mut self, _scene: &mut PropScene, _wire: TransformId, _mesh: ts_game::placemaker::prop_placer::WireMesh, _length: f32) {
+    fn get_world_mesh(&mut self) -> u32 {
         self.wires += 1;
+        self.wires as u32 - 1
     }
     fn log_error(&mut self, message: &str) {
         self.errors.push(message.into());
@@ -139,8 +176,6 @@ impl PropSide<'_> {
             };
             move_to(&mut self.scene, t, self.squares_root);
             self.scene.transforms.set_local_position(t, graph.square(sq).local_position);
-            // (the game's squares and qubes hold the rotation (-0, -0, -0, 1))
-            self.scene.transforms.nodes[t].r = NEG_ID;
             for &q in &graph.square(sq).qubes {
                 let qt = match self.qube_t.get(&q) {
                     Some(&x) => x,
@@ -152,7 +187,6 @@ impl PropSide<'_> {
                 };
                 move_to(&mut self.scene, qt, t);
                 self.scene.transforms.set_local_position(qt, graph.qube(q).local_position);
-                self.scene.transforms.nodes[qt].r = NEG_ID;
             }
         }
         for &sq in &graph.square_pool {
@@ -214,9 +248,10 @@ impl WfcHost for Builder<'_> {
 }
 
 fn settle(g: &mut Game, grid: &mut GridGenerator, ours: &mut Graph, host: &mut Host) {
-    while ret::bytes(&g.g("Iterate", vec![]))[0] != 0 {}
+    let gr = g.graph;
+    while ret::bytes(&budgeted(g, Game::call(gr, G, "Iterate", vec![], false)))[0] != 0 {}
     while ours.iterate(grid, host) {}
-    while ret::bytes(&g.g("IterateFocus", vec![]))[0] != 0 {}
+    while ret::bytes(&budgeted(g, Game::call(gr, G, "IterateFocus", vec![], false)))[0] != 0 {}
     while ours.iterate_focus(grid, host) {}
 }
 
@@ -238,10 +273,31 @@ fn random_action(r: &mut Rng, ours: &Graph, verts: &[Int2], id: i32) -> Action {
 }
 
 /// Calls a `bool` method until it returns false, one call per request (time-budgeted loops).
+/// `UniversalStopwatch.stopwatch`: `KeepGoing` is its `ElapsedMilliseconds < 8`, restarted by the scene's frame.
+static STOPWATCH: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+/// Calls a time-budgeted `bool` method until it returns false, one call per request, each with the stopwatch
+/// restarted first in the same batch (else a busy scene can leave the budget spent for every call).
+fn stopwatch(g: &mut Game) -> u64 {
+    let sw = STOPWATCH.load(std::sync::atomic::Ordering::Relaxed);
+    if sw != 0 {
+        return sw;
+    }
+    let h = handle(&ok(g.h.request(json!({"static_field": "Placemaker.UniversalStopwatch.stopwatch", "main": true, "keep": true})), "stopwatch"), "stopwatch");
+    STOPWATCH.store(h, std::sync::atomic::Ordering::Relaxed);
+    h
+}
+
+/// A time-budgeted call with the stopwatch restarted just before, in the same batch.
+fn budgeted(g: &mut Game, call: Value) -> Value {
+    let sw = stopwatch(g);
+    g.batch(vec![Game::call(sw, "System.Diagnostics.Stopwatch", "Restart", vec![], false), call], "budgeted").remove(1)
+}
+
 fn run_one_by_one(g: &mut Game, obj: u64, class: &str, m: &str) -> usize {
     eprintln!("  {m}");
     let mut n = 0;
-    while ret::bytes(&ok(g.h.request(Game::call(obj, class, m, vec![], false)), m))[0] != 0 {
+    while ret::bytes(&budgeted(g, Game::call(obj, class, m, vec![], false)))[0] != 0 {
         n += 1;
         assert!(n < 100_000, "{m} never ends");
     }
@@ -252,9 +308,10 @@ fn run_one_by_one(g: &mut Game, obj: u64, class: &str, m: &str) -> usize {
 fn run_game(g: &mut Game, wfc: u64, m: &str) -> usize {
     let mut n = 0;
     loop {
-        let reqs = (0..64).map(|_| Game::call(wfc, WFC, m, vec![], false)).collect();
+        let sw = stopwatch(g);
+        let reqs = (0..64).flat_map(|_| [Game::call(sw, "System.Diagnostics.Stopwatch", "Restart", vec![], false), Game::call(wfc, WFC, m, vec![], false)]).collect();
         let r = g.batch(reqs, m);
-        for v in &r {
+        for v in r.iter().skip(1).step_by(2) {
             if ret::bytes(v)[0] == 0 {
                 return n;
             }
@@ -296,6 +353,7 @@ struct Types {
     anchor: u64,
     wire: u64,
     window: u64,
+    renderer: u64,
 }
 
 /// Every object below `roots` on both sides, breadth first, paired.
@@ -404,6 +462,17 @@ fn check(g: &mut Game, side: &PropSide, placer: u64, types: &Types, prefab_addrs
         assert_eq!([b(6), b(7), b(8), b(9), b(10)], [n.parent_count, n.child_count, n.overlap_count, n.motevee_count, n.anchor_count], "{w}: counts");
         assert_eq!(rels[k], n.relations.iter().map(|&r| r as u32).collect::<Vec<_>>(), "{w}: relations");
     }
+    // renderers
+    let with_r: Vec<(TransformId, u64)> = props.iter().filter(|p| scene.object(p.1).renderer_enabled.is_some()).map(|p| (p.1, p.2)).collect();
+    let rs: Vec<u64> = g
+        .batch(with_r.iter().map(|&(_, t)| Game::call(t, "UnityEngine.Component", "GetComponent", vec![json!({"handle": types.renderer})], true)).collect(), "Renderer")
+        .iter()
+        .map(|r| handle(r, "renderer"))
+        .collect();
+    let en = g.batch(rs.iter().map(|&r| Game::call(r, "UnityEngine.Renderer", "get_enabled", vec![], false)).collect(), "enabled");
+    for (k, &(o, _)) in with_r.iter().enumerate() {
+        assert_eq!(Some(ret::bytes(&en[k])[0] != 0), scene.object(o).renderer_enabled, "{what}: {} #{o}: renderer enabled", scene.object(o).name);
+    }
     // meshes
     let with_mf: Vec<(TransformId, u64)> = props.iter().filter(|p| side.scene.object(p.1).mesh.is_some() || prefab_node(side, p.1).has_mesh_filter).map(|p| (p.1, p.2)).collect();
     let mfs: Vec<u64> = g
@@ -422,6 +491,28 @@ fn check(g: &mut Game, side: &PropSide, placer: u64, types: &Types, prefab_addrs
                 let a = *it.next().unwrap();
                 Some(match meshes.by_addr.get(&a) {
                     Some(&m) => m,
+                    None if matches!(scene.object(o).mesh, Some(MeshId::World(_))) => {
+                        // a mesh built at run time: its contents
+                        let Some(MeshId::World(id)) = scene.object(o).mesh else { unreachable!() };
+                        let gm = &scene.generated[&id];
+                        let lst = |g: &mut Game, t: &str| handle(&ok(g.h.request(json!({"new": list(t), "args": [], "main": true})), "list"), "list");
+                        let (lv, ln, lu, lt) = (lst(g, V3T), lst(g, V3T), lst(g, V2T), lst(g, "System.Int32"));
+                        let mc = "UnityEngine.Mesh";
+                        ok(g.h.request(json!({"call": "GetVertices", "class": mc, "handle": mh, "args": [{"handle": lv}], "param_types": ["System.Collections.Generic.List<UnityEngine.Vector3>"], "main": true})), "GetVertices");
+                        ok(g.h.request(json!({"call": "GetNormals", "class": mc, "handle": mh, "args": [{"handle": ln}], "param_types": ["System.Collections.Generic.List<UnityEngine.Vector3>"], "main": true})), "GetNormals");
+                        ok(g.h.request(json!({"call": "GetUVs", "class": mc, "handle": mh, "args": [arg::i32(0), {"handle": lu}], "param_types": ["System.Int32", "System.Collections.Generic.List<UnityEngine.Vector2>"], "main": true})), "GetUVs");
+                        ok(g.h.request(json!({"call": "GetTriangles", "class": mc, "handle": mh, "args": [{"handle": lt}, arg::i32(0)], "param_types": ["System.Collections.Generic.List<System.Int32>", "System.Int32"], "main": true})), "GetTriangles");
+                        let arr = |g: &mut Game, l: u64, t: &str| ret::bytes(&ok(g.h.request(Game::call(l, &list(t), "ToArray", vec![], false)), "ToArray"));
+                        let fl = |v: &[Vector3]| v.iter().flat_map(|p| [p.x, p.y, p.z]).collect::<Vec<f32>>();
+                        assert_eq!(bits(&f32s(&arr(g, lv, V3T))), bits(&fl(&gm.verts)), "{w}: generated vertices");
+                        assert_eq!(bits(&f32s(&arr(g, ln, V3T))), bits(&fl(&gm.normals)), "{w}: generated normals");
+                        let uv: Vec<f32> = gm.uvs.iter().flat_map(|p| [p.x, p.y]).collect();
+                        assert_eq!(bits(&f32s(&arr(g, lu, V2T))), bits(&uv), "{w}: generated uvs");
+                        let tris: Vec<i32> = arr(g, lt, "System.Int32").chunks(4).map(|c| i32::from_le_bytes(c.try_into().unwrap())).collect();
+                        assert_eq!(tris, gm.tris, "{w}: generated triangles");
+                        meshes.by_addr.insert(a, MeshId::World(id));
+                        MeshId::World(id)
+                    }
                     None => {
                         let nm = ret::string(&ok(g.h.request(Game::call(mh, "UnityEngine.Object", "get_name", vec![], false)), "name"));
                         let id = *meshes.names.get(&nm).unwrap_or_else(|| panic!("{w}: mesh {nm} unknown"));
@@ -725,6 +816,20 @@ fn placing_props_matches_the_game() {
     let pool_c = root(&mut scene, false);
     let secondary = root(&mut scene, true);
     let decon = root(&mut scene, false);
+    let anim_root = root(&mut scene, true);
+    let mf_pool = root(&mut scene, false);
+    // the Italian wire meshes, by name
+    let italian: Vec<u64> = {
+        let misc = handle(&ok(g.h.request(Game::field(scene_master, "miscReferences")), "miscReferences"), "misc");
+        let arr = handle(&ok(g.h.request(json!({"field": "italianMeshes", "handle": misc, "main": true})), "italianMeshes"), "italian");
+        array_items(&mut g, arr)
+            .into_iter()
+            .map(|m| {
+                let n = ret::string(&ok(g.h.request(Game::call(m, "UnityEngine.Object", "get_name", vec![], false)), "name"));
+                *meshes.names.get(&n).unwrap_or_else(|| panic!("Italian mesh {n}"))
+            })
+            .collect()
+    };
     let mut placer_ours = PropPlacer {
         src_props: vec![],
         prop_pools: HashMap::new(),
@@ -736,6 +841,7 @@ fn placing_props_matches_the_game() {
         collider_dict: HashMap::new(),
         material_meshes: vec![],
         prefab_of: prop_common::prefab_of(&lib, &props),
+        italian_meshes: italian,
     };
     placer_ours.on_enable(&mut scene, &props.prefabs, &[]);
     let mut ours = Graph { shadow_mesh_index_iterator: (g.ao_skip as i32) * 16383, ..Default::default() };
@@ -745,7 +851,7 @@ fn placing_props_matches_the_game() {
         prefabs: &props.prefabs,
         placer: placer_ours,
         scene,
-        calls: Calls::default(),
+        calls: Calls { animator: Some(PropMeshAnimator { root: anim_root, pool: MeshFilterPool { root: mf_pool } }), ..Calls::default() },
         squares_root,
         square_pool,
         qube_pool,
@@ -764,17 +870,22 @@ fn placing_props_matches_the_game() {
         anchor: ty(&mut g, "Placemaker.Props.PropWireAnchor, Assembly-CSharp"),
         wire: ty(&mut g, "Placemaker.Props.PropWire, Assembly-CSharp"),
         window: ty(&mut g, "Placemaker.Props.Window, Assembly-CSharp"),
+        renderer: ty(&mut g, "UnityEngine.Renderer, UnityEngine.CoreModule"),
     };
-    while ret::bytes(&g.g("IterateRefillPools", vec![]))[0] != 0 {}
+    let gr = g.graph;
+    while ret::bytes(&budgeted(&mut g, Game::call(gr, G, "IterateRefillPools", vec![], false)))[0] != 0 {}
     while ours.iterate_refill_pools(&mut || true) {}
     settle(&mut g, &mut grid, &mut ours, &mut host);
     let ps: Vec<Vector3> = grid.bits.iter().filter(|b| b.state == GridBitState::Done).map(|b| b.position).collect();
     let cx = ps.iter().map(|p| p.x).sum::<f32>() / ps.len() as f32;
     let cz = ps.iter().map(|p| p.z).sum::<f32>() / ps.len() as f32;
-    let mut r = Rng(71);
+    // TS_PROP_SEED / TS_PROP_SPREAD pick another town (the default one meets no wires)
+    let seed: u32 = std::env::var("TS_PROP_SEED").ok().and_then(|s| s.parse().ok()).unwrap_or(71);
+    let spread: f32 = std::env::var("TS_PROP_SPREAD").ok().and_then(|s| s.parse().ok()).unwrap_or(2.5);
+    let mut r = Rng(seed);
     let mut verts: Vec<Int2> = Vec::new();
     for _ in 0..150 {
-        let q = grid.get_quad(f2(r.f(cx - 2.5, cx + 2.5), r.f(cz - 2.5, cz + 2.5)));
+        let q = grid.get_quad(f2(r.f(cx - spread, cx + spread), r.f(cz - spread, cz + spread)));
         if q.is_valid() {
             for v in [q.v0, q.v1, q.v2, q.v3] {
                 if !verts.contains(&v) {
@@ -839,6 +950,26 @@ fn placing_props_matches_the_game() {
         }
         while b.props.placer.iterate_deconstruct_props(&mut b.props.scene, b.props.prefabs, &mut b.props.calls) {}
         b.props.sync(&ours, &b.mb);
+        // the squares' and qubes' local rotations as the game holds them: (-0, -0, -0, 1) or (0, 0, 0, 1) by their
+        // history (pooled objects re-parented keeping their pose; the graph's transforms are not ours here)
+        {
+            let sq_t = g.containers["squares"];
+            let sqs = g.children(&[sq_t]).remove(0);
+            assert_eq!(sqs.len(), ours.squares.len(), "step {step}: squares");
+            let qks = g.children(&sqs);
+            let mut pairs: Vec<(TransformId, u64)> = vec![];
+            for (k, &s) in ours.squares.iter().enumerate() {
+                pairs.push((b.props.square_t[&s], sqs[k]));
+                for (j, &q) in ours.square(s).qubes.iter().enumerate() {
+                    pairs.push((b.props.qube_t[&q], qks[k][j]));
+                }
+            }
+            let rs = g.batch(pairs.iter().map(|&(_, t)| Game::call(t, T, "get_localRotation", vec![], false)).collect(), "localRotation");
+            for (k, &(o, _)) in pairs.iter().enumerate() {
+                let q = u32s(&ret::bytes(&rs[k]));
+                b.props.scene.transforms.nodes[o].r = ts_game::unity::sse::X([q[0], q[1], q[2], q[3]]);
+            }
+        }
         {
             let gl = handle(&ok(g.h.request(Game::field(mb, "qubesToGrass")), "qubesToGrass"), "qubesToGrass");
             let gq = list_items(&mut g, gl, "Placemaker.Graphs.Qube, Assembly-CSharp");

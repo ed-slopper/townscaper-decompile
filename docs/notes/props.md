@@ -110,12 +110,74 @@ show the secondary props.
 Checked by `tests/placemaker_prop_placing.rs`: the WFC loops build a town on both sides with a fresh game
 `PropPlacer`; after each step every prop object (poses bit for bit, flags, node states and relations, meshes,
 collider bounds, anchors, wires, windows), `srcProps`, `materialMeshes` and the collider dictionary match. The
-game's time-budgeted loops (`ModuleBuilder.Iterate`, `IterateDeconstructQubes`, `IterateDeconstructProps`) run
-on `UniversalStopwatch.KeepGoing`, the scene's frame budget, which can stay spent for a stand-in: the test calls
-their bodies directly in the loops' order. The game's squares and qubes hold the rotation (-0, -0, -0, 1),
-which reaches the props' local rotations. Twelve steps (159 qubes, 329 prop objects) match; that town met no
+game's time-budgeted loops (`ModuleBuilder.Iterate`, the WFC's, the graph's, `IterateDeconstructProps`) run
+on `UniversalStopwatch.KeepGoing` (`stopwatch.ElapsedMilliseconds < 8`, restarted by the scene's frame): the test
+restarts the stopwatch in the same batch before each such call. The game's squares and qubes hold the rotation
+(-0, -0, -0, 1) or (0, 0, 0, 1) depending on their history (pooled objects re-parented keeping their pose), which
+reaches the props' local rotations; the test copies them from the game. Twelve steps (159 qubes, 329 prop objects) match; that town met no
 wire anchor pair, propeller, wind vane or n-gon scaler, so those paths are ported but not yet seen (row E10d's
-check covers the wires).
+check covers the wires). A denser town (seed 5, spread 1.5) matches for 40 steps (470 qubes, 764 objects), still
+without a wire.
+
+## Mesh animation (E10c, proven)
+
+`placemaker::prop_mesh_animator`. `PropMeshReference` is a node's `IPropEnable`: `OnFirstEnable` stores the
+master, `OnEnable` / `OnDisable` go to the master's `PropMeshAnimator`.
+
+- `OnTurnedOn`: not dimmed and in view (`Camera.main.WorldToViewportPoint`: z > 0, 0 < x, y < 1): the reference
+  enables, `time = Time.time + 0.5`; each item (from the last) takes a loose mesh filter under its own mesh filter:
+  one of the animator's shrinking children (they are kept sorted by x: `BinarySearchTransformX(x + 0.7)`, then
+  down while `localPosition.x >= x - 0.7`) within 0.7 (`sqrMagnitude <= 0.49`), facing within 60° (forward dot
+  ≥ 0.5), same material and mesh, re-parented keeping its world pose; else `WorldMeshes.GetMeshFilterOnly` on the
+  no-shadows layer with the item's material at scale 0. The item's renderer goes off, the loose one gets the mesh
+  and becomes the first child. Otherwise each item shows: unbatched by its renderer, batched into the big meshes
+  (`BigMeshList.Populate`, `BigMeshMaster.AddMesh`).
+- `PropMeshReference.Update` while enabled: before `time` the growing objects close in (position × `expTFaster`,
+  rotation `Lerp(identity, r, expTFast)`, scale `(s - 1)·clamp01(expTFast) + 1`); after it the animator's `OnDone`:
+  disabled, each item shows (as above) and its growing object returns to the pool at scale 1.
+- `OnTurnedOff`: past loading (`state > 18`) and active in the hierarchy: a still reference hands each item's mesh
+  to a new loose mesh filter (no-shadows layer, its material) inserted among the animator's children by x, and
+  leaves the big meshes; a growing one hands its growing objects over and disables. Otherwise a growing one drops
+  them (one missing logs an error), a still one leaves the big meshes.
+- `OnLateUpdate`: the animator's children (from the last) scale by `expTFast` until x < 0.01, then reset and go
+  back to the pool; `OnReset` sends them all back.
+- `WorldMeshes.GetMeshFilterOnly` / `ReturnMeshFilterOnly` move the pool's objects with `SetParent(.., false)`; the
+  return resets the local pose and the layer.
+
+`AddSmoothTangentsToMesh` has no caller in the build; `PropReference` is an editor aid (`NameAfterProps`,
+`OnDrawGizmos`); `PropMeshOutline` and `PropColoredMesh` carry no code; no shipped object has a `ShiftingMesh`.
+
+Checked by `tests/placemaker_prop_mesh_animator.rs`: props in front of the scene's camera with a fresh animator
+(the props' parent inactive so Unity runs no `Update` of its own, `Time.timeScale` 0 while they grow; each call
+batched with the frame's `Time.time`, decay factors and viewport points), through turning on, growing, turning
+off mid-growth, shrinking, take-overs, finishing, turning off still and resetting; and the dimmed path in
+`placemaker_prop_placing.rs` (renderers).
+
+## Wires, propellers, achievements (E10d, wires proven)
+
+`tests/placemaker_prop_wires.rs`: 24 wires (flag and Italian, lengths 0.05 to 5.1, random voxel types and
+positions) between two anchor props from a fresh game `PropPlacer`; the flag meshes' vertices, normals, uvs and
+triangles and the Italian wires' scale, rotation and coloured mesh match bit for bit. A wire shorter than 0.1 has
+`n = 0`: the sag is infinite and the second row's `normalized` step NaN; the game's `xorps` flips that NaN's sign
+before the product (`-d.y * 0.2`), which the port keeps from LLVM's `x * -c` fold.
+
+- `PropWireFlagMesh.Setup` 0x83F9A0: a `WorldMeshes` mesh built as `n = 2·RoundToInt(5·length)` segments of
+  flags along z, `n + 2` rows from `-length / 2` stepping `length / (n + 1)`, sagging (step y from
+  `-0.03 - 0.01·length`, growing by `2·(-y0) / n` a row); each row two vertex pairs, on the wire and 0.2 below it
+  across the wire's direction (`normalized` step), normals `-right` / `right` (the negation's zeros are -0), uvs
+  from the `uv` quarter cells alternating the two anchors' voxel colours every two rows; two triangles a side a
+  segment. `Reset` returns the mesh to `WorldMeshes`.
+- `PropWireItalianMesh.Setup` 0x840380: `Random(hash(position))` (no `Abs`): scale `(1, NextFloat(0.7, 1.3),
+  length)`, half the time turned 180° about y, one of `miscReferences.italianMeshes` (`NextInt`), coloured by an
+  anchor's voxel type (`NextBool`: anchor0) through `GetMeshWithVoxelType`.
+- `PropPropeller.Update` 0x83EB30: `localRotation = Euler(0, ((±1)·Time.time)·250 + 15, 0)`.
+- `PropAchievements`: `OnStart` pads `propCounts` to nine; `TriggerAchievements` reports each achievement 1..7
+  with a positive count ("Achievement: " + name, `SetAchievementProgress(name, 1)`) and lowers it by a million.
+- `PropRadiusIterator<T>` (`GetPropIterator`, used by `ButterflyFlock.OnUpdate`): the chunks from
+  `floor((pos - r) / 2)` to `ceil((pos + r) / 2)`, each chunk's colliders (from the last) whose object lies in that
+  chunk, within `r`, with a `T` and a turned-on node.
+- The `Window.Timer` / `<OnEnableAsync>d__64` rows filed under `Placemaker.Props` belong to Rewired's
+  `ControlMapper.Window` (middleware), not to the prop `Window`.
 
 ## Prefabs and pools (E10b1, proven)
 

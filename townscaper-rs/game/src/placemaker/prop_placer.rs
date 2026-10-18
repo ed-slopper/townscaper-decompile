@@ -38,6 +38,17 @@ pub type MeshAsset = u64;
 pub enum MeshId {
     Asset(MeshAsset),
     Clone(u32),
+    /// A mesh of `WorldMeshes`' pool (its contents in [`PropScene::generated`]).
+    World(u32),
+}
+
+/// A mesh built at run time (`Mesh.SetVertices` / `SetNormals` / `SetUVs(0)` / `SetTriangles`).
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct GeneratedMesh {
+    pub verts: Vec<Vector3>,
+    pub normals: Vec<Vector3>,
+    pub uvs: Vec<crate::unity::vector::Vector2>,
+    pub tris: Vec<i32>,
 }
 
 /// How a mesh copy's uvs differ from its source's (`Object.Instantiate(mesh)` then `SetUVs(0, ..)`), each
@@ -130,13 +141,6 @@ pub enum EnableCall {
     OnDisable,
 }
 
-/// The wire meshes `PropWireAnchor`s make (`Setup(master, wire, length)`, row E10d).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum WireMesh {
-    Flag,
-    Italian,
-}
-
 /// `Placemaker.Props.PropWireAnchor` as stored.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PrefabWireAnchor {
@@ -202,10 +206,12 @@ pub struct MeshRefItem {
 }
 
 /// `Placemaker.Props.PropMeshReference` (added to a node by `RecursivePropNodeSetup`, disabled).
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PropMeshReference {
     pub enabled: bool,
     pub items: Vec<MeshRefItem>,
+    /// `time`: when its growing animation ends (`PropMeshAnimator.OnTurnedOn`).
+    pub time: f32,
 }
 
 /// A `PropWireAnchor`'s run-time state.
@@ -230,6 +236,8 @@ pub struct PropObject {
     pub node: Option<PropNode>,
     pub mesh_ref: Option<PropMeshReference>,
     pub renderer_enabled: Option<bool>,
+    /// The `MeshRenderer`'s `sharedMaterial` (the prefab's, or what `SetMaterial` gave it).
+    pub material: Option<MaterialId>,
     /// `MeshFilter.sharedMesh`.
     pub mesh: Option<MeshId>,
     pub colliders: Vec<PropCollider>,
@@ -250,6 +258,8 @@ pub struct PropScene {
     pub mesh_clones: Vec<MeshClone>,
     /// `Window.materialMeshes` (static: shared by every window).
     pub window_meshes: Vec<MeshId>,
+    /// The meshes built at run time, by their `WorldMeshes` mesh.
+    pub generated: HashMap<u32, GeneratedMesh>,
 }
 
 impl PropScene {
@@ -265,7 +275,7 @@ impl PropScene {
         id
     }
 
-    fn add_object(&mut self, n: Node, active: bool, o: PropObject) -> TransformId {
+    pub fn add_object(&mut self, n: Node, active: bool, o: PropObject) -> TransformId {
         let id = self.transforms.add(n);
         self.active.push(active);
         self.objects.push(Some(o));
@@ -335,6 +345,7 @@ impl PropScene {
                 node: n.node.as_ref().map(|d| d.node.clone()),
                 mesh_ref: None,
                 renderer_enabled: n.renderer.map(|r| r.0),
+                material: n.renderer.and_then(|r| r.1),
                 mesh: n.mesh.map(MeshId::Asset),
                 colliders: n.colliders.clone(),
                 window: (None, None),
@@ -388,8 +399,8 @@ pub trait PropHost {
     /// An `IPropEnable` call on a node's first `IPropEnable` component (`PropMeshReference` →
     /// `PropMeshAnimator.OnTurnedOn` / `OnTurnedOff`, row E10d; the landings → the flocks).
     fn prop_enable(&mut self, _scene: &mut PropScene, _obj: TransformId, _kind: EnableKind, _call: EnableCall) {}
-    /// `PropWireFlagMesh.Setup` / `PropWireItalianMesh.Setup(master, wire, length)` (row E10d).
-    fn wire_setup(&mut self, _scene: &mut PropScene, _wire: TransformId, _mesh: WireMesh, _length: f32) {}
+    /// `master.worldMeshes.GetMesh()` (`PropWireFlagMesh.Setup`): a pooled mesh.
+    fn get_world_mesh(&mut self) -> u32;
     /// `master.worldMeshes.ReturnMesh(mesh)` (`PropWireFlagMesh.Reset`).
     fn return_world_mesh(&mut self, _mesh: Option<MeshId>) {}
     /// `WorldMaster.KeepGoing`.
@@ -400,9 +411,15 @@ pub trait PropHost {
     fn log_error(&mut self, _message: &str) {}
 }
 
-/// A host that does nothing.
-pub struct NoProps;
-impl PropHost for NoProps {}
+/// A host that does nothing (its world meshes are numbered from 0).
+#[derive(Default)]
+pub struct NoProps(pub u32);
+impl PropHost for NoProps {
+    fn get_world_mesh(&mut self) -> u32 {
+        self.0 += 1;
+        self.0 - 1
+    }
+}
 
 /// `Placemaker.PropPlacer`'s state.
 #[derive(Clone, Debug, PartialEq)]
@@ -424,6 +441,8 @@ pub struct PropPlacer {
     pub material_meshes: Vec<MeshId>,
     /// The library placements' `Prop`s as prefabs.
     pub prefab_of: HashMap<AssetRef, usize>,
+    /// `master.miscReferences.italianMeshes`.
+    pub italian_meshes: Vec<MeshAsset>,
 }
 
 /// `PropNode.InserOverlap` on `a` (the comparer reads every node's priority).
@@ -447,6 +466,12 @@ fn abs_i32(v: i32) -> i32 {
 /// `Vector4` to `Vector3`.
 fn xyz(v: Vector4) -> Vector3 {
     v3(v.x, v.y, v.z)
+}
+
+/// `xorps` with the sign mask, kept from being folded into the next product: LLVM rewrites `-x * c` as
+/// `x * -c`, which leaves a NaN's sign unflipped (a zero-segment wire's `normalized` is NaN).
+fn xorps_neg(x: f32) -> f32 {
+    f32::from_bits(std::hint::black_box(x.to_bits()) ^ 0x8000_0000)
 }
 
 fn neg(v: Vector3) -> Vector3 {
@@ -601,7 +626,7 @@ impl PropPlacer {
         if pn.has_mesh_filter && pn.mesh.is_some() {
             let c = cur.expect("a node above a mesh (the original throws)");
             if scene.object(c).mesh_ref.is_none() {
-                scene.object_mut(c).mesh_ref = Some(PropMeshReference { enabled: false, items: Vec::new() });
+                scene.object_mut(c).mesh_ref = Some(PropMeshReference { enabled: false, items: Vec::new(), time: 0.0 });
             }
             let batched = self.should_be_batched(scene, prefabs, dst);
             let item = MeshRefItem { mf: dst, big_mesh_part: batched, should_be_batched: batched };
@@ -1305,13 +1330,51 @@ impl PropPlacer {
             scene.node_mut(wire).add_motevee(c0);
             scene.node_mut(wire).add_motevee(c1);
             let wpn = scene.prefab_node(prefabs, wire);
-            if wpn.modifiers.iter().any(|m| matches!(m, Modifier::WireFlagMesh { .. })) {
-                host.wire_setup(scene, wire, WireMesh::Flag, len);
+            let flag = wpn.modifiers.iter().find_map(|m| match m {
+                Modifier::WireFlagMesh { uv } => Some(*uv),
+                _ => None,
+            });
+            if let Some(uv) = flag {
+                self.flag_mesh_setup(scene, host, wire, uv, len);
             } else if wpn.modifiers.iter().any(|m| matches!(m, Modifier::WireItalianMesh)) {
-                host.wire_setup(scene, wire, WireMesh::Italian, len);
+                self.italian_mesh_setup(scene, wire, len);
             }
             list.push(wire);
         }
+    }
+
+    // ---- the wire meshes (row E10d) ----
+
+    /// `Placemaker.Props.PropWireFlagMesh.Setup` 0x83F9A0: a pooled world mesh on the wire, built as a row of
+    /// flags along z ([`flag_mesh`]), coloured by the two anchors' voxel types.
+    pub fn flag_mesh_setup(&mut self, scene: &mut PropScene, host: &mut dyn PropHost, wire: TransformId, uv: Vector4, length: f32) {
+        let m = host.get_world_mesh();
+        scene.object_mut(wire).mesh = Some(MeshId::World(m));
+        let (a0, a1) = scene.object(wire).wire;
+        let vt = |a: Option<TransformId>| scene.object(a.expect("an anchor")).anchor.as_ref().expect("a PropWireAnchor").voxel_type;
+        let mesh = flag_mesh(uv, length, vt(a0), vt(a1));
+        scene.generated.insert(m, mesh);
+    }
+
+    /// `Placemaker.Props.PropWireItalianMesh.Setup` 0x840380: a random state from the wire's position's hash; the
+    /// wire scaled `(1, NextFloat(0.7, 1.3), length)`, turned round half the time; one of the master's Italian
+    /// meshes (`NextInt`), coloured (`GetMeshWithVoxelType`) by one anchor's voxel type (`NextBool`: anchor0).
+    pub fn italian_mesh_setup(&mut self, scene: &mut PropScene, wire: TransformId, length: f32) {
+        let mut random = Random::new(scene.transforms.position(wire).hash_code() as u32);
+        let s = random.next_float() * 0.59999996 + 0.7;
+        scene.transforms.set_local_scale(wire, v3(1.0, s, length));
+        if random.next_state() & 1 != 0 {
+            let lr = scene.transforms.local_rotation(wire);
+            scene.transforms.set_local_rotation(wire, Quaternion::mul(lr, Quaternion::euler(0.0, 180.0, 0.0)));
+        }
+        let n = self.italian_meshes.len() as u64;
+        let i = ((random.next_state() as u64 * n) >> 32) as usize;
+        let mesh = *self.italian_meshes.get(i).expect("IndexOutOfRangeException");
+        let (a0, a1) = scene.object(wire).wire;
+        let a = if random.next_state() & 1 == 0 { a1 } else { a0 };
+        let vt = scene.object(a.expect("an anchor")).anchor.as_ref().expect("a PropWireAnchor").voxel_type;
+        let m = self.get_mesh_with_voxel_type(scene, Some(MeshId::Asset(mesh)), vt);
+        scene.object_mut(wire).mesh = m;
     }
 
     // ---- the modifiers (row E10c) ----
@@ -1567,9 +1630,146 @@ pub fn window_mesh_with_voxel_type(scene: &mut PropScene, mesh: Option<MeshId>, 
     Some(*scene.window_meshes.get(i as usize).expect("ArgumentOutOfRangeException"))
 }
 
+/// `PropWireFlagMesh.Setup`'s mesh: `n = 2·RoundToInt(length·5)` segments; `n + 2` rows from `z = -length / 2`
+/// stepping `length / (n + 1)` while the wire sags (the step's y starts at `-0.03 - length·0.01` and grows by
+/// `2·(-y0) / n` a row). Each row has two pairs of vertices: on the wire, and 0.2 below it across the wire's
+/// direction; normals `-right`, `right`; uvs from the `uv` quarter cells, alternating the two anchors' voxel
+/// colours every two rows. Two triangles a side per segment.
+pub fn flag_mesh(uv: Vector4, length: f32, vt0: u8, vt1: u8) -> GeneratedMesh {
+    let o = Vector4 { x: uv.x * 0.25, y: uv.y * 0.25, z: uv.z * 0.25, w: uv.w * 0.25 };
+    let n = mathf::round_to_int(length * 5.0) * 2;
+    let rows = n + 1;
+    let (mut px, mut py) = (0.0f32, 0.0f32);
+    let mut z = -length * 0.5;
+    let mut step = v3(0.0, -0.03 - length * 0.01, (1.0 / rows as f32) * length);
+    let mut sag = (1.0 / n as f32) * -step.y;
+    sag += sag;
+    let cell = |v: u8| ((v & 3) as f32 * 0.25, (v >> 2) as f32 * 0.25);
+    let (u0, v0) = cell(vt0);
+    let (u1, v1) = cell(vt1);
+    let mut m = GeneratedMesh::default();
+    let right = Vector3::RIGHT;
+    let left = v3(-right.x, -right.y, -right.z);
+    let mut k = 0i32;
+    while k <= rows {
+        let d = step.normalized();
+        let a = d.z * 0.2;
+        let b = xorps_neg(d.y) * 0.2;
+        m.verts.push(v3(px, py, z));
+        m.verts.push(v3(px, py, z));
+        let low = v3(px - 0.0, py - a, z - b);
+        m.verts.push(low);
+        m.verts.push(low);
+        let nz = step.z + z;
+        let (npx, npy) = (step.x + px, step.y + py);
+        let ny = sag + step.y;
+        step = v3(step.x + 0.0, ny, step.z + 0.0);
+        px = npx;
+        py = npy;
+        z = nz;
+        let f = if (k / 2) & 1 == 0 { o.x } else { o.z };
+        k += 1;
+        let (u, v) = if (k / 2) % 2 == 1 { (u0, v0) } else { (u1, v1) };
+        let x = u + f;
+        m.uvs.push(crate::unity::vector::v2(x, o.y + v));
+        m.uvs.push(crate::unity::vector::v2(x, (o.y + 2.0) + v));
+        m.uvs.push(crate::unity::vector::v2(x, (o.w + 1.0) + v));
+        m.uvs.push(crate::unity::vector::v2(x, (o.w + 3.0) + v));
+        m.normals.extend([left, right, left, right]);
+    }
+    let mut b = 2;
+    for _ in 0..rows {
+        m.tris.extend([b - 2, b, b + 2, b + 2, b, b + 4, b - 1, b + 3, b + 1, b + 1, b + 3, b + 5]);
+        b += 4;
+    }
+    m
+}
+
 /// `Placemaker.PropPlacer.GetChunkMatrix` 0x709A70: a collider chunk (`chunkSize` 2) as a matrix: identity
 /// rotation, its centre `2c + 1` as translation.
 pub fn get_chunk_matrix(c: Int3) -> Matrix4x4 {
     let f = |v: i32| v as f32 + v as f32 + 1.0;
     Matrix4x4 { m: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, f(c.x), f(c.y), f(c.z), 1.0] }
+}
+
+/// `Placemaker.Props.PropPropeller.Update` 0x83EB30: spins about y: `localRotation = Euler(0, ((±1)·Time.time)·250
+/// + 15, 0)` (+1 for `forward`). (`OnValidate`, which puts it on the no-shadows layer, is the editor's.)
+pub fn propeller_update(scene: &mut PropScene, t: TransformId, forward: bool, time: f32) {
+    let sign = if forward { 1.0f32 } else { -1.0 };
+    scene.transforms.set_local_rotation(t, Quaternion::euler(0.0, (sign * time) * 250.0 + 15.0, 0.0));
+}
+
+/// `Placemaker.Props.PropRadiusIterator<T>` (`PropPlacer.GetPropIterator<T>`; `..ctor` 0x5B0C50, `MoveNext`
+/// 0x5B07E0 for the shared instance): over the dictionary's chunks from `floor((pos - r) / 2)` to
+/// `ceil((pos + r) / 2)` (x fastest), each chunk's colliders from the last whose object lies in that chunk (so
+/// each counts once), within `r` of `pos`, with a `T` (`has`) and a turned-on node: the collider objects.
+pub struct PropRadiusIterator {
+    sq_radius: f32,
+    pos: Vector3,
+    x: i32,
+    y: i32,
+    z: i32,
+    i: i32,
+    list: Vec<(TransformId, usize)>,
+    min: [i32; 3],
+    max: [i32; 3],
+}
+
+impl PropRadiusIterator {
+    pub fn new(pos: Vector3, radius: f32) -> PropRadiusIterator {
+        let one = Vector3::ONE;
+        let (rx, ry, rz) = (one.x * radius, one.y * radius, one.z * radius);
+        let min = [mathf::floor_to_int((pos.x - rx) * 0.5), mathf::floor_to_int((pos.y - ry) * 0.5), mathf::floor_to_int((pos.z - rz) * 0.5)];
+        let max = [mathf::ceil_to_int((rx + pos.x) * 0.5), mathf::ceil_to_int((ry + pos.y) * 0.5), mathf::ceil_to_int((rz + pos.z) * 0.5)];
+        PropRadiusIterator { sq_radius: radius * radius, pos, x: min[0] - 1, y: min[1], z: min[2], i: -1, list: Vec::new(), min, max }
+    }
+
+    /// `MoveNext`: the next collider object, or `None` at the end.
+    pub fn next(&mut self, placer: &PropPlacer, scene: &PropScene, has: &dyn Fn(&PropScene, TransformId) -> bool) -> Option<TransformId> {
+        loop {
+            if self.i < 0 {
+                self.x += 1;
+                if self.x >= self.max[0] {
+                    self.x = self.min[0];
+                    self.y += 1;
+                    if self.y >= self.max[1] {
+                        self.y = self.min[1];
+                        self.z += 1;
+                        if self.z >= self.max[2] {
+                            return None;
+                        }
+                    }
+                }
+                // (TryGetValue writes its out list even when the key is missing)
+                match placer.collider_dict.get(&Int3 { x: self.x, y: self.y, z: self.z }) {
+                    Some(l) => {
+                        self.list = l.clone();
+                        self.i = l.len() as i32 - 1;
+                    }
+                    None => self.list.clear(),
+                }
+                continue;
+            }
+            let (o, _) = self.list[self.i as usize];
+            self.i -= 1;
+            let p = scene.transforms.position(o);
+            let f = |v: i32| v as f32 + v as f32;
+            if f(self.x) > p.x || f(self.y) > p.y || f(self.z) > p.z {
+                continue;
+            }
+            if p.x >= f(self.x + 1) || p.y >= f(self.y + 1) || p.z >= f(self.z + 1) {
+                continue;
+            }
+            let d = v3(self.pos.x - p.x, self.pos.y - p.y, self.pos.z - p.z);
+            if d.sqr_magnitude() > self.sq_radius {
+                continue;
+            }
+            if !has(scene, o) {
+                continue;
+            }
+            if scene.node(o).turned_on {
+                return Some(o);
+            }
+        }
+    }
 }

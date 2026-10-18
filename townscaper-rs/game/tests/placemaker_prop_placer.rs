@@ -202,6 +202,7 @@ fn get_prop_matches_the_game() {
         collider_dict: HashMap::new(),
         material_meshes: vec![],
         prefab_of: HashMap::new(),
+        italian_meshes: vec![],
     };
     ours.on_enable(&mut scene, &props.prefabs, &[]);
     let types = Types {

@@ -29,10 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E10 | Props: `PropPlacer` (22), `PropPlacement`, `Placemaker.Props` (27 types: `PropNode`, wires and flags, windows, propellers, wind vanes, `PropAchievements`, ...), `Prop` | unowned | E7d | | Split: E10a–E10d |
-| E10c | Prop modifiers and meshes: `PropTransformer`, `PropNgonScaler`, `PropReference`, `PropMeshReference`, `PropColoredMesh`, `PropMeshOutline`, `ShiftingMesh`, `PropMeshAnimator`, `GetMeshWithVoxelType`, `AddSmoothTangentsToMesh` | unowned | E10b, E11 | ed-slopper/wren (2026-10-17) | Split of E10 |
-| E10d | Animated props: `Window` (+`Timer`), `PropPropeller`, `WindVane`, `PropWire` / anchors / flag and Italian meshes, `PropAchievements`, `PropRadiusIterator` | unowned | E10b, E11 | | Split of E10 |
-| E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
+| E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | ed-slopper/wren (2026-10-18) | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
 | E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | | Gap of F11f; needed by G3/G3a |
 
 ## P2 Gameplay systems
@@ -148,6 +145,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E11 | Transform math in `unity::transform` (+ `unity::sse`): the engine's hand-vectorised routines transcribed (global position / rotation / matrices / `lossyScale`, `TransformPoint` / `Direction` and inverses, the setters, `SetParent` keeping the world pose), bit-exact on random hierarchies and the scene's transforms; `rcpps` is the CPU's own; notes/unity.md | P1 | ed-slopper/wren | 2026-10-17 | 79969e6 |
 | E10b1 | Prop prefabs and pools: `ts_data::props` (71 prefabs, checked node by node against the game's), `placemaker::prop_placer` `GetProp` / `RecursivePropNodeSetup` / `ShouldBeBatched` `checked` (every prefab and random ones, from pools too), `OnEnable` pools, hide counts, `GetChunkMatrix` `ported` | P1 | ed-slopper/wren | 2026-10-17 | ae01bc2 |
 | E10b2–E10b4 | `PropPlacer.PlacePropsInQube` (with its `finally` node part), `RecursiveCheck`, the collider dictionary (`AddColliderToDict` / `RemoveColliderFromDict`, `PropCollider` matrix / bounds / layers), `ReturnProp`, `RemovePropsFromContainer`, coloured and window meshes, `PropTransformer` / `Window` modifiers `checked` (16 rows) end to end against a fresh game `PropPlacer` behind the WFC loops; wires, propellers, wind vanes, n-gon scalers, `IterateDeconstructProps`, reset hooks `ported`; `Intersections.corners` order fixed; notes/props.md | P1 | ed-slopper/wren | 2026-10-17 | 48581d9 |
+| E10c–E10d | `PropMeshAnimator` (grow-in on loose filters, big meshes when out of view or dimmed, x-sorted children) and `PropMeshReference` `checked` (9 rows); the flag and Italian wire meshes `checked` on 24 wires; `PropAchievements`, `PropPropeller.Update`, `WindVane`, `PropRadiusIterator`, `ShiftingMesh` order `ported`; the placing check passes a 40-step dense town; editor aids and the Rewired `Window.Timer` rows `read`; E10 closed; notes/props.md | P1 | ed-slopper/wren | 2026-10-18 | HASH |
 
 ## Changes to the board
 
@@ -232,3 +230,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: split E10b into E10b1–E10b4; claim E10b1.
 - 2026-10-17 ed-slopper/wren: E10b1 done; claim E10b2.
 - 2026-10-17 ed-slopper/wren: E10b2–E10b4 done (one row in Done, E10b removed); claim E10c.
+- 2026-10-18 ed-slopper/wren: E10c and E10d done (one row in Done, E10 closed); claim E12.

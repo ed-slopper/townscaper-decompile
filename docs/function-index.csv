@@ -621,7 +621,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x707B00,0x10707B00,Placemaker,PropPlacement,get_rotation,public Vector3 get_rotation(),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707B50,0x10707B50,Placemaker,PropPlacement,set_rotation,public void set_rotation(Vector3 value),checked,"placemaker::props (tests/placemaker_props.rs: 500 random placements, bit-exact)"
 0x707C40,0x10707C40,Placemaker,PropPlacer,AddColliderToDict,private void AddColliderToDict(PropNode node0),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
-0x708B00,0x10708B00,Placemaker,PropPlacer,AddSmoothTangentsToMesh,private void AddSmoothTangentsToMesh(Mesh mesh),dumped,
+0x708B00,0x10708B00,Placemaker,PropPlacer,AddSmoothTangentsToMesh,private void AddSmoothTangentsToMesh(Mesh mesh),read,"no caller in the build (CallerCount 0), not ported"
 0x7099B0,0x107099B0,Placemaker,PropPlacer,ChangeHideCount,"private void ChangeHideCount(PropNode node, bool add)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x709A50,0x10709A50,Placemaker,PropPlacer,FirstTurnOn,private void FirstTurnOn(PropNode node),ported,placemaker::prop_placer
 0x709A70,0x10709A70,Placemaker,PropPlacer,GetChunkMatrix,private Matrix4x4 GetChunkMatrix(int3 coordinate),ported,placemaker::prop_placer
@@ -1183,30 +1183,30 @@ rva,va,namespace,type,method,signature,status,notes
 0x840770,0x10840770,Placemaker.Modules.Processing,ProtoModule,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
 0x840970,0x10840970,Placemaker.Modules.Processing,ProtoModule,get_worldPos,public Vector3 get_worldPos(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
 0x840610,0x10840610,Placemaker.Modules.Processing,ProtoModuleMesh,.ctor,public void .ctor(),read,"editor-time module import: no Processing script on any MonoBehaviour of the build (list_scripts), no caller outside the namespace; not ported (docs/notes/modules.md)"
-0x704D90,0x10704D90,Placemaker.Props,PropAchievements,OnStart,public void OnStart(),dumped,
-0x704E00,0x10704E00,Placemaker.Props,PropAchievements,PropDisabled,public void PropDisabled(PropAchievements.Achievement achievement),dumped,
-0x704E70,0x10704E70,Placemaker.Props,PropAchievements,PropEnabled,public void PropEnabled(PropAchievements.Achievement achievement),dumped,
-0x704EF0,0x10704EF0,Placemaker.Props,PropAchievements,TriggerAchievements,public void TriggerAchievements(),dumped,
-0x705070,0x10705070,Placemaker.Props,PropAchievements,.ctor,public void .ctor(),dumped,
+0x704D90,0x10704D90,Placemaker.Props,PropAchievements,OnStart,public void OnStart(),ported,placemaker::prop_achievements (notes/props.md)
+0x704E00,0x10704E00,Placemaker.Props,PropAchievements,PropDisabled,public void PropDisabled(PropAchievements.Achievement achievement),ported,placemaker::prop_achievements (notes/props.md)
+0x704E70,0x10704E70,Placemaker.Props,PropAchievements,PropEnabled,public void PropEnabled(PropAchievements.Achievement achievement),ported,placemaker::prop_achievements (notes/props.md)
+0x704EF0,0x10704EF0,Placemaker.Props,PropAchievements,TriggerAchievements,public void TriggerAchievements(),ported,placemaker::prop_achievements (notes/props.md)
+0x705070,0x10705070,Placemaker.Props,PropAchievements,.ctor,public void .ctor(),ported,placemaker::prop_achievements (notes/props.md)
 0x1F53D0,0x101F53D0,Placemaker.Props,PropCollider,.ctor,public void .ctor(),dumped,
 0x7050D0,0x107050D0,Placemaker.Props,PropCollider,CalculateWorldBounds,public void CalculateWorldBounds(),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x705270,0x10705270,Placemaker.Props,PropCollider,Collides,"public static bool Collides(PropCollider.Layer layer0, PropCollider.Layer layer1)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x7052E0,0x107052E0,Placemaker.Props,PropCollider,GetMatrix,public Matrix4x4 GetMatrix(),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x1F53D0,0x101F53D0,Placemaker.Props,PropColoredMesh,.ctor,public void .ctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,PropMeshAnimator,.ctor,public void .ctor(),dumped,
-0x7056A0,0x107056A0,Placemaker.Props,PropMeshAnimator,OnDone,public void OnDone(PropMeshReference propMeshReference),dumped,
-0x7058E0,0x107058E0,Placemaker.Props,PropMeshAnimator,OnLateUpdate,public void OnLateUpdate(),dumped,
-0x705B20,0x10705B20,Placemaker.Props,PropMeshAnimator,OnReset,public void OnReset(),dumped,
-0x705CA0,0x10705CA0,Placemaker.Props,PropMeshAnimator,OnTurnedOff,public void OnTurnedOff(PropMeshReference propMeshReference),dumped,
-0x706290,0x10706290,Placemaker.Props,PropMeshAnimator,OnTurnedOn,public void OnTurnedOn(PropMeshReference propMeshReference),dumped,
-0x706B00,0x10706B00,Placemaker.Props,PropMeshAnimator,PosInView,private bool PosInView(PropMeshReference propMeshReference),dumped,
+0x1F53D0,0x101F53D0,Placemaker.Props,PropMeshAnimator,.ctor,public void .ctor(),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
+0x7056A0,0x107056A0,Placemaker.Props,PropMeshAnimator,OnDone,public void OnDone(PropMeshReference propMeshReference),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x7058E0,0x107058E0,Placemaker.Props,PropMeshAnimator,OnLateUpdate,public void OnLateUpdate(),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x705B20,0x10705B20,Placemaker.Props,PropMeshAnimator,OnReset,public void OnReset(),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x705CA0,0x10705CA0,Placemaker.Props,PropMeshAnimator,OnTurnedOff,public void OnTurnedOff(PropMeshReference propMeshReference),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x706290,0x10706290,Placemaker.Props,PropMeshAnimator,OnTurnedOn,public void OnTurnedOn(PropMeshReference propMeshReference),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x706B00,0x10706B00,Placemaker.Props,PropMeshAnimator,PosInView,private bool PosInView(PropMeshReference propMeshReference),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
 0x1F53D0,0x101F53D0,Placemaker.Props,PropMeshOutline,.ctor,public void .ctor(),dumped,
-0x1EAA40,0x101EAA40,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnFirstEnable,private void Placemaker.Props.IPropEnable.OnFirstEnable(WorldMaster master),dumped,
-0x706C30,0x10706C30,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnDisable,private void Placemaker.Props.IPropEnable.OnDisable(WorldMaster master),dumped,
-0x706C60,0x10706C60,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnEnable,private void Placemaker.Props.IPropEnable.OnEnable(WorldMaster master),dumped,
-0x706C90,0x10706C90,Placemaker.Props,PropMeshReference,Update,private void Update(),dumped,
-0x706F60,0x10706F60,Placemaker.Props,PropMeshReference,.ctor,public void .ctor(),dumped,
-0x1E73E0,0x101E73E0,Placemaker.Props,PropMeshReference.Item,.ctor,public void .ctor(),dumped,
+0x1EAA40,0x101EAA40,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnFirstEnable,private void Placemaker.Props.IPropEnable.OnFirstEnable(WorldMaster master),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
+0x706C30,0x10706C30,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnDisable,private void Placemaker.Props.IPropEnable.OnDisable(WorldMaster master),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x706C60,0x10706C60,Placemaker.Props,PropMeshReference,Placemaker.Props.IPropEnable.OnEnable,private void Placemaker.Props.IPropEnable.OnEnable(WorldMaster master),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x706C90,0x10706C90,Placemaker.Props,PropMeshReference,Update,private void Update(),checked,placemaker::prop_mesh_animator (tests/placemaker_prop_mesh_animator.rs; notes/props.md)
+0x706F60,0x10706F60,Placemaker.Props,PropMeshReference,.ctor,public void .ctor(),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
+0x1E73E0,0x101E73E0,Placemaker.Props,PropMeshReference.Item,.ctor,public void .ctor(),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
 0x1F53D0,0x101F53D0,Placemaker.Props,PropNgonScaler,.ctor,public void .ctor(),dumped,
 0x706FC0,0x10706FC0,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
 0x707380,0x10707380,Placemaker.Props,PropNgonScaler,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
@@ -1229,53 +1229,53 @@ rva,va,namespace,type,method,signature,status,notes
 0x707940,0x10707940,Placemaker.Props,PropNode,get_childIndex,public int get_childIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
 0x707950,0x10707950,Placemaker.Props,PropNode,get_moteveeIndex,public int get_moteveeIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
 0x707970,0x10707970,Placemaker.Props,PropNode,get_overlapIndex,public int get_overlapIndex(),checked,"placemaker::props (tests/placemaker_props.rs: 400 random relation edits on fresh nodes, the game's exceptions included)"
-0x1D4430,0x101D4430,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,PropPropeller,.ctor,public void .ctor(),dumped,
-0x83E900,0x1083E900,Placemaker.Props,PropPropeller,OnValidate,private void OnValidate(),dumped,
+0x1D4430,0x101D4430,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker.Props,PropPropeller,.ctor,public void .ctor(),ported,empty body (shared stub)
+0x83E900,0x1083E900,Placemaker.Props,PropPropeller,OnValidate,private void OnValidate(),read,"editor aid (inspector / gizmos), not ported"
 0x83E9C0,0x1083E9C0,Placemaker.Props,PropPropeller,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
-0x83EB30,0x1083EB30,Placemaker.Props,PropPropeller,Update,private void Update(),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,PropReference,RecursiveDraw,private void RecursiveDraw(Transform t),dumped,
+0x83EB30,0x1083EB30,Placemaker.Props,PropPropeller,Update,private void Update(),ported,placemaker::prop_placer (notes/props.md; wires not yet met by the check)
+0x1D4430,0x101D4430,Placemaker.Props,PropReference,RecursiveDraw,private void RecursiveDraw(Transform t),read,"editor aid (inspector / gizmos), not ported"
 0x1F53D0,0x101F53D0,Placemaker.Props,PropReference,.ctor,public void .ctor(),dumped,
-0x83EBD0,0x1083EBD0,Placemaker.Props,PropReference,NameAfterProps,private void NameAfterProps(),dumped,
-0x83EC50,0x1083EC50,Placemaker.Props,PropReference,OnDrawGizmos,private void OnDrawGizmos(),dumped,
+0x83EBD0,0x1083EBD0,Placemaker.Props,PropReference,NameAfterProps,private void NameAfterProps(),read,"editor aid (inspector / gizmos), not ported"
+0x83EC50,0x1083EC50,Placemaker.Props,PropReference,OnDrawGizmos,private void OnDrawGizmos(),read,"editor aid (inspector / gizmos), not ported"
 0x707380,0x10707380,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x83F260,0x1083F260,Placemaker.Props,PropTransformer,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x83F710,0x1083F710,Placemaker.Props,PropTransformer,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,PropWire,Setup,public void Setup(),dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,PropWire,.ctor,public void .ctor(),dumped,
-0x83F740,0x1083F740,Placemaker.Props,PropWireAnchor,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x83F8C0,0x1083F8C0,Placemaker.Props,PropWireAnchor,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,PropWireFlagMesh,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
-0x83F920,0x1083F920,Placemaker.Props,PropWireFlagMesh,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x83F9A0,0x1083F9A0,Placemaker.Props,PropWireFlagMesh,Setup,"public void Setup(WorldMaster master, PropWire wire, float length)",dumped,
-0x840350,0x10840350,Placemaker.Props,PropWireFlagMesh,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,PropWireItalianMesh,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",dumped,
-0x1D4430,0x101D4430,Placemaker.Props,PropWireItalianMesh,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,PropWireItalianMesh,.ctor,public void .ctor(),dumped,
-0x840380,0x10840380,Placemaker.Props,PropWireItalianMesh,Setup,"public void Setup(WorldMaster master, PropWire wire, float length)",dumped,
+0x1D4430,0x101D4430,Placemaker.Props,PropWire,Setup,public void Setup(),ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker.Props,PropWire,.ctor,public void .ctor(),ported,empty body (shared stub)
+0x83F740,0x1083F740,Placemaker.Props,PropWireAnchor,OnDrawGizmos,private void OnDrawGizmos(),read,"editor aid (inspector / gizmos), not ported"
+0x83F8C0,0x1083F8C0,Placemaker.Props,PropWireAnchor,.ctor,public void .ctor(),ported,field defaults (ts_data::props reads the prefab values)
+0x1D4430,0x101D4430,Placemaker.Props,PropWireFlagMesh,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,empty body (shared stub)
+0x83F920,0x1083F920,Placemaker.Props,PropWireFlagMesh,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,placemaker::prop_placer (notes/props.md; wires not yet met by the check)
+0x83F9A0,0x1083F9A0,Placemaker.Props,PropWireFlagMesh,Setup,"public void Setup(WorldMaster master, PropWire wire, float length)",checked,"placemaker::prop_placer (tests/placemaker_prop_wires.rs: 24 wires, flag meshes and Italian scale / rotation / mesh bit-exact)"
+0x840350,0x10840350,Placemaker.Props,PropWireFlagMesh,.ctor,public void .ctor(),ported,field defaults (ts_data::props reads the prefab values)
+0x1D4430,0x101D4430,Placemaker.Props,PropWireItalianMesh,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,empty body (shared stub)
+0x1D4430,0x101D4430,Placemaker.Props,PropWireItalianMesh,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker.Props,PropWireItalianMesh,.ctor,public void .ctor(),ported,empty body (shared stub)
+0x840380,0x10840380,Placemaker.Props,PropWireItalianMesh,Setup,"public void Setup(WorldMaster master, PropWire wire, float length)",checked,"placemaker::prop_placer (tests/placemaker_prop_wires.rs: 24 wires, flag meshes and Italian scale / rotation / mesh bit-exact)"
 0x1F53D0,0x101F53D0,Placemaker.Props,ShiftingMesh,.ctor,public void .ctor(),dumped,
-0x976190,0x10976190,Placemaker.Props,ShiftingMesh,System.IComparable<Placemaker.Props.ShiftingMesh>.CompareTo,private int System.IComparable<Placemaker.Props.ShiftingMesh>.CompareTo(ShiftingMesh other),dumped,
-0x976210,0x10976210,Placemaker.Props,ShiftingMesh,System.IComparable<UnityEngine.Vector3>.CompareTo,private int System.IComparable<UnityEngine.Vector3>.CompareTo(Vector3 other),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,WindVane,.ctor,public void .ctor(),dumped,
+0x976190,0x10976190,Placemaker.Props,ShiftingMesh,System.IComparable<Placemaker.Props.ShiftingMesh>.CompareTo,private int System.IComparable<Placemaker.Props.ShiftingMesh>.CompareTo(ShiftingMesh other),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
+0x976210,0x10976210,Placemaker.Props,ShiftingMesh,System.IComparable<UnityEngine.Vector3>.CompareTo,private int System.IComparable<UnityEngine.Vector3>.CompareTo(Vector3 other),ported,placemaker::prop_mesh_animator / prop_placer (notes/props.md)
+0x1D4430,0x101D4430,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker.Props,WindVane,.ctor,public void .ctor(),ported,empty body (shared stub)
 0x1F53E0,0x101F53E0,Placemaker.Props,WindVane,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",ported,placemaker::prop_placer (notes/props.md; not met yet in the checked town)
-0x1D4430,0x101D4430,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",dumped,
-0x1F53D0,0x101F53D0,Placemaker.Props,Window,.ctor,public void .ctor(),dumped,
+0x1D4430,0x101D4430,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Reset,"private void Placemaker.Props.IPropModifier.Reset(WorldMaster master, Transform srcT)",ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker.Props,Window,.ctor,public void .ctor(),ported,empty body (shared stub)
 0x1F7B20,0x101F7B20,Placemaker.Props,Window,GetMeshWithVoxelType,"public Mesh GetMeshWithVoxelType(Mesh srcMesh, byte voxelType, int variation)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x1F8110,0x101F8110,Placemaker.Props,Window,Placemaker.Props.IPropModifier.Apply,"private void Placemaker.Props.IPropModifier.Apply(WorldMaster master, ref Random random, PropModifierStruct propModifierStruct)",checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
-0x1F8890,0x101F8890,Placemaker.Props,Window,.cctor,private static void .cctor(),dumped,
-0x1D4430,0x101D4430,Placemaker.Props,Window.<OnEnableAsync>d__64,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker.Props,Window.<OnEnableAsync>d__64,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FFFE0,0x104FFFE0,Placemaker.Props,Window.<OnEnableAsync>d__64,MoveNext,private bool MoveNext(),dumped,
-0x500180,0x10500180,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1E73E0,0x101E73E0,Placemaker.Props,Window.Timer,.ctor,public void .ctor(),dumped,
-0x1E7BE0,0x101E7BE0,Placemaker.Props,Window.Timer,get_started,public bool get_started(),dumped,
-0x4FD990,0x104FD990,Placemaker.Props,Window.Timer,Start,public void Start(float length),dumped,
-0x4FD9B0,0x104FD9B0,Placemaker.Props,Window.Timer,Stop,public void Stop(),dumped,
-0x4FD9C0,0x104FD9C0,Placemaker.Props,Window.Timer,get_finished,public bool get_finished(),dumped,
-0x4FDA00,0x104FDA00,Placemaker.Props,Window.Timer,get_remaining,public float get_remaining(),dumped,
+0x1F8890,0x101F8890,Placemaker.Props,Window,.cctor,private static void .cctor(),ported,the static materialMeshes list (PropScene.window_meshes)
+0x1D4430,0x101D4430,Placemaker.Props,Window.<OnEnableAsync>d__64,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x1E4050,0x101E4050,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x1E4050,0x101E4050,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x1EEF60,0x101EEF60,Placemaker.Props,Window.<OnEnableAsync>d__64,.ctor,public void .ctor(int <>1__state),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x4FFFE0,0x104FFFE0,Placemaker.Props,Window.<OnEnableAsync>d__64,MoveNext,private bool MoveNext(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x500180,0x10500180,Placemaker.Props,Window.<OnEnableAsync>d__64,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x1E73E0,0x101E73E0,Placemaker.Props,Window.Timer,.ctor,public void .ctor(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x1E7BE0,0x101E7BE0,Placemaker.Props,Window.Timer,get_started,public bool get_started(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x4FD990,0x104FD990,Placemaker.Props,Window.Timer,Start,public void Start(float length),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x4FD9B0,0x104FD9B0,Placemaker.Props,Window.Timer,Stop,public void Stop(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x4FD9C0,0x104FD9C0,Placemaker.Props,Window.Timer,get_finished,public bool get_finished(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
+0x4FDA00,0x104FDA00,Placemaker.Props,Window.Timer,get_remaining,public float get_remaining(),read,"Rewired.UI.ControlMapper.Window (middleware), filed under Placemaker.Props by the index; not ported"
 0x840A70,0x10840A70,Placemaker.Quads,Quad,ContainsVert,public bool ContainsVert(int2 v),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
 0x840AD0,0x10840AD0,Placemaker.Quads,Quad,GetPlanePos,public float2 GetPlanePos(int index),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs
 0x840BB0,0x10840BB0,Placemaker.Quads,Quad,GetVert,public int2 GetVert(int index),checked,ts_game::placemaker::quads::Quad; tests/placemaker_quads.rs

@@ -200,6 +200,26 @@ impl Transforms {
         false
     }
 
+    /// `Transform.forward` (managed): `rotation * Vector3.forward`.
+    pub fn forward(&self, id: TransformId) -> Vector3 {
+        Quaternion::rotate(self.rotation(id), Vector3::FORWARD)
+    }
+
+    /// `Transform.SetSiblingIndex`: moved to `index` among its parent's children (clamped to the ends).
+    pub fn set_sibling_index(&mut self, id: TransformId, index: i32) {
+        let Some(p) = self.nodes[id].parent else { return };
+        let list = &mut self.children[p];
+        let Some(at) = list.iter().position(|&c| c == id) else { return };
+        list.remove(at);
+        let i = index.clamp(0, list.len() as i32) as usize;
+        list.insert(i, id);
+    }
+
+    /// `Transform.SetAsFirstSibling`.
+    pub fn set_as_first_sibling(&mut self, id: TransformId) {
+        self.set_sibling_index(id, 0);
+    }
+
     /// `Transform.right` (managed): `rotation * Vector3.right`.
     pub fn right(&self, id: TransformId) -> Vector3 {
         Quaternion::rotate(self.rotation(id), Vector3::RIGHT)
