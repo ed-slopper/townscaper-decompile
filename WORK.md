@@ -28,7 +28,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | ed-slopper/wren (2026-10-18) | Split of E1 |
 
 ## P2 Gameplay systems
 
@@ -36,7 +35,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
-| G6 | Audio: `AmbientSound`, `AudioSnapshotManager`, `AudioSourcePool`, `ClickParticleSound`, `WaterSound`, `UiAudio`, `Beatbox`, `ManySound`/`ManySoundsManager`, `MenuMusic` | unowned | E8d | | |
+| G6 | Audio: `AmbientSound`, `AudioSnapshotManager`, `AudioSourcePool`, `ClickParticleSound`, `WaterSound`, `UiAudio`, `Beatbox`, `ManySound`/`ManySoundsManager`, `MenuMusic` | unowned | E8d | ed-slopper/wren (2026-10-18) | |
 | G7 | UI (`Placemaker.Ui`, 174 types, 963 methods): split before claiming | unowned | E8, F7 | | Split: G7a–G7f |
 | G7a | UI core: `UiMaster` (39), `UpdateState` (25), `SideMenu`/`SideMenuNavigator`, `GameViewRect`, `UiScaler`, `UiElementScaler`, `ScaleUiButtons`, `PinnedUi`/`PinnedUiMobile`, `Dim`, `LoadingUi` | unowned | E8, F7 | | |
 | G7b | Save menu: `SaveMenu` (35), `SaveCard`, `FocusedSaveCard`, `MaxSavesCounter`, `SavingIndicator`, `TextSaveButtons` | unowned | G3, G7a | | |
@@ -104,6 +103,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E1a | `ts_game::os::utils`: `Bitwise`, `ByteFloat`, `ByteFloat2`, `ByteFloat3`, `SbyteFloat3` (61 rows `checked` against the game in `tests/os_utils.rs`, the 4 boxed `Equals(object)` `ported`). Found by the harness: `SbyteFloat3 * int3x3` dots each column with the vector (the transpose of `math.mul`); `FloatToByte` clamps only the top (negatives wrap); SbyteFloat3's scale is 254 and its `normal` has no −1. `tools/mark.py` sets index statuses | P1 | ed-slopper/wren | 2026-10-15 | 0fb2e05 |
 | E1b | `ts_game::os::extra_math`: all of `ExtraMath` (42 rows `checked` against the game in `tests/os_extra_math.rs`, 1,200 rounds; `BinarySearchTransformX` `ported` on child x positions, its harness check waits for E11). Found: `Cross2` rounds once from x87 precision; huge trig arguments differ between the game's Intel libm and the CRT (outside the game's range; `unity.md`) | P1 | ed-slopper/wren | 2026-10-16 | d1f62c4 |
 | E1c | `ts_game::os::intersections`: `Intersections` (`BoxBox`, the oriented box/box and box/triangle separating-axis tests `PropPlacer` uses, Möller–Trumbore `TriangleRay`, plane-based `TriangleTriangle`) and `NumberStrings`; all 10 rows `checked` (1,500 random near-touching cases per test with both answers frequent, 300 numbers) | P1 | ed-slopper/wren | 2026-10-16 | 35d327e |
+| E1d | The Unity glue in `ts_game::os::utils`: `UnityFunctions.EnumerateHirearchy` (the `HirearchyEnumerator` walk, `Reset`, `Dispose`, `ToString`), `GetNewGameObject`, `Extensions.KeepGoing`, `SetSingleLayer` `checked` (40 random trees with inactive branches walked step by step, 40 new objects, every project layer); `ScopedProfiler` empty, `UnityEvent_*` constructors only, the list / dict pools generic (`read`); notes/unity.md | P1 | ed-slopper/wren | 2026-10-18 | |
 | E2 | `ts_game::os::hex`: `HexMath` (cube/plane/world conversions, rotations, `HexRound`, `HexClamp` with the original's corner bug, every static axis and matrix bit for bit) and `HexOnionIterator` (the ring walk: `GetAt`, `Increment`/`Decrement`, a 1,500-step random walk); all 35 rows `checked`; the two editor gizmos `read`, not ported. Harness gained `static_field` | P1 | ed-slopper/wren | 2026-10-16 | 66f0f22 |
 | E3a | `ts_game::placemaker::quads` (`Quad`, `Vert`: byte for byte, `AddQuad`'s angle sort is `atan2(d.x, d.y)`), `grid_generation` (`GridConstants`, `MotivationCounter`, `HexPatch`, `HexCluster`, `CustomGridPatch`, `CustomGridLibrary.GetRandom`), `GridBit`; `ts_data::grid` reads the 40-patch library asset. 19 rows `checked`, 15 `ported` (records, empty enumerator), `Quad.ToString` waits on E13 | P1 | ed-slopper/wren | 2026-10-16 | 4f54363 |
 | E3b | `ts_game::placemaker::grid_generator` coordinate maths: `HexToPlane` (4), `PlaneToHex`, `HexToPatchHex` (2), `HexToPatchHexes`, `HexToGridCentroid`, `GetClosestClusterPos`, `GetPatchOffset`, `GetClusterOffset`, `GetStartingHex`, `GetSubdivisions`, `IsBorder`, `IsNewGrid`, `GetVertCost`, `diagonal`; all 18 rows `checked` (1,500 random grid positions near the 36/72/1152 lattices) | P1 | ed-slopper/wren | 2026-10-16 | f0d4d4a |
@@ -260,3 +260,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: split G5 into G5a (perches, creation, take-off), G5b (flight) and G5c (butterflies); G5a done; claim G5b.
 - 2026-10-18 ed-slopper/wren: G5b done; claim G5c.
 - 2026-10-18 ed-slopper/wren: G5c done; claim E1d.
+- 2026-10-18 ed-slopper/wren: E1d done; claim G6.

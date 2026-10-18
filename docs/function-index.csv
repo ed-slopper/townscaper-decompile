@@ -186,8 +186,8 @@ rva,va,namespace,type,method,signature,status,notes
 0x1FC8F0,0x101FC8F0,Os.Utils,ByteFloat3,op_Inequality,"public static bool op_Inequality(ByteFloat3 a, ByteFloat3 b)",checked,tests/os_utils.rs
 0x1FC920,0x101FC920,Os.Utils,ByteFloat3,set_Item,"public void set_Item(int key, byte value)",checked,tests/os_utils.rs
 0x1FC990,0x101FC990,Os.Utils,ByteFloat3,set_fz,public void set_fz(float value),checked,tests/os_utils.rs
-0x6CC2E0,0x106CC2E0,Os.Utils,Extensions,KeepGoing,"public static bool KeepGoing(Stopwatch stopwatch, int milliseconds)",dumped,
-0x6CC320,0x106CC320,Os.Utils,Extensions,SetSingleLayer,"public static void SetSingleLayer(Camera camera, string layerName, bool enabled)",dumped,
+0x6CC2E0,0x106CC2E0,Os.Utils,Extensions,KeepGoing,"public static bool KeepGoing(Stopwatch stopwatch, int milliseconds)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x6CC320,0x106CC320,Os.Utils,Extensions,SetSingleLayer,"public static void SetSingleLayer(Camera camera, string layerName, bool enabled)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
 0x2A3FC0,0x102A3FC0,Os.Utils,ExtraMath,SetW,"public static float4 SetW(float3 xyz, float w = 0)",checked,tests/os_extra_math.rs
 0x3DC700,0x103DC700,Os.Utils,ExtraMath,XZtoXYZ,"public static Vector3 XZtoXYZ(Vector2 xz, float y = 0)",checked,tests/os_extra_math.rs
 0x3DC700,0x103DC700,Os.Utils,ExtraMath,GetXYZfromXZ,"public static Vector3 GetXYZfromXZ(Vector2 xz, float y = 0)",checked,tests/os_extra_math.rs
@@ -262,22 +262,22 @@ rva,va,namespace,type,method,signature,status,notes
 0x96EEE0,0x1096EEE0,Os.Utils,SbyteFloat3,set_fx,public void set_fx(float value),checked,tests/os_utils.rs
 0x96EF10,0x1096EF10,Os.Utils,SbyteFloat3,set_fy,public void set_fy(float value),checked,tests/os_utils.rs
 0x96EF40,0x1096EF40,Os.Utils,SbyteFloat3,set_fz,public void set_fz(float value),checked,tests/os_utils.rs
-0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,.ctor,public void .ctor(string name),dumped,
-0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x3CCD90,0x103CCD90,Os.Utils,UnityEvent_Float,.ctor,public void .ctor(),dumped,
-0x3CCDD0,0x103CCDD0,Os.Utils,UnityEvent_Int,.ctor,public void .ctor(),dumped,
-0x3CCE10,0x103CCE10,Os.Utils,UnityFunctions,EnumerateHirearchy,"public static IEnumerable<Transform> EnumerateHirearchy(Transform t, bool includeInactive)",dumped,
-0x3CCE80,0x103CCE80,Os.Utils,UnityFunctions,GetNewGameObject,"public static GameObject GetNewGameObject(string name, Transform parent)",dumped,
+0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,.ctor,public void .ctor(string name),read,empty in the build (profiling compiled out)
+0x1D4430,0x101D4430,Os.Utils,ScopedProfiler,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,empty in the build (profiling compiled out)
+0x3CCD90,0x103CCD90,Os.Utils,UnityEvent_Float,.ctor,public void .ctor(),read,UnityEvent<T> subclasses: the base constructor only; events are the host's (Bevy)
+0x3CCDD0,0x103CCDD0,Os.Utils,UnityEvent_Int,.ctor,public void .ctor(),read,UnityEvent<T> subclasses: the base constructor only; events are the host's (Bevy)
+0x3CCE10,0x103CCE10,Os.Utils,UnityFunctions,EnumerateHirearchy,"public static IEnumerable<Transform> EnumerateHirearchy(Transform t, bool includeInactive)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x3CCE80,0x103CCE80,Os.Utils,UnityFunctions,GetNewGameObject,"public static GameObject GetNewGameObject(string name, Transform parent)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
 0x3CCEF0,0x103CCEF0,Os.Utils,UnityFunctions,InView,"public static bool InView(Camera camera, Vector3 worldPos, float margin = 0)",checked,"os::utils::in_view (tests/placemaker_bird_update.rs, the leaving birds)"
-0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,get_Current,public Transform get_Current(),dumped,
-0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x42D9E0,0x1042D9E0,Os.Utils,UnityFunctions.HirearchyEnumerator,Dispose,public void Dispose(),dumped,
-0x4FB2C0,0x104FB2C0,Os.Utils,UnityFunctions.HirearchyEnumerator,MoveNext,public bool MoveNext(),dumped,
-0x4FB440,0x104FB440,Os.Utils,UnityFunctions.HirearchyEnumerator,Reset,public void Reset(),dumped,
-0x4FB4A0,0x104FB4A0,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.Generic.IEnumerable<UnityEngine.Transform>.GetEnumerator,private IEnumerator<Transform> System.Collections.Generic.IEnumerable<UnityEngine.Transform>.GetEnumerator(),dumped,
-0x4FB4F0,0x104FB4F0,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.IEnumerable.GetEnumerator,private IEnumerator System.Collections.IEnumerable.GetEnumerator(),dumped,
-0x4FB540,0x104FB540,Os.Utils,UnityFunctions.HirearchyEnumerator,ToString,public override string ToString(),dumped,
-0x4FB800,0x104FB800,Os.Utils,UnityFunctions.HirearchyEnumerator,.ctor,"public void .ctor(Transform t, bool includeInactive)",dumped,
+0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,get_Current,public Transform get_Current(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x1E7950,0x101E7950,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),ported,os::utils::HirearchyEnumerator is Copy: a boxed copy of itself
+0x42D9E0,0x1042D9E0,Os.Utils,UnityFunctions.HirearchyEnumerator,Dispose,public void Dispose(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x4FB2C0,0x104FB2C0,Os.Utils,UnityFunctions.HirearchyEnumerator,MoveNext,public bool MoveNext(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x4FB440,0x104FB440,Os.Utils,UnityFunctions.HirearchyEnumerator,Reset,public void Reset(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x4FB4A0,0x104FB4A0,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.Generic.IEnumerable<UnityEngine.Transform>.GetEnumerator,private IEnumerator<Transform> System.Collections.Generic.IEnumerable<UnityEngine.Transform>.GetEnumerator(),ported,os::utils::HirearchyEnumerator is Copy: a boxed copy of itself
+0x4FB4F0,0x104FB4F0,Os.Utils,UnityFunctions.HirearchyEnumerator,System.Collections.IEnumerable.GetEnumerator,private IEnumerator System.Collections.IEnumerable.GetEnumerator(),ported,os::utils::HirearchyEnumerator is Copy: a boxed copy of itself
+0x4FB540,0x104FB540,Os.Utils,UnityFunctions.HirearchyEnumerator,ToString,public override string ToString(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
+0x4FB800,0x104FB800,Os.Utils,UnityFunctions.HirearchyEnumerator,.ctor,"public void .ctor(Transform t, bool includeInactive)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
 0x278960,0x10278960,Os.Utils.InEditor,EditorRoutineAttribute,.ctor,public void .ctor(),dumped,
 0x1F53D0,0x101F53D0,Placemaker,AmbientSound,.ctor,public void .ctor(),dumped,
 0x7B2D50,0x107B2D50,Placemaker,AmbientSound,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,

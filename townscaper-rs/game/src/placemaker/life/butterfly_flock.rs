@@ -16,6 +16,7 @@ use std::collections::HashMap;
 
 use crate::placemaker::life::bird_flock::{perches_in_grid, ColliderRef, LandingId};
 use crate::unity::mathematics::Int3;
+use crate::unity::dotnet::single_to_string_fixed;
 use crate::unity::mathf;
 use crate::unity::quaternion::{quat, Quaternion};
 use crate::unity::random::Rand;
@@ -173,7 +174,8 @@ impl ButterflyFlock {
             return;
         }
         if cur.is_some() && b.is_some() {
-            log_error("landing.butterfly");
+            // (the literal the birds' SetBird logs)
+            log_error("landing.bird");
         }
         self.landing(l).butterfly = b;
     }
@@ -412,7 +414,8 @@ impl ButterflyFlock {
         bf.velocity_next = Vector3::lerp(vn, v3(n.x * 0.2, n.y * 0.2, n.z * 0.2), 0.3);
         let vn = bf.velocity_next;
         if vn.x.is_nan() || vn.y.is_nan() || vn.z.is_nan() {
-            log_error("NaN velocity");
+            let f = |x: f32| single_to_string_fixed(x, 1);
+            log_error(&format!("Butterfly Velocity is NaN ({}, {}, {})", f(vn.x), f(vn.y), f(vn.z)));
             let lp = world.landing_position(l);
             let bf = &mut self.all[b];
             bf.rotation0 = Quaternion::IDENTITY;

@@ -259,3 +259,35 @@ game's code.
   `m`, `s` runs and literals. `Now` is the host's clock plus the local UTC offset (`TimeZoneInfo.Local`).
   Checked: 1,562 dates (random, round leap years, both ends of the range) in both formats, the hash and
   `GetDateTimeLong`.
+
+## The game's Unity glue in `Os.Utils` (E1d, proven)
+
+`ts_game::os::utils`, checked with `tests/os_unity_glue.rs`.
+
+- `UnityFunctions.EnumerateHirearchy(t, includeInactive)` boxes a `HirearchyEnumerator` struct. Its walk
+  (`MoveNext`) is depth first over `t`'s descendants, children in order, never `t` itself. Without
+  `includeInactive` an object whose `activeSelf` is false is skipped with its whole subtree. The `depth == -2`
+  path that would yield `t` is never reached. The port walks any [`Hierarchy`] (children, parent, sibling index,
+  `activeSelf`, name).
+  - `Reset` climbs by setting `transform` to the stored `parent` `depth` times, so it lands on the walk's parent
+    rather than `t` once it has gone down.
+  - `Dispose` (a body shared with an unrelated method) forgets `transform` and `parent`.
+  - `ToString` is `"{depth}, {siblingIndex}/{siblingCount}, {parent} > {transform}"` with the objects' names or
+    `null`.
+  - The harness keeps no boxed structs, so the test drives the struct's bytes (`this_raw`). It covers 40 random
+    trees with inactive branches, both modes, a `Reset` at a random step and `Dispose`; the state, `Current` and
+    `ToString` match at every step (about 800 steps).
+  - Callers to come: the audio manager (G6), the menu navigators and the OBJ exporter (G7).
+- `UnityFunctions.GetNewGameObject(name, parent)` makes `new GameObject()` (named `New Game Object`; the name
+  argument is unused) and `SetParent(parent, false)`. Pose checked under 40 random parents.
+- `UnityFunctions.InView` is in G5b.
+- `Extensions.KeepGoing(stopwatch, ms)` is `ElapsedMilliseconds < ms` (the time-budget test of the build loops).
+- `Extensions.SetSingleLayer(camera, name, enabled)` is `cullingMask & ~GetMask(name) | (enabled ? GetMask(name) :
+  0)`, with mask 0 for an unknown name. Checked on a disabled test camera for every project layer and an unknown
+  name. `LayerMask.LayerToName` / `NameToLayer` are stripped from the managed side, so the names come from
+  `LayerMaster`'s table.
+- `ScopedProfiler` is empty in the build (profiling compiled out). `UnityEvent_Float` / `_Int` are `UnityEvent<T>`
+  subclasses with the base constructor only; events are the host's.
+- `ListPoolExtension` (`GetListOfComponentsInChildren`, `Pop`, `ReturnToPool`) and `DictPoolExtension.ReturnToPool`
+  are generic, with shared bodies and no index rows. `Pop(list, i)` is `list[i]`, then `RemoveAt(i)`
+  (`Vec::remove`); the pools are allocation reuse with nothing to port.
