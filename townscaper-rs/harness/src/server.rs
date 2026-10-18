@@ -36,6 +36,7 @@
 //! `static_field` with `"keep": true` also returns a reference field's object as a `handle`; `{"array_raw": n}`
 //! returns the element bytes of a value-type array held by handle `n`.
 //! `{"icall": "Ns.Class::method(Args)", "args": [...], "main": true}` calls an engine internal call by name
+//! (`"ret": "f32"` for a float result)
 //! (for getters the build strips from the managed side; see `icall`).
 //! `{"addr": n}` returns the address of the object held by handle `n` (to match references in raw values).
 //! `{"static_field": "Namespace.Class.field", "main": true}` runs the class's static constructor and returns
@@ -225,7 +226,8 @@ impl Ctx {
     /// `{"icall": "UnityEngine.BoxCollider::get_size_Injected(UnityEngine.Vector3&)", "args": [{"handle": n},
     /// {"buf": hex}]}`: an engine internal call by its registered name (`il2cpp_resolve_icall`), for getters the
     /// build strips from the managed side. Arguments: objects by handle (the managed pointer), `u32`s, or buffers
-    /// (pointers to a copy, returned in `bufs_after`); `eax` is the 32-bit return value.
+    /// (pointers to a copy, returned in `bufs_after`); `eax` is the 32-bit return value, or with `"ret": "f32"`
+    /// the float one (`f32`: its bits).
     unsafe fn icall(&self, req: &Value) -> Result<Value, String> {
         let name = req["icall"].as_str().ok_or("icall: name")?;
         let f = (self.api.il2cpp_resolve_icall)(c(name).as_ptr());
@@ -247,6 +249,13 @@ impl Ctx {
             }
         }
         let w = |i: usize| words.get(i).copied().unwrap_or(0);
+        if req["ret"].as_str() == Some("f32") {
+            // a float result comes back in ST0
+            type G6 = unsafe extern "C" fn(u32, u32, u32, u32, u32, u32) -> f32;
+            let fp: G6 = std::mem::transmute(f);
+            let v = fp(w(0), w(1), w(2), w(3), w(4), w(5));
+            return Ok(json!({"f32": v.to_bits(), "bufs_after": bufs.iter().map(|b| hex(b)).collect::<Vec<_>>()}));
+        }
         type F6 = unsafe extern "C" fn(u32, u32, u32, u32, u32, u32) -> u32;
         let fp: F6 = std::mem::transmute(f);
         let eax = fp(w(0), w(1), w(2), w(3), w(4), w(5));

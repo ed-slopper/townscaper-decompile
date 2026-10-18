@@ -300,9 +300,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x7B5040,0x107B5040,Placemaker,AudioSnapshotManager,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0,private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0(float x),dumped,
 0x7B5070,0x107B5070,Placemaker,AudioSnapshotManager,Update,private void Update(),dumped,
 0x7B50C0,0x107B50C0,Placemaker,AudioSnapshotManager,.ctor,public void .ctor(),dumped,
-0x7B50E0,0x107B50E0,Placemaker,AudioSourcePool,GetAudioSource,public AudioSource GetAudioSource(),dumped,
-0x7B51A0,0x107B51A0,Placemaker,AudioSourcePool,Start,private void Start(),dumped,
-0x7B5250,0x107B5250,Placemaker,AudioSourcePool,.ctor,public void .ctor(),dumped,
+0x7B50E0,0x107B50E0,Placemaker,AudioSourcePool,GetAudioSource,public AudioSource GetAudioSource(),checked,placemaker::audio_source_pool (tests/placemaker_sounds.rs; notes/audio.md)
+0x7B51A0,0x107B51A0,Placemaker,AudioSourcePool,Start,private void Start(),ported,placemaker::audio_source_pool (notes/audio.md)
+0x7B5250,0x107B5250,Placemaker,AudioSourcePool,.ctor,public void .ctor(),ported,placemaker::audio_source_pool (notes/audio.md)
 0x7B5A90,0x107B5A90,Placemaker,BaseModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x7B9D10,0x107B9D10,Placemaker,BigMesh,Clear,public void Clear(),checked,tests/placemaker_big_mesh.rs
 0x7B9E10,0x107B9E10,Placemaker,BigMesh,SetDirty,public void SetDirty(),ported,placemaker::big_mesh
@@ -392,9 +392,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x2014C0,0x102014C0,Placemaker,ClickEffect,SetColorPickColor,private void SetColorPickColor(VoxelType voxelType),read,no callers (CallerCount 0): not ported
 0x201610,0x10201610,Placemaker,ClickEffect,SetColor,private void SetColor(VoxelType voxelType),ported,placemaker::click_effect (particle colour events)
 0x201840,0x10201840,Placemaker,ClickEffect,.ctor,public void .ctor(),ported,placemaker::click_effect
-0x201940,0x10201940,Placemaker,ClickParticleSound,OnParticleCollision,public void OnParticleCollision(GameObject other),dumped,
-0x201C60,0x10201C60,Placemaker,ClickParticleSound,OnParticleTrigger,private void OnParticleTrigger(),dumped,
-0x201EA0,0x10201EA0,Placemaker,ClickParticleSound,.ctor,public void .ctor(),dumped,
+0x201940,0x10201940,Placemaker,ClickParticleSound,OnParticleCollision,public void OnParticleCollision(GameObject other),ported,placemaker::click_particle_sound (no harness test: particle events; notes/audio.md)
+0x201C60,0x10201C60,Placemaker,ClickParticleSound,OnParticleTrigger,private void OnParticleTrigger(),ported,placemaker::click_particle_sound (no harness test: particle events; notes/audio.md)
+0x201EA0,0x10201EA0,Placemaker,ClickParticleSound,.ctor,public void .ctor(),ported,placemaker::click_particle_sound (no harness test: particle events; notes/audio.md)
 0x44C1F0,0x1044C1F0,Placemaker,DecorModule,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x44E7B0,0x1044E7B0,Placemaker,DrawPlane,AllowedQuad,private bool AllowedQuad(Quad quad),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
 0x44E840,0x1044E840,Placemaker,DrawPlane,Awake,private void Awake(),read,dev tool: DrawPlane is in none of the game's scenes (a quad-strip drawing aid); not ported
@@ -924,10 +924,10 @@ rva,va,namespace,type,method,signature,status,notes
 0x320CD0,0x10320CD0,Placemaker,TimeManager,get_slowmo,public static bool get_slowmo(),checked,tests/placemaker_timing.rs
 0x320D20,0x10320D20,Placemaker,TimeManager,set_dimScale,public static void set_dimScale(float value),checked,tests/placemaker_timing.rs
 0x320D80,0x10320D80,Placemaker,TimeManager,set_slowmo,public static void set_slowmo(bool value),checked,tests/placemaker_timing.rs
-0x1F53D0,0x101F53D0,Placemaker,UiAudio,.ctor,public void .ctor(),dumped,
-0x3C9480,0x103C9480,Placemaker,UiAudio,GetAudioSource,public AudioSource GetAudioSource(),dumped,
-0x3C9510,0x103C9510,Placemaker,UiAudio,Play,"public AudioSource Play(AudioClip clip, bool randomizePitch = True)",dumped,
-0x3C9600,0x103C9600,Placemaker,UiAudio,Start,private void Start(),dumped,
+0x1F53D0,0x101F53D0,Placemaker,UiAudio,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x3C9480,0x103C9480,Placemaker,UiAudio,GetAudioSource,public AudioSource GetAudioSource(),checked,placemaker::ui_audio (tests/placemaker_sounds.rs; notes/audio.md)
+0x3C9510,0x103C9510,Placemaker,UiAudio,Play,"public AudioSource Play(AudioClip clip, bool randomizePitch = True)",checked,placemaker::ui_audio (tests/placemaker_sounds.rs; notes/audio.md)
+0x3C9600,0x103C9600,Placemaker,UiAudio,Start,private void Start(),ported,placemaker::ui_audio (notes/audio.md)
 0x3CCFB0,0x103CCFB0,Placemaker,UniversalStopwatch,KeepGoing,public static bool KeepGoing(),ported,"placemaker::timing (wall-clock budget: unit-tested, not comparable on the harness)"
 0x3CD020,0x103CD020,Placemaker,UniversalStopwatch,StartCounting,public static bool StartCounting(),checked,tests/placemaker_timing.rs
 0x3CD0D0,0x103CD0D0,Placemaker,UniversalStopwatch,.cctor,private static void .cctor(),ported,placemaker::timing (Default)
@@ -1011,11 +1011,11 @@ rva,va,namespace,type,method,signature,status,notes
 0x1FAAE0,0x101FAAE0,Placemaker,WorldMeshes,ReturnMeshFilters,public void ReturnMeshFilters(Transform container),checked,tests/placemaker_materials.rs
 0x1FABA0,0x101FABA0,Placemaker,WorldMeshes,ReturnMesh,public void ReturnMesh(Mesh mesh),checked,tests/placemaker_materials.rs
 0x1FAC00,0x101FAC00,Placemaker,WorldMeshes,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
-0x329D50,0x10329D50,Placemaker.Audio,ManySound,.ctor,public void .ctor(),dumped,
-0x329D90,0x10329D90,Placemaker.Audio,ManySoundsManager,OnEnable,private void OnEnable(),dumped,
-0x32A000,0x1032A000,Placemaker.Audio,ManySoundsManager,OnUpdate,public void OnUpdate(),dumped,
-0x32A730,0x1032A730,Placemaker.Audio,ManySoundsManager,PlaySound,"public void PlaySound(ManySoundsManager.SoundType soundType, Vector3 pos, float pitch = 0, float volume = 1)",dumped,
-0x32AAB0,0x1032AAB0,Placemaker.Audio,ManySoundsManager,.ctor,public void .ctor(),dumped,
+0x329D50,0x10329D50,Placemaker.Audio,ManySound,.ctor,public void .ctor(),ported,placemaker::audio::many_sounds_manager (notes/audio.md)
+0x329D90,0x10329D90,Placemaker.Audio,ManySoundsManager,OnEnable,private void OnEnable(),checked,placemaker::audio::many_sounds_manager (tests/placemaker_sounds.rs; notes/audio.md)
+0x32A000,0x1032A000,Placemaker.Audio,ManySoundsManager,OnUpdate,public void OnUpdate(),checked,placemaker::audio::many_sounds_manager (tests/placemaker_sounds.rs; notes/audio.md)
+0x32A730,0x1032A730,Placemaker.Audio,ManySoundsManager,PlaySound,"public void PlaySound(ManySoundsManager.SoundType soundType, Vector3 pos, float pitch = 0, float volume = 1)",checked,placemaker::audio::many_sounds_manager (tests/placemaker_sounds.rs; notes/audio.md)
+0x32AAB0,0x1032AAB0,Placemaker.Audio,ManySoundsManager,.ctor,public void .ctor(),ported,placemaker::audio::many_sounds_manager (notes/audio.md)
 0x7B2A90,0x107B2A90,Placemaker.Graphs,Action,GetReverse,public Action GetReverse(),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x7B2AD0,0x107B2AD0,Placemaker.Graphs,Action,ToString,public override string ToString(),checked,placemaker::graphs (tests/placemaker_undo.rs)
 0x7B2D20,0x107B2D20,Placemaker.Graphs,Action,.ctor,"public void .ctor(int2 hexPos, byte height, VoxelType inType, VoxelType outType, int actionId)",checked,placemaker::graphs; tests/placemaker_graphs.rs

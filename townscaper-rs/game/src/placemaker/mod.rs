@@ -3,9 +3,12 @@
 //! bakes (E9), props (E10), building (G1), camera (G2), saving (G3), life (G5), audio (G6), UI (G7).
 
 pub mod ao_baker;
+pub mod audio;
+pub mod audio_source_pool;
 pub mod big_mesh;
 pub mod boot;
 pub mod click_effect;
+pub mod click_particle_sound;
 pub mod border_drawer;
 pub mod graphs;
 pub mod grid_generator;
@@ -36,4 +39,5 @@ pub mod wfc;
 pub mod world_master;
 pub mod world_meshes;
 pub mod ui;
+pub mod ui_audio;
 pub mod voxel_bob_effect;

@@ -19,3 +19,4 @@ Names, signatures, addresses and constants only: no pasted decompiler output.
 | [graph.md](graph.md) | The voxel graph (E4): objects and containers, editing, the update loop, saving and loading, sampling, the flow field |
 | [saving.md](saving.md) | Saving (G3): the save folder, the town and settings files (XmlSerializer form), the save system |
 | [life.md](life.md) | Life (G5): birds on the props (perches, creation, take-off, flight), butterflies |
+| [audio.md](audio.md) | Audio (G6): the sound effects' blending and pools, the UI sounds |

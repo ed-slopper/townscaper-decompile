@@ -35,8 +35,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
-| G6a | Sound effects: `ManySoundsManager` (`OnEnable`, `PlaySound`, `OnUpdate`: the screen-weighted blend of requests per sound, occlusion, Perlin pitch), `ManySound`, `AudioSourcePool`, `UiAudio`, `ClickParticleSound` | unowned | E8d | ed-slopper/wren (2026-10-18) | Split of G6 |
-| G6b | Ambience and music: `AmbientSound`, `WaterSound`, `AudioSnapshotManager`, `MenuMusic`, `Beatbox` | unowned | E8d | | Split of G6 |
+| G6b | Ambience and music: `AmbientSound`, `WaterSound`, `AudioSnapshotManager`, `MenuMusic`, `Beatbox` | unowned | E8d | ed-slopper/wren (2026-10-18) | Split of G6 |
 | G7 | UI (`Placemaker.Ui`, 174 types, 963 methods): split before claiming | unowned | E8, F7 | | Split: G7a–G7f |
 | G7a | UI core: `UiMaster` (39), `UpdateState` (25), `SideMenu`/`SideMenuNavigator`, `GameViewRect`, `UiScaler`, `UiElementScaler`, `ScaleUiButtons`, `PinnedUi`/`PinnedUiMobile`, `Dim`, `LoadingUi` | unowned | E8, F7 | | |
 | G7b | Save menu: `SaveMenu` (35), `SaveCard`, `FocusedSaveCard`, `MaxSavesCounter`, `SavingIndicator`, `TextSaveButtons` | unowned | G3, G7a | | |
@@ -158,6 +157,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G5a | Bird perches and take-off in `placemaker::life::bird_flock`: `CalculateOptimalLandings`, `GetSearchCoordinates`, `SetState`, `UprootBird` `checked` (5,002 counts, 500 boxes, 300 calls with `Random` in a known state); perch registry and neighbour counts over the prop collider grid, `IterateBirdCreation`, `UprootRadius`, `OnReset`, `BirdLanding` normals and positions `ported`; notes/life.md | P2 | ed-slopper/wren | 2026-10-18 | b77b871 |
 | G5b | Bird flight in `placemaker::life::bird_flock`: `BirdFlock.OnUpdate` (revival, orbit, the x sort, the 0.3 s steps: boiding with neighbours and the ground, leaving out of view, landing, stopping, hops, poses, turns; the Bézier placing, shade and mesh scales) and `GetLanding` `checked` (300 updates, 2,155 birds, test perches in the prop grid, `Random` in a known state), with `SetBird`, `SetLanding`, `GetLandingPos`, `UnityFunctions.InView`; the audio and shake fields are unused in the build; notes/life.md | P2 | ed-slopper/wren | 2026-10-18 |6d0ca14 |
 | G5c | Butterflies in `placemaker::life::butterfly_flock`: `ButterflyFlock.OnUpdate` (flowers found through the prop grid, the Perlin flutter round a flower, the ground push, landing and sitting, take-off, re-targeting, put away without a flower, the Bézier placing), `AddLanding`, `RemoveLanding`, `OnReset`, `SetButterfly`, `SetLanding` `checked` (300 rounds of one simulation, up to 12 butterflies, test flowers in the grid, `Random` in a known state); `ButterflyLanding` enable hooks `ported`; `Transform.TransformVector` in `unity::transform`; notes/life.md | P2 | ed-slopper/wren | 2026-10-18 |41bedc5 |
+| G6a | Sound effects: `ManySoundsManager` (`OnEnable`, `PlaySound`, `OnUpdate`: requests blended per sound by screen weight, ground push, Perlin pitch, voxel occlusion, damping) and `AudioSourcePool.GetAudioSource` in `placemaker::audio`, `checked` (300 rounds, about 1,800 playings, every source's volume / pitch / pan / position / clip); `UiAudio.Play` `checked` (200 calls); `ClickParticleSound` `ported`; harness internal calls return floats (`"ret": "f32"`); notes/audio.md | P2 | ed-slopper/wren | 2026-10-18 | |
 
 ## Changes to the board
 
@@ -263,3 +263,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: G5c done; claim E1d.
 - 2026-10-18 ed-slopper/wren: E1d done; claim G6.
 - 2026-10-18 ed-slopper/wren: split G6 into G6a (sound effects) and G6b (ambience and music); claim G6a.
+- 2026-10-18 ed-slopper/wren: G6a done; claim G6b.
