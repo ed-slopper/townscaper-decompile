@@ -484,7 +484,8 @@ impl SaveSystem {
         host.on_index_change(meta, i as u8);
     }
 
-    /// `Os.Utils.ExtraMath.BinarySearchComponent<MetaSave>(transform, item, marginMin, marginMax)` 0x30D540:
+    /// `Os.Utils.ExtraMath.BinarySearchComponent<MetaSave>(transform, item, marginMin, marginMax)` (a generic:
+    /// its shared body at 0x30D540, not an index row):
     /// over the container's children `marginMin ..= count - marginMax - 1` by `CompareTo`; not found: the
     /// complement of where it would go.
     fn binary_search(&self, item: MetaSaveId, margin_min: i32, margin_max: i32) -> i32 {
