@@ -188,3 +188,47 @@ tiny scales): `localRotation` after both setters, `position`, `rotation`, both m
 `TransformPoint` / `Direction` and their inverses, `position =`, and random `SetParent`s with and without
 keeping the world pose; and up to 1,500 of the scene's own transforms under the world master (the animated
 flocks left out), all bit-exact.
+
+## Camera and raycasts (E12, proven)
+
+`unity::camera` and `unity::physics`, transcribed from UnityPlayer.dll (PhysX 4.1 is linked into it).
+
+Camera (`tests/unity_camera.rs`: 40 random cameras under random hierarchies, mirrored scales included, random
+field of view, aspect, clip planes and viewport rect; every value bit-exact):
+
+- `worldToCameraMatrix` = `Scale(1, 1, -1) · Transform::GetWorldToLocalMatrixNoScale` (the global rotation's
+  columns transposed, `-position` through them; `CalculateGlobalPositionAndRotation` walks up with the same steps
+  as `position` / `rotation`). Products are `Matrix4x4f::operator*=`'s SSE columns:
+  `((a0·b.x + a1·b.y) + a2·b.z) + a3·b.w`.
+- `projectionMatrix` (implicit): `SetPerspective(fov, aspect, near, far)`, `cot = cos(a) / sin(a)` in double with
+  `a = ((fov·0.5) / 360 · 2)·π`. The game only sets the field of view and far plane; the aspect follows the
+  pixel rect (`width / height`) unless set. The managed `aspect` and `rect` accessors are stripped from the build
+  (the test uses the icalls).
+- `InvertMatrix4x4_Full` is Mesa's Gauss-Jordan inversion with partial pivoting (single operations, so its order is
+  safe to read from the decompile).
+- `ScreenPointToRay`: the viewport rect in whole pixels (`RectfToRectInt`: `+0.5`, truncated), `CameraUnProject`
+  of the point at depth `near` and `near + 1000` (clip `z` 0.95, then slid along the view axis to the wanted depth;
+  `|w| > 1e-7`, `|dot| >= 1e-6`), direction normalised through a double sqrt. `ViewportPointToRay` goes through
+  `ViewportToScreenPoint` (float rect). `WorldToScreenPoint` = `CameraProject` (`(size·(c + 1))·0.5 + corner`,
+  depth along `-forward`); `WorldToViewportPoint` divides by the float rect.
+- Orthographic and physical cameras are not ported (no camera the game picks through is one).
+
+Raycasts (`tests/unity_physics.rs`: 400 rays at the scene town's 71 clickable colliders, hit and miss agree on
+every ray, 161 of 163 hits bit-exact, the rest within 2e-6):
+
+- What `HoverData` hits (`LayerMaster.clickMask` = layers 8 and 13): each voxel's convex `MeshCollider` (the corner's
+  collider prism; pooled voxels keep the collider with the mesh cleared), the graph's ground `BoxCollider`, and
+  HoverData's enlarged helpers `LastHitVoxel` (×1.2) and `LastNewVoxel` (×1.5).
+- `Physics.Raycast` normalises twice (`direction / magnitude`, then `Ray`'s `normalized`). Unity drops PhysX's
+  initial overlaps: a collider the ray starts inside is not hit, and the query goes on to the next one.
+- `raycast_convexMesh`: the ray into hull space (inverse pose, inverse mesh scale), the hull's planes clipped
+  (entering `dn < -1e-7` raise the entry, leaving `dn > 1e-7` lower the exit, a parallel plane with the origin
+  outside misses), a hit when `exit > entry > 0` and `entry < max - 1e-5`; the point back through scale and pose,
+  the normal the face plane through the transposed matrix, normalised by `1 / sqrtf`.
+- `raycast_box` / `rayAABBIntersect2`: the slab test in the box's frame (`±1e-5` on the other axes), the normal the
+  hit axis signed by the point's coordinate.
+- The hull planes come from PhysX's cooking, which is not ported (STANDIN in `ConvexHull::from_points`): the
+  points are round-tripped through `1 / bounds size` as `cleanupVertices` does (Unity's build has no second
+  scale-up), each face's plane is fitted as quickhull's `computeNormalAndCentroid` does (a fixed first edge from
+  the longest of the first three, crossed with each later vertex's offset; centroid offset). The face's starting
+  vertex is our guess (lowest index), which accounts for the last ulp on about 1% of hits.

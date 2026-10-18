@@ -29,14 +29,13 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E12 | `ts_game::unity::{camera, physics}`: `Camera.ScreenPointToRay` / `WorldToScreenPoint` / projection matrices and `Physics.Raycast` against `MeshCollider`s (closest hit, triangle test, `RaycastHit` fields) as the engine computes them, for picking blocks (G1) | unowned | F11b | ed-slopper/wren (2026-10-18) | Gap of F11f; PhysX inside UnityPlayer.dll: read before porting |
 | E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | | Gap of F11f; needed by G3/G3a |
 
 ## P2 Gameplay systems
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Placing and removing blocks, colours, the click feel |
+| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | ed-slopper/wren (2026-10-18) | Placing and removing blocks, colours, the click feel |
 | G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8d | | |
 | G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
 | G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9, E13 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
@@ -146,6 +145,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E10b1 | Prop prefabs and pools: `ts_data::props` (71 prefabs, checked node by node against the game's), `placemaker::prop_placer` `GetProp` / `RecursivePropNodeSetup` / `ShouldBeBatched` `checked` (every prefab and random ones, from pools too), `OnEnable` pools, hide counts, `GetChunkMatrix` `ported` | P1 | ed-slopper/wren | 2026-10-17 | ae01bc2 |
 | E10b2–E10b4 | `PropPlacer.PlacePropsInQube` (with its `finally` node part), `RecursiveCheck`, the collider dictionary (`AddColliderToDict` / `RemoveColliderFromDict`, `PropCollider` matrix / bounds / layers), `ReturnProp`, `RemovePropsFromContainer`, coloured and window meshes, `PropTransformer` / `Window` modifiers `checked` (16 rows) end to end against a fresh game `PropPlacer` behind the WFC loops; wires, propellers, wind vanes, n-gon scalers, `IterateDeconstructProps`, reset hooks `ported`; `Intersections.corners` order fixed; notes/props.md | P1 | ed-slopper/wren | 2026-10-17 | 48581d9 |
 | E10c–E10d | `PropMeshAnimator` (grow-in on loose filters, big meshes when out of view or dimmed, x-sorted children) and `PropMeshReference` `checked` (9 rows); the flag and Italian wire meshes `checked` on 24 wires; `PropAchievements`, `PropPropeller.Update`, `WindVane`, `PropRadiusIterator`, `ShiftingMesh` order `ported`; the placing check passes a 40-step dense town; editor aids and the Rewired `Window.Timer` rows `read`; E10 closed; notes/props.md | P1 | ed-slopper/wren | 2026-10-18 | d7fa938 |
+| E12 | `unity::camera`: world-to-camera / projection / clip matrices, `InvertMatrix4x4_Full`, `ScreenPointToRay`, `ViewportPointToRay`, `WorldToScreenPoint`, `WorldToViewportPoint` bit-exact on 40 random cameras; `unity::physics`: `Physics.Raycast` over convex mesh colliders (scaled too) and boxes as PhysX 4.1 runs it, hit / miss identical on 400 rays at the scene town, 161 of 163 hits bit-exact (hull planes are a STANDIN for PhysX cooking, last ulp on ~1%); notes/unity.md | P1 | ed-slopper/wren | 2026-10-18 | HASH |
 
 ## Changes to the board
 
@@ -231,3 +231,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: E10b1 done; claim E10b2.
 - 2026-10-17 ed-slopper/wren: E10b2–E10b4 done (one row in Done, E10b removed); claim E10c.
 - 2026-10-18 ed-slopper/wren: E10c and E10d done (one row in Done, E10 closed); claim E12.
+- 2026-10-18 ed-slopper/wren: E12 done; claim G1.

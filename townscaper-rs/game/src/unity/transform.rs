@@ -502,6 +502,27 @@ impl Transforms {
         to_matrix(m)
     }
 
+    /// `Transform::GetWorldToLocalMatrixNoScale` 0x1065BE50 (`CalculateInverseGlobalMatrixNoScale` 0x10659800,
+    /// used by `Camera::GetWorldToCameraMatrix`): the global rotation's columns (`rot_columns`) transposed, and
+    /// `-position` through them (`r0·(-x) + (r1·(-y) + r2·(-z))`). `CalculateGlobalPositionAndRotation`
+    /// 0x100A0D10 walks up with the same steps as [`position`](Self::position) and
+    /// [`rotation`](Self::rotation).
+    pub fn world_to_local_matrix_no_scale(&self, id: TransformId) -> Matrix4x4 {
+        let n = &self.nodes[id];
+        let t = self.point_up(n.parent, n.t);
+        let [c0, c1, c2] = rot_columns(self.global_rotation_x(id));
+        let lo = c0.unpcklps(c1);
+        let hi = c0.unpckhps(c1);
+        let c2l = c2.unpcklps(c2);
+        let c2h = c2.unpckhps(c2);
+        let r0 = lo.movlhps(c2l);
+        let r1 = c2l.movhlps(lo);
+        let r2 = hi.movlhps(c2h);
+        let mt = k::SIGNS.xor(t);
+        let c3 = r0.mul(mt.pshufd(0x00)).add(r1.mul(mt.pshufd(0x55)).add(r2.mul(mt.pshufd(0xAA))));
+        to_matrix([r0, r1, r2, c3])
+    }
+
     /// `Transform.localRotation` (stored).
     pub fn local_rotation(&self, id: TransformId) -> Quaternion {
         xq(self.nodes[id].r)
