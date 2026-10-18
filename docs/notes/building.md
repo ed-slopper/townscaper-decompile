@@ -188,3 +188,20 @@ run in the same batch as the frame's inputs are read, every field (and the camer
   Checked: the pose on 12 thumbnails of the scene town (camera three transforms deep, read into our model).
 - `CustomCameraProjection` keeps the projection matrix from `Start` and sets it back every `Update`.
 - `ScreenshotCamera` (the photo mode's render pipeline, called from `ScreenshotButtons` only) moved to G7f.
+
+## Undo and redo (G4)
+
+The undo queue itself is the maker's (G1b: `Maker.Undo` / `Redo` through `Graph.ApplyAction`, `Action.GetReverse`,
+checked there). G4 adds the buttons and `Action.ToString`.
+
+- `Action.ToString` 0x7B2AD0: `({x}, {y}, {height}) {in} -> {out}` with the voxel types by name; checked on the
+  game for every type (`tests/placemaker_undo.rs`).
+- `UndoRedoButtons` (`placemaker::ui::undo_redo_buttons`, ported; a fake-maker test): the maker's
+  `onQueueChange` sets each label to the count (`NumberStrings.Get`) or `-` and disables a button at zero. A press
+  (`onButtonDownChange`) enables the component and arms a one-second delay (`initialDelay`); `Update` then holds
+  (`Maker.HoldUndo` / `HoldRedo`, the maker's own repeat timing) every frame past it, undo before redo, and switches
+  itself off when nothing is pressed. A click (`onClickAction`) steps once unless that press already held. Each
+  successful step squashes the button (`StandardButton.scaleXY` / `scaleZ` currents × 0.95). The gamepad stepper
+  on the object holds redo for a positive step, undo otherwise, and undoes once on press. `Button_Undo` /
+  `Button_Redo` are empty in the build.
+- `UndoRedoFeedback.OnSetup` subscribes its rect to the safe area (`UiMaster.SubscribeToSafeArea`, G7a).

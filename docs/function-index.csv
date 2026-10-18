@@ -100,9 +100,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x1EEF60,0x101EEF60,,TextFps.<FpsCounter>d__5,.ctor,public void .ctor(int <>1__state),dumped,
 0x4FEB80,0x104FEB80,,TextFps.<FpsCounter>d__5,MoveNext,private bool MoveNext(),dumped,
 0x4FEC20,0x104FEC20,,TextFps.<FpsCounter>d__5,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,,UndoRedoFeedback,OnStart,public void OnStart(UiMaster master),dumped,
-0x1FC200,0x101FC200,,UndoRedoFeedback,.ctor,public void .ctor(),dumped,
-0x3CCD10,0x103CCD10,,UndoRedoFeedback,OnSetup,public void OnSetup(UiMaster master),dumped,
+0x1D4430,0x101D4430,,UndoRedoFeedback,OnStart,public void OnStart(UiMaster master),read,empty in the build
+0x1FC200,0x101FC200,,UndoRedoFeedback,.ctor,public void .ctor(),read,a component / closure with no members of its own
+0x3CCD10,0x103CCD10,,UndoRedoFeedback,OnSetup,public void OnSetup(UiMaster master),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
 0x3DC080,0x103DC080,Os.Hex,HexMath,GetHex2,public static float2 GetHex2(float3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
 0x3DC0B0,0x103DC0B0,Os.Hex,HexMath,GetHex2,public static int2 GetHex2(int3 hexPos),checked,ts_game::os::hex; tests/os_hex.rs
 0x3DC0C0,0x103DC0C0,Os.Hex,HexMath,GetHex3,public static int3 GetHex3(int2 hex2),checked,ts_game::os::hex; tests/os_hex.rs
@@ -1017,7 +1017,7 @@ rva,va,namespace,type,method,signature,status,notes
 0x32A730,0x1032A730,Placemaker.Audio,ManySoundsManager,PlaySound,"public void PlaySound(ManySoundsManager.SoundType soundType, Vector3 pos, float pitch = 0, float volume = 1)",dumped,
 0x32AAB0,0x1032AAB0,Placemaker.Audio,ManySoundsManager,.ctor,public void .ctor(),dumped,
 0x7B2A90,0x107B2A90,Placemaker.Graphs,Action,GetReverse,public Action GetReverse(),checked,placemaker::graphs; tests/placemaker_graphs.rs
-0x7B2AD0,0x107B2AD0,Placemaker.Graphs,Action,ToString,public override string ToString(),read,debug text; waits on E13 (string.Format)
+0x7B2AD0,0x107B2AD0,Placemaker.Graphs,Action,ToString,public override string ToString(),checked,placemaker::graphs (tests/placemaker_undo.rs)
 0x7B2D20,0x107B2D20,Placemaker.Graphs,Action,.ctor,"public void .ctor(int2 hexPos, byte height, VoxelType inType, VoxelType outType, int actionId)",checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x443F70,0x10443F70,Placemaker.Graphs,Corner,AddSquare,public void AddSquare(Square quad0),checked,placemaker::graphs; tests/placemaker_graphs.rs
 0x444240,0x10444240,Placemaker.Graphs,Corner,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos; not ported
@@ -2188,22 +2188,22 @@ rva,va,namespace,type,method,signature,status,notes
 0x3CC390,0x103CC390,Placemaker.Ui,UiScaler,GetScale,public static float GetScale(),dumped,
 0x3CC3F0,0x103CC3F0,Placemaker.Ui,UiScaler,OnEnable,private void OnEnable(),dumped,
 0x3CC400,0x103CC400,Placemaker.Ui,UiScaler,SetScale,private void SetScale(),dumped,
-0x1D4430,0x101D4430,Placemaker.Ui,UndoRedoButtons,Button_Undo,public void Button_Undo(),dumped,
-0x1D4430,0x101D4430,Placemaker.Ui,UndoRedoButtons,Button_Redo,public void Button_Redo(),dumped,
-0x1FC200,0x101FC200,Placemaker.Ui,UndoRedoButtons,.ctor,public void .ctor(),dumped,
-0x3CC5D0,0x103CC5D0,Placemaker.Ui,UndoRedoButtons,OnQueueChange,"private void OnQueueChange(int undoCount, int redoCount)",dumped,
-0x3CC700,0x103CC700,Placemaker.Ui,UndoRedoButtons,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
-0x3CCB40,0x103CCB40,Placemaker.Ui,UndoRedoButtons,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
-0x3CCC20,0x103CCC20,Placemaker.Ui,UndoRedoButtons,Update,private void Update(),dumped,
-0x1E73E0,0x101E73E0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,.ctor,public void .ctor(),dumped,
-0x502D20,0x10502D20,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__0,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__0(),dumped,
-0x502DA0,0x10502DA0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__1,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__1(),dumped,
-0x502E20,0x10502E20,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__2,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__2(bool x),dumped,
-0x502E90,0x10502E90,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__3,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__3(bool x),dumped,
-0x502F00,0x10502F00,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4(),dumped,
-0x502F70,0x10502F70,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__5,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__5(),dumped,
-0x502FE0,0x10502FE0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__6,"internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__6(int step, float axis)",dumped,
-0x503040,0x10503040,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__7,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__7(),dumped,
+0x1D4430,0x101D4430,Placemaker.Ui,UndoRedoButtons,Button_Undo,public void Button_Undo(),read,empty in the build
+0x1D4430,0x101D4430,Placemaker.Ui,UndoRedoButtons,Button_Redo,public void Button_Redo(),read,empty in the build
+0x1FC200,0x101FC200,Placemaker.Ui,UndoRedoButtons,.ctor,public void .ctor(),read,a component / closure with no members of its own
+0x3CC5D0,0x103CC5D0,Placemaker.Ui,UndoRedoButtons,OnQueueChange,"private void OnQueueChange(int undoCount, int redoCount)",ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x3CC700,0x103CC700,Placemaker.Ui,UndoRedoButtons,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x3CCB40,0x103CCB40,Placemaker.Ui,UndoRedoButtons,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x3CCC20,0x103CCC20,Placemaker.Ui,UndoRedoButtons,Update,private void Update(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x1E73E0,0x101E73E0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,.ctor,public void .ctor(),read,a component / closure with no members of its own
+0x502D20,0x10502D20,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__0,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__0(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502DA0,0x10502DA0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__1,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__1(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502E20,0x10502E20,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__2,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__2(bool x),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502E90,0x10502E90,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__3,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__3(bool x),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502F00,0x10502F00,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502F70,0x10502F70,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__5,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__5(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x502FE0,0x10502FE0,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__6,"internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__6(int step, float axis)",ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
+0x503040,0x10503040,Placemaker.Ui,UndoRedoButtons.<>c__DisplayClass16_0,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__7,internal void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__7(),ported,placemaker::ui::undo_redo_buttons (tests/placemaker_undo.rs; notes/building.md)
 0x1E70A0,0x101E70A0,Placemaker.Ui,UpdateState,get_target,public float get_target(),dumped,
 0x1E70B0,0x101E70B0,Placemaker.Ui,UpdateState,get_current,public float get_current(),dumped,
 0x3CD130,0x103CD130,Placemaker.Ui,UpdateState,CheckUpdating,private void CheckUpdating(),dumped,

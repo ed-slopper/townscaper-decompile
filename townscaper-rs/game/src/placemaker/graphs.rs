@@ -90,6 +90,17 @@ impl Action {
     }
 }
 
+/// `Placemaker.Graphs.Action.ToString` 0x7B2AD0: `({x}, {y}, {height}) {in} -> {out}` (the types by name).
+impl std::fmt::Display for Action {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let s = crate::unity::dotnet::format(
+            "({0}, {1}, {2}) {3} -> {4}",
+            &[&self.hex_pos.x.to_string(), &self.hex_pos.y.to_string(), &self.height.to_string(), &format!("{:?}", self.in_type), &format!("{:?}", self.out_type)],
+        );
+        f.write_str(&s)
+    }
+}
+
 macro_rules! id {
     ($name:ident, $what:literal) => {
         #[doc = concat!("A ", $what, " of the graph (its index in the graph's arena).")]
