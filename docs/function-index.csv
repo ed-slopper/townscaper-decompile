@@ -1,8 +1,8 @@
 rva,va,namespace,type,method,signature,status,notes
 0x46D070,0x1046D070,,<PrivateImplementationDetails>,ComputeStringHash,internal static uint ComputeStringHash(string s),dumped,
-0x1F53D0,0x101F53D0,,Beatbox,.ctor,public void .ctor(),dumped,
-0x7B61A0,0x107B61A0,,Beatbox,GetBeat,"public static int GetBeat(float time, float divisor, float offset)",dumped,
-0x7B61D0,0x107B61D0,,Beatbox,IsBeat,"public static bool IsBeat(float divisor = 1, float offset = 0)",dumped,
+0x1F53D0,0x101F53D0,,Beatbox,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x7B61A0,0x107B61A0,,Beatbox,GetBeat,"public static int GetBeat(float time, float divisor, float offset)",checked,beatbox (tests/placemaker_ambience.rs; notes/audio.md)
+0x7B61D0,0x107B61D0,,Beatbox,IsBeat,"public static bool IsBeat(float divisor = 1, float offset = 0)",checked,beatbox (tests/placemaker_ambience.rs; notes/audio.md)
 0x1F53D0,0x101F53D0,,BindingRow,.ctor,public void .ctor(),dumped,
 0x7B9FD0,0x107B9FD0,,BindingRow,SetAction,"public void SetAction(InputAction action, AxisRange actionRange, string label, ControlBinding.RowVisibilityCategory visibility)",dumped,
 0x7BA010,0x107BA010,,BindingRow,SetButton,"public void SetButton(string name, Action<int, int, bool> action, int index, int mapId, bool isAltField)",dumped,
@@ -279,9 +279,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x4FB540,0x104FB540,Os.Utils,UnityFunctions.HirearchyEnumerator,ToString,public override string ToString(),checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
 0x4FB800,0x104FB800,Os.Utils,UnityFunctions.HirearchyEnumerator,.ctor,"public void .ctor(Transform t, bool includeInactive)",checked,os::utils (tests/os_unity_glue.rs; notes/unity.md)
 0x278960,0x10278960,Os.Utils.InEditor,EditorRoutineAttribute,.ctor,public void .ctor(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,AmbientSound,.ctor,public void .ctor(),dumped,
-0x7B2D50,0x107B2D50,Placemaker,AmbientSound,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,
-0x7B2D70,0x107B2D70,Placemaker,AmbientSound,Update,private void Update(),dumped,
+0x1F53D0,0x101F53D0,Placemaker,AmbientSound,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x7B2D50,0x107B2D50,Placemaker,AmbientSound,OnApplicationFocus,private void OnApplicationFocus(bool focus),checked,placemaker::ambient_sound (tests/placemaker_ambience.rs; notes/audio.md)
+0x7B2D70,0x107B2D70,Placemaker,AmbientSound,Update,private void Update(),checked,placemaker::ambient_sound (tests/placemaker_ambience.rs; notes/audio.md)
 0x7B2E50,0x107B2E50,Placemaker,AoBaker,ApplyMaterialColors,public void ApplyMaterialColors(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
 0x7B2F60,0x107B2F60,Placemaker,AoBaker,BakeAo,public void BakeAo(),checked,"placemaker::ao_baker (tests/placemaker_ao_baker.rs: 300 random atlas layouts and both globals on a fresh inactive baker, bit-exact)"
 0x7B3500,0x107B3500,Placemaker,AoBaker,GetShadowMesh,"public ValueTuple<ShadowMesh, int> GetShadowMesh(int shadowIndex)",checked,tests/placemaker_graph_loop.rs
@@ -294,12 +294,12 @@ rva,va,namespace,type,method,signature,status,notes
 0x1D4430,0x101D4430,Placemaker,AoBaker.<>c,<.cctor>b__37_0,"internal void <.cctor>b__37_0(RenderTexture <p0>, RenderTexture <p1>)",ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
 0x1E73E0,0x101E73E0,Placemaker,AoBaker.<>c,.ctor,public void .ctor(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
 0x1F2E50,0x101F2E50,Placemaker,AoBaker.<>c,.cctor,private static void .cctor(),ported,"placemaker::ao_baker (render-pass side: AoPasses, needs the shaders (C3))"
-0x1D4430,0x101D4430,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
-0x7B4F80,0x107B4F80,Placemaker,AudioSnapshotManager,OnApplicationFocus,private void OnApplicationFocus(bool focus),dumped,
-0x7B4FB0,0x107B4FB0,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
-0x7B5040,0x107B5040,Placemaker,AudioSnapshotManager,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0,private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0(float x),dumped,
-0x7B5070,0x107B5070,Placemaker,AudioSnapshotManager,Update,private void Update(),dumped,
-0x7B50C0,0x107B50C0,Placemaker,AudioSnapshotManager,.ctor,public void .ctor(),dumped,
+0x1D4430,0x101D4430,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),read,an empty shared body
+0x7B4F80,0x107B4F80,Placemaker,AudioSnapshotManager,OnApplicationFocus,private void OnApplicationFocus(bool focus),checked,placemaker::audio_snapshot_manager (tests/placemaker_ambience.rs; notes/audio.md)
+0x7B4FB0,0x107B4FB0,Placemaker,AudioSnapshotManager,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),ported,placemaker::audio_snapshot_manager: on_dim_target is what it subscribes (notes/audio.md)
+0x7B5040,0x107B5040,Placemaker,AudioSnapshotManager,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0,private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__4_0(float x),checked,placemaker::audio_snapshot_manager (tests/placemaker_ambience.rs; notes/audio.md)
+0x7B5070,0x107B5070,Placemaker,AudioSnapshotManager,Update,private void Update(),checked,placemaker::audio_snapshot_manager (tests/placemaker_ambience.rs; notes/audio.md)
+0x7B50C0,0x107B50C0,Placemaker,AudioSnapshotManager,.ctor,public void .ctor(),ported,placemaker::audio_snapshot_manager (notes/audio.md)
 0x7B50E0,0x107B50E0,Placemaker,AudioSourcePool,GetAudioSource,public AudioSource GetAudioSource(),checked,placemaker::audio_source_pool (tests/placemaker_sounds.rs; notes/audio.md)
 0x7B51A0,0x107B51A0,Placemaker,AudioSourcePool,Start,private void Start(),ported,placemaker::audio_source_pool (notes/audio.md)
 0x7B5250,0x107B5250,Placemaker,AudioSourcePool,.ctor,public void .ctor(),ported,placemaker::audio_source_pool (notes/audio.md)
@@ -952,8 +952,8 @@ rva,va,namespace,type,method,signature,status,notes
 0x3D58E0,0x103D58E0,Placemaker,VoxelBounceEffect,VoxelRemoved,"public void VoxelRemoved(Voxel voxel, Corner corner)",read,in no scene and no callers: not ported (notes/building.md)
 0x3D5900,0x103D5900,Placemaker,VoxelBounceEffect,.cctor,private static void .cctor(),read,in no scene and no callers: not ported (notes/building.md)
 0x3D5970,0x103D5970,Placemaker,VoxelBounceEffect,.ctor,public void .ctor(),read,in no scene and no callers: not ported (notes/building.md)
-0x1F53D0,0x101F53D0,Placemaker,WaterSound,.ctor,public void .ctor(),dumped,
-0x3D5A60,0x103D5A60,Placemaker,WaterSound,Update,public void Update(),dumped,
+0x1F53D0,0x101F53D0,Placemaker,WaterSound,.ctor,public void .ctor(),read,the shared MonoBehaviour constructor: no field initialisers
+0x3D5A60,0x103D5A60,Placemaker,WaterSound,Update,public void Update(),checked,placemaker::water_sound (tests/placemaker_ambience.rs; notes/audio.md)
 0x3D5C50,0x103D5C50,Placemaker,WaveFunctionCollapse,DrawPropagationGizmo,private void DrawPropagationGizmo(WaveFunctionCollapse.Propagation propagation),read,editor gizmos (not in a player build's frame)
 0x3D6240,0x103D6240,Placemaker,WaveFunctionCollapse,FillDecorPossibilities,private byte FillDecorPossibilities(Qube qube),checked,tests/placemaker_wfc.rs
 0x3D6DD0,0x103D6DD0,Placemaker,WaveFunctionCollapse,FillQubePossibilities,private byte FillQubePossibilities(Qube qube),checked,tests/placemaker_wfc.rs
@@ -1692,13 +1692,13 @@ rva,va,namespace,type,method,signature,status,notes
 0x32C710,0x1032C710,Placemaker.Ui,MasterClicker,get_maker,private Maker get_maker(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
 0x1FC200,0x101FC200,Placemaker.Ui,MaxSavesCounter,.ctor,public void .ctor(),dumped,
 0x32CAC0,0x1032CAC0,Placemaker.Ui,MaxSavesCounter,UpdateCountText,"public void UpdateCountText(string current, string max)",dumped,
-0x1D4430,0x101D4430,Placemaker.Ui,MenuMusic,OnStart,public void OnStart(UiMaster master),dumped,
-0x32CB90,0x1032CB90,Placemaker.Ui,MenuMusic,OnSetup,public void OnSetup(UiMaster master),dumped,
-0x32CBD0,0x1032CBD0,Placemaker.Ui,MenuMusic,StartPlaying,public void StartPlaying(),dumped,
-0x32CCC0,0x1032CCC0,Placemaker.Ui,MenuMusic,StartPlaying,public void StartPlaying(AudioClip clip),dumped,
-0x32CDC0,0x1032CDC0,Placemaker.Ui,MenuMusic,StopPlaying,public void StopPlaying(float timer = 1),dumped,
-0x32CDF0,0x1032CDF0,Placemaker.Ui,MenuMusic,Update,private void Update(),dumped,
-0x32CEE0,0x1032CEE0,Placemaker.Ui,MenuMusic,.ctor,public void .ctor(),dumped,
+0x1D4430,0x101D4430,Placemaker.Ui,MenuMusic,OnStart,public void OnStart(UiMaster master),read,an empty shared body
+0x32CB90,0x1032CB90,Placemaker.Ui,MenuMusic,OnSetup,public void OnSetup(UiMaster master),ported,placemaker::ui::menu_music: the host's GetComponent<AudioSource> (notes/audio.md)
+0x32CBD0,0x1032CBD0,Placemaker.Ui,MenuMusic,StartPlaying,public void StartPlaying(),checked,placemaker::ui::menu_music (tests/placemaker_ambience.rs; notes/audio.md)
+0x32CCC0,0x1032CCC0,Placemaker.Ui,MenuMusic,StartPlaying,public void StartPlaying(AudioClip clip),checked,placemaker::ui::menu_music (tests/placemaker_ambience.rs; notes/audio.md)
+0x32CDC0,0x1032CDC0,Placemaker.Ui,MenuMusic,StopPlaying,public void StopPlaying(float timer = 1),checked,placemaker::ui::menu_music (tests/placemaker_ambience.rs; notes/audio.md)
+0x32CDF0,0x1032CDF0,Placemaker.Ui,MenuMusic,Update,private void Update(),checked,placemaker::ui::menu_music (tests/placemaker_ambience.rs; notes/audio.md)
+0x32CEE0,0x1032CEE0,Placemaker.Ui,MenuMusic,.ctor,public void .ctor(),ported,placemaker::ui::menu_music (notes/audio.md)
 0x1D4430,0x101D4430,Placemaker.Ui,NavigableButton,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
 0x334520,0x10334520,Placemaker.Ui,NavigableButton,OnHorizontal,"public void OnHorizontal(int step, float axis)",dumped,
 0x334570,0x10334570,Placemaker.Ui,NavigableButton,OnSelectedUpdate,public void OnSelectedUpdate(),dumped,

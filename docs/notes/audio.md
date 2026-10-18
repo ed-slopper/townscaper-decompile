@@ -51,3 +51,39 @@ playings. `UiAudio.Play` is checked over 200 calls on the scene's UI audio.
   Debris sound at its point. On the water trigger's entering particles it picks the fastest one and makes a
   DebrisSplash at its position. Either way the volume is `speed / 10` (`PlaySound(type, pos, 0, volume)`).
 - The harness learned `"ret": "f32"` for internal calls: `AudioSource.panStereo`'s managed getter is stripped.
+
+## Ambience and music (G6b)
+
+`beatbox`, `placemaker::ambient_sound`, `placemaker::water_sound`, `placemaker::audio_snapshot_manager`,
+`placemaker::ui::menu_music`.
+
+Checked with `tests/placemaker_ambience.rs`:
+- `Beatbox` over 2,000 values and 300 frames.
+- `WaterSound` over 200 random shorelines on a stand-in master and camera positions.
+- 600 random calls on fresh `AmbientSound`, `AudioSnapshotManager` and `MenuMusic` components with their own
+  source (listener muted). The fields, the enabled flags, the source's volume, clip and playing flag, and
+  `Random` all match.
+- These are live behaviours: Unity runs their `Update` every frame. The test keeps them disabled between batches
+  and sets their flags at each batch's start.
+
+- `Beatbox` (global namespace; nothing calls it): 100 bpm. `GetBeat(time, scale, offset) = RoundToInt(time ×
+  1.6666666 × scale + offset)`. `IsBeat(scale, offset)` is whether that number changes between `Time.time` and
+  `Time.time + Time.deltaTime`.
+- `AmbientSound.Update`: the ambience source's volume moves towards 0.5 while `Application.isFocused` (else 0) by
+  `unscaledDeltaTime / 4`. Once there, the component disables itself; `OnApplicationFocus` re-enables it.
+- `WaterSound.Update` puts the water's sound on a vertex of `master.sandbanker.verts`, walking the list from the
+  end.
+  - It measures the camera's squared distance to the vertex taken so far (the origin at first), not to the vertex
+    looked at.
+  - So it takes the last vertex, then each earlier vertex for which the distance to the vertex before it (the one
+    last taken) is a new minimum. It is not the nearest vertex.
+- `AudioSnapshotManager`: the in-focus mixer snapshot when the window has focus and the UI dim's alpha target
+  (`UiMaster.dim.alphaState`, subscribed in `OnSetup`) is not above 0, else the out-of-focus one.
+  `TransitionTo(0.5)` once per change (`Update` disables itself). The constructor starts focused and dimmed.
+- `MenuMusic`:
+  - `StartPlaying()`: target volume 1, `speed` 1. Unless already playing, a random clip of `audioClips` plays at
+    volume 1.
+  - `StartPlaying(clip)` sets the clip first, which the random pick then replaces.
+  - `StopPlaying(timer)`: target 0, `speed = 1/timer`. `speed` is never read.
+  - `Update`: the volume moves towards the target by `Time.deltaTime`. Once there, it disables itself, and stops
+    the source at 0.
