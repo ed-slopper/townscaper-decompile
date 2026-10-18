@@ -11,6 +11,7 @@ pub mod graphs;
 pub mod grid_generator;
 pub mod hover_data;
 pub mod hover_hightlight;
+pub mod life;
 pub mod maker;
 pub mod materials;
 pub mod module_builder;

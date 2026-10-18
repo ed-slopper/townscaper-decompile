@@ -36,7 +36,8 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
-| G5 | Life: `BirdFlock` (17), `Bird`, `BirdLanding`, `BirdSpot`, `ButterflyFlock`, `Butterfly`, `ButterflyLanding` | unowned | E8d | ed-slopper/wren (2026-10-18)
+| G5b | Bird flight: `BirdFlock.OnUpdate` (the 0.3 s step simulation: boiding, landing, stopping, leaving, orbit, the x sort, take-off feathers and audio, shake) and `GetLanding` | unowned | G5a | ed-slopper/wren (2026-10-18) | Split of G5 |
+| G5c | Butterflies: `ButterflyFlock` (`OnUpdate`, `SetButterfly`, `SetLanding`, `AddLanding`, `RemoveLanding`, `OnReset`), `Butterfly`, `ButterflyLanding` | unowned | G5a | | Split of G5 |
 | G6 | Audio: `AmbientSound`, `AudioSnapshotManager`, `AudioSourcePool`, `ClickParticleSound`, `WaterSound`, `UiAudio`, `Beatbox`, `ManySound`/`ManySoundsManager`, `MenuMusic` | unowned | E8d | | |
 | G7 | UI (`Placemaker.Ui`, 174 types, 963 methods): split before claiming | unowned | E8, F7 | | Split: G7a–G7f |
 | G7a | UI core: `UiMaster` (39), `UpdateState` (25), `SideMenu`/`SideMenuNavigator`, `GameViewRect`, `UiScaler`, `UiElementScaler`, `ScaleUiButtons`, `PinnedUi`/`PinnedUiMobile`, `Dim`, `LoadingUi` | unowned | E8, F7 | | |
@@ -155,6 +156,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G3c | `.binscape` files in `placemaker::save_binary`: MS-NRBF reader (general records) and writer of `SaveData` (ids in the order met, structs inline, `List<T>` arrays at their capacity) `checked`: 120 random save data byte-identical to the game's `BinaryFormatter`, read both ways; the save system uses it for `isBin` metas; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | 2db96f2 |
 | G3d | The editable texture PNGs in `placemaker::texture_png_master`: `TexturePngMaster` (write when missing, read when newer, shader globals, palette colours, the `_BakedTex` bake, reset, focus) `ported`, with a fake-folder test and the harness game's post-enable state as the check; PNG coding and the blit are the host's; notes/saving.md | P2 | ed-slopper/wren | 2026-10-18 | 8976020 |
 | G4 | Undo / redo: the queue was G1b's (`Maker.Undo` / `Redo`, `Graph.ApplyAction`, `Action.GetReverse`); `Action.ToString` `checked` (every voxel type); `UndoRedoButtons` (labels, disabling, click vs one-second hold repeat, squash, gamepad stepper; moved here from G7f) and `UndoRedoFeedback` `ported` in `placemaker::ui::undo_redo_buttons` with a fake-maker test; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | 4539d3e |
+| G5a | Bird perches and take-off in `placemaker::life::bird_flock`: `CalculateOptimalLandings`, `GetSearchCoordinates`, `SetState`, `UprootBird` `checked` (5,002 counts, 500 boxes, 300 calls with `Random` in a known state); perch registry and neighbour counts over the prop collider grid, `IterateBirdCreation`, `UprootRadius`, `OnReset`, `BirdLanding` normals and positions `ported`; notes/life.md | P2 | ed-slopper/wren | 2026-10-18 | |
 
 ## Changes to the board
 
@@ -255,3 +257,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: G3c done; claim G3d.
 - 2026-10-18 ed-slopper/wren: G3d done; claim G4.
 - 2026-10-18 ed-slopper/wren: G4 done (UndoRedoButtons taken from G7f); claim G5.
+- 2026-10-18 ed-slopper/wren: split G5 into G5a (perches, creation, take-off), G5b (flight) and G5c (butterflies); G5a done; claim G5b.
