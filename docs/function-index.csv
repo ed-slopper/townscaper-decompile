@@ -491,27 +491,27 @@ rva,va,namespace,type,method,signature,status,notes
 0xE3A8F0,0x10E3A8F0,Placemaker,GroundClicker,Update,private void Update(),dumped,
 0xE3AAA0,0x10E3AAA0,Placemaker,GroundClicker,.ctor,public void .ctor(),dumped,
 0xE3AAF0,0x10E3AAF0,Placemaker,GroundClicker,get_maker,private Maker get_maker(),dumped,
-0x1D4430,0x101D4430,Placemaker,HoverData,Finish,public void Finish(),dumped,
-0x1D4430,0x101D4430,Placemaker,HoverData,Update,private void Update(),dumped,
-0x1F53D0,0x101F53D0,Placemaker,HoverData,.ctor,public void .ctor(),dumped,
-0x3DE530,0x103DE530,Placemaker,HoverData,ClearHover,public void ClearHover(),dumped,
+0x1D4430,0x101D4430,Placemaker,HoverData,Finish,public void Finish(),ported,empty body (shared stub)
+0x1D4430,0x101D4430,Placemaker,HoverData,Update,private void Update(),ported,empty body (shared stub)
+0x1F53D0,0x101F53D0,Placemaker,HoverData,.ctor,public void .ctor(),ported,placemaker::hover_data (notes/building.md)
+0x3DE530,0x103DE530,Placemaker,HoverData,ClearHover,public void ClearHover(),ported,placemaker::hover_data (notes/building.md)
 0x3DE550,0x103DE550,Placemaker,HoverData,GamepadAddMove,"public void GamepadAddMove(Vector2 position, Vector2 delta, float actionT)",dumped,
-0x3DFA30,0x103DFA30,Placemaker,HoverData,GetDstPos,public Vector3 GetDstPos(),dumped,
-0x3DFB00,0x103DFB00,Placemaker,HoverData,GetSrcPos,public Vector3 GetSrcPos(),dumped,
-0x3DFBC0,0x103DFBC0,Placemaker,HoverData,IsOccupied,"private bool IsOccupied(int2 hexPos, int height)",dumped,
-0x3DFCA0,0x103DFCA0,Placemaker,HoverData,Iterate,private bool Iterate(),dumped,
-0x3E01C0,0x103E01C0,Placemaker,HoverData,JumpForwardOnAdd,public void JumpForwardOnAdd(),dumped,
-0x3E0420,0x103E0420,Placemaker,HoverData,OnDrawGizmos,private void OnDrawGizmos(),dumped,
-0x3E04D0,0x103E04D0,Placemaker,HoverData,OnGamepadMoveAdd,public void OnGamepadMoveAdd(),dumped,
-0x3E0510,0x103E0510,Placemaker,HoverData,OnGamepadRemove,public void OnGamepadRemove(),dumped,
-0x3E0530,0x103E0530,Placemaker,HoverData,SetHover,"public void SetHover(Vector2 position, int actionId)",dumped,
-0x3E1490,0x103E1490,Placemaker,HoverData,TryGetVert,private Vert TryGetVert(float2 planePos),dumped,
+0x3DFA30,0x103DFA30,Placemaker,HoverData,GetDstPos,public Vector3 GetDstPos(),ported,placemaker::hover_data (notes/building.md)
+0x3DFB00,0x103DFB00,Placemaker,HoverData,GetSrcPos,public Vector3 GetSrcPos(),ported,placemaker::hover_data (notes/building.md)
+0x3DFBC0,0x103DFBC0,Placemaker,HoverData,IsOccupied,"private bool IsOccupied(int2 hexPos, int height)",ported,placemaker::hover_data (notes/building.md)
+0x3DFCA0,0x103DFCA0,Placemaker,HoverData,Iterate,private bool Iterate(),ported,placemaker::hover_data (notes/building.md)
+0x3E01C0,0x103E01C0,Placemaker,HoverData,JumpForwardOnAdd,public void JumpForwardOnAdd(),ported,placemaker::hover_data (notes/building.md)
+0x3E0420,0x103E0420,Placemaker,HoverData,OnDrawGizmos,private void OnDrawGizmos(),read,"editor gizmos, not ported"
+0x3E04D0,0x103E04D0,Placemaker,HoverData,OnGamepadMoveAdd,public void OnGamepadMoveAdd(),ported,placemaker::hover_data (notes/building.md)
+0x3E0510,0x103E0510,Placemaker,HoverData,OnGamepadRemove,public void OnGamepadRemove(),ported,placemaker::hover_data (notes/building.md)
+0x3E0530,0x103E0530,Placemaker,HoverData,SetHover,"public void SetHover(Vector2 position, int actionId)",checked,"placemaker::hover_data (tests/placemaker_hover_data.rs: 300 hovers on a stand-in town through the scene camera, every field)"
+0x3E1490,0x103E1490,Placemaker,HoverData,TryGetVert,private Vert TryGetVert(float2 planePos),checked,"placemaker::hover_data (tests/placemaker_hover_data.rs: 300 hovers on a stand-in town through the scene camera, every field)"
 0x3E1590,0x103E1590,Placemaker,HoverData,<GamepadAddMove>g__Compare|39_0,"private void <GamepadAddMove>g__Compare|39_0(int2 hexPos, float2 planePos, ref HoverData.<>c__DisplayClass39_0 )",dumped,
-0x3E1840,0x103E1840,Placemaker,HoverData,get_dstHexPosHeight,public int3 get_dstHexPosHeight(),dumped,
-0x3E1870,0x103E1870,Placemaker,HoverData,get_dstHexPos,public int2 get_dstHexPos(),dumped,
-0x3E1890,0x103E1890,Placemaker,HoverData,get_srcHexPosHeight,public int3 get_srcHexPosHeight(),dumped,
-0x3E18C0,0x103E18C0,Placemaker,HoverData,get_srcHexPos,public int2 get_srcHexPos(),dumped,
-0x3E18D0,0x103E18D0,Placemaker,HoverData,get_vertical,public bool get_vertical(),dumped,
+0x3E1840,0x103E1840,Placemaker,HoverData,get_dstHexPosHeight,public int3 get_dstHexPosHeight(),ported,placemaker::hover_data (notes/building.md)
+0x3E1870,0x103E1870,Placemaker,HoverData,get_dstHexPos,public int2 get_dstHexPos(),ported,placemaker::hover_data (notes/building.md)
+0x3E1890,0x103E1890,Placemaker,HoverData,get_srcHexPosHeight,public int3 get_srcHexPosHeight(),ported,placemaker::hover_data (notes/building.md)
+0x3E18C0,0x103E18C0,Placemaker,HoverData,get_srcHexPos,public int2 get_srcHexPos(),ported,placemaker::hover_data (notes/building.md)
+0x3E18D0,0x103E18D0,Placemaker,HoverData,get_vertical,public bool get_vertical(),ported,placemaker::hover_data (notes/building.md)
 0x1F53D0,0x101F53D0,Placemaker,HoverHightlight,.ctor,public void .ctor(),dumped,
 0x3E18F0,0x103E18F0,Placemaker,HoverHightlight,Draw,public void Draw(),dumped,
 0x3E2700,0x103E2700,Placemaker,HoverHightlight,OnStart,public void OnStart(),dumped,

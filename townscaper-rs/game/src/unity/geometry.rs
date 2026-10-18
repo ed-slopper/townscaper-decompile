@@ -92,7 +92,7 @@ impl Rect {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct Ray {
     pub origin: Vector3,
     pub direction: Vector3,
@@ -110,7 +110,7 @@ impl Ray {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct Plane {
     pub normal: Vector3,
     pub distance: f32,

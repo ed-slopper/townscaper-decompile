@@ -8,6 +8,7 @@ pub mod boot;
 pub mod border_drawer;
 pub mod graphs;
 pub mod grid_generator;
+pub mod hover_data;
 pub mod maker;
 pub mod materials;
 pub mod module_builder;

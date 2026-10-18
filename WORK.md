@@ -35,7 +35,10 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
-| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | ed-slopper/wren (2026-10-18) | Placing and removing blocks, colours, the click feel |
+| G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
+| G1b | Placing: `Maker` (24 + `<>c`): add / remove / paint voxels through the graph, the action list, undo / redo | unowned | G1a | ed-slopper/wren (2026-10-18) | Split of G1; overlaps G4 |
+| G1c | Input: `GroundClicker` (23), `MasterClicker` (27), `RapidButton` (3), `ToolType`, `HoverData.GamepadAddMove` (+ `Compare`): pointer and gamepad clicks to `Maker` | unowned | G1b | | Split of G1 |
+| G1d | Feel: `HoverHightlight` (6: the hover outline mesh), `ClickEffect` (7), `VoxelBobEffect` (8), `VoxelBounceEffect` (11) | unowned | G1b | | Split of G1 |
 | G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8d | | |
 | G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
 | G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9, E13 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
@@ -146,6 +149,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E10b2–E10b4 | `PropPlacer.PlacePropsInQube` (with its `finally` node part), `RecursiveCheck`, the collider dictionary (`AddColliderToDict` / `RemoveColliderFromDict`, `PropCollider` matrix / bounds / layers), `ReturnProp`, `RemovePropsFromContainer`, coloured and window meshes, `PropTransformer` / `Window` modifiers `checked` (16 rows) end to end against a fresh game `PropPlacer` behind the WFC loops; wires, propellers, wind vanes, n-gon scalers, `IterateDeconstructProps`, reset hooks `ported`; `Intersections.corners` order fixed; notes/props.md | P1 | ed-slopper/wren | 2026-10-17 | 48581d9 |
 | E10c–E10d | `PropMeshAnimator` (grow-in on loose filters, big meshes when out of view or dimmed, x-sorted children) and `PropMeshReference` `checked` (9 rows); the flag and Italian wire meshes `checked` on 24 wires; `PropAchievements`, `PropPropeller.Update`, `WindVane`, `PropRadiusIterator`, `ShiftingMesh` order `ported`; the placing check passes a 40-step dense town; editor aids and the Rewired `Window.Timer` rows `read`; E10 closed; notes/props.md | P1 | ed-slopper/wren | 2026-10-18 | d7fa938 |
 | E12 | `unity::camera`: world-to-camera / projection / clip matrices, `InvertMatrix4x4_Full`, `ScreenPointToRay`, `ViewportPointToRay`, `WorldToScreenPoint`, `WorldToViewportPoint` bit-exact on 40 random cameras; `unity::physics`: `Physics.Raycast` over convex mesh colliders (scaled too) and boxes as PhysX 4.1 runs it, hit / miss identical on 400 rays at the scene town, 161 of 163 hits bit-exact (hull planes are a STANDIN for PhysX cooking, last ulp on ~1%); notes/unity.md | P1 | ed-slopper/wren | 2026-10-18 | fd98f36 |
+| G1a | Picking in `placemaker::hover_data`: `HoverData.SetHover` (camera ray, voxel colliders, top / bottom / side sector destinations, ground plane) and `TryGetVert` `checked` on 300 hovers against a fresh game HoverData on a stand-in town; the getters, positions, `IsOccupied`, `JumpForwardOnAdd`, gamepad hooks, the bucket flood `Iterate` `ported`; `GamepadAddMove` moved to G1c, `HoverHightlight` to G1d; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | HASH |
 
 ## Changes to the board
 
@@ -232,3 +236,5 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-17 ed-slopper/wren: E10b2–E10b4 done (one row in Done, E10b removed); claim E10c.
 - 2026-10-18 ed-slopper/wren: E10c and E10d done (one row in Done, E10 closed); claim E12.
 - 2026-10-18 ed-slopper/wren: E12 done; claim G1.
+- 2026-10-18 ed-slopper/wren: split G1 into G1a–G1d; claim G1a.
+- 2026-10-18 ed-slopper/wren: G1a done (GamepadAddMove to G1c, HoverHightlight to G1d); claim G1b.
