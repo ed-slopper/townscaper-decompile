@@ -11,6 +11,7 @@
 //! world master are the host's ([`SaveSystemHost`]); the storage container (the Fury SDK's, middleware) is
 //! [`StorageContainer`], with its requests completing through [`SaveSystem::complete`].
 
+use crate::placemaker::save_binary;
 use crate::placemaker::save_data::{SaveData, SettingsData};
 use crate::placemaker::save_xml;
 use crate::unity::mathematics::Random;
@@ -532,8 +533,9 @@ impl SaveSystem {
     fn serialize(meta: &MetaSave) -> Vec<u8> {
         let data = meta.save_data.as_ref().expect("SaveMetaSaveToDisk: no save data");
         if meta.is_bin {
-            // STANDIN: .binscape (BinaryFormatter) writing is row G3c; the game never writes one (shouldBeBin false)
-            unimplemented!("BinaryFormatter of SaveData (G3c)")
+            // (only a meta read from a .binscape file writes one; the lists' capacities are taken as grown by
+            // Adds, which is how the graph fills them)
+            return save_binary::write_save(data, save_binary::capacity_after_adds(data.corners.len()), save_binary::capacity_after_adds(data.voxels.len()));
         }
         save_xml::write_save(data)
     }
@@ -649,8 +651,14 @@ impl SaveSystem {
     fn on_loaded(&mut self, host: &mut dyn SaveSystemHost, meta: MetaSaveId, request: RequestId) {
         let bytes = host.storage().bytes_result(request).unwrap_or_default();
         let data = if self.metas[meta].is_bin {
-            // STANDIN: .binscape (BinaryFormatter) reading is row G3c
-            None
+            match save_binary::read_save(&bytes) {
+                Ok(d) => d,
+                Err(e) => {
+                    // the formatter throws out of the callback: the meta is left loading
+                    host.log_error(&format!("SerializationException: {}: {}", self.metas[meta].path, e.0));
+                    return;
+                }
+            }
         } else {
             match save_xml::read_save(&bytes) {
                 Ok(d) => Some(d),

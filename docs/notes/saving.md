@@ -90,3 +90,23 @@ time and flags, the visible and total counts, boot and refresh states, the curre
   The current town's file name becomes the settings' `lastSave` when it saves.
 - `StorageUtils` and `SaveCardsHandler` are an older save path in no scene or loaded asset of this build: read,
   not ported. `TexturePngMaster` (the palette PNG cache) is row G3d.
+
+## `.binscape` files (G3c, proven)
+
+`placemaker::save_binary`, checked against the game's `SaveSystem.binaryFormatter` (`tests/placemaker_save_binary.rs`:
+120 random save data built in the game with `Add`: our bytes equal the game's, we read the game's back, the game
+reads ours, written with other list capacities, to the same data).
+
+- The game reads a `.binscape` file (`MetaSave.isBin`) with `BinaryFormatter.Deserialize` and writes one only for
+  a meta that came from such a file; on PC it makes `.scape` files (`shouldBeBin` false).
+- MS-NRBF as the reference source writes it: header (root 1, version 1.0); `Assembly-CSharp`'s library; `SaveData`
+  as `ClassWithMembersAndTypes` with its 7 members (string, Int64, two `Class` structs, two `SystemClass` lists, a
+  byte array); `saveString` as a string record (null: `ObjectNull`); `cam`, `sun` inline with negative ids; the
+  lists and `bigJpg` as references, written after the root in the order met. A `List<T>` is `_items`, `_size`,
+  `_version` (= the size for lists built by `Add`); its array a `BinaryArray` as long as the capacity (0, 4, 8, …
+  for `Add`s), the first element a full struct record, the rest `ClassWithId` pointing at its layout, unused slots
+  as zero structs; the image an `ArraySinglePrimitive` of bytes. Ids count every object in the order met.
+- Reading is general (any record kind, `ClassWithId`, nulls, references, any capacity) and takes `_size` items; a
+  root that is not `SaveData` reads as null (the game's `as`), an unreadable stream throws (the meta stays loading).
+- Writing takes the capacities as grown by `Add`s; the game's could differ after other list operations (a gap
+  only for a `.binscape` written back, which PC saves never are).
