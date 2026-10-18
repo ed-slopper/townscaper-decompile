@@ -551,21 +551,21 @@ rva,va,namespace,type,method,signature,status,notes
 0x32C980,0x1032C980,Placemaker,MaterialMaster,Placemaker.WorldMaster.IOnOnEnable.OnOnEnable,private void Placemaker.WorldMaster.IOnOnEnable.OnOnEnable(WorldMaster worldMaster),checked,tests/placemaker_materials.rs
 0x32CA40,0x1032CA40,Placemaker,MaterialMaster,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
 0x1E73E0,0x101E73E0,Placemaker,MaterialMaster.VoxelMaterial,.ctor,public void .ctor(),ported,placemaker::materials / world_meshes (Default)
-0x1D4430,0x101D4430,Placemaker,MetaSave,SetPathAsName,public void SetPathAsName(),dumped,
-0x1E73D0,0x101E73D0,Placemaker,MetaSave,get_isLoading,public bool get_isLoading(),dumped,
-0x32CF50,0x1032CF50,Placemaker,MetaSave,ResetPooledObject,public void ResetPooledObject(),dumped,
-0x32D060,0x1032D060,Placemaker,MetaSave,SaveThis,private void SaveThis(),dumped,
-0x32D0B0,0x1032D0B0,Placemaker,MetaSave,System.IComparable<Placemaker.MetaSave>.CompareTo,private int System.IComparable<Placemaker.MetaSave>.CompareTo(MetaSave other),dumped,
-0x32D140,0x1032D140,Placemaker,MetaSave,.ctor,public void .ctor(),dumped,
-0x32D2C0,0x1032D2C0,Placemaker,MetaSave,get_isBroken,public bool get_isBroken(),dumped,
-0x32D2E0,0x1032D2E0,Placemaker,MetaSave,get_isSaving,public bool get_isSaving(),dumped,
-0x32D2F0,0x1032D2F0,Placemaker,MetaSave,get_isXml,public bool get_isXml(),dumped,
-0x32D300,0x1032D300,Placemaker,MetaSave,get_shouldBeInPool,public bool get_shouldBeInPool(),dumped,
-0x32D320,0x1032D320,Placemaker,MetaSave,get_shouldBeVisible,public bool get_shouldBeVisible(),dumped,
-0x1D4430,0x101D4430,Placemaker,MetaSave.<>c,<.ctor>b__32_0,internal void <.ctor>b__32_0(),dumped,
-0x1D4430,0x101D4430,Placemaker,MetaSave.<>c,<.ctor>b__32_1,internal void <.ctor>b__32_1(int <p0>),dumped,
-0x1E73E0,0x101E73E0,Placemaker,MetaSave.<>c,.ctor,public void .ctor(),dumped,
-0x1F2D10,0x101F2D10,Placemaker,MetaSave.<>c,.cctor,private static void .cctor(),dumped,
+0x1D4430,0x101D4430,Placemaker,MetaSave,SetPathAsName,public void SetPathAsName(),read,empty in the build; notes/saving.md
+0x1E73D0,0x101E73D0,Placemaker,MetaSave,get_isLoading,public bool get_isLoading(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32CF50,0x1032CF50,Placemaker,MetaSave,ResetPooledObject,public void ResetPooledObject(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D060,0x1032D060,Placemaker,MetaSave,SaveThis,private void SaveThis(),read,"editor context menu, not ported"
+0x32D0B0,0x1032D0B0,Placemaker,MetaSave,System.IComparable<Placemaker.MetaSave>.CompareTo,private int System.IComparable<Placemaker.MetaSave>.CompareTo(MetaSave other),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D140,0x1032D140,Placemaker,MetaSave,.ctor,public void .ctor(),ported,placemaker::save_system (notes/saving.md)
+0x32D2C0,0x1032D2C0,Placemaker,MetaSave,get_isBroken,public bool get_isBroken(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D2E0,0x1032D2E0,Placemaker,MetaSave,get_isSaving,public bool get_isSaving(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D2F0,0x1032D2F0,Placemaker,MetaSave,get_isXml,public bool get_isXml(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D300,0x1032D300,Placemaker,MetaSave,get_shouldBeInPool,public bool get_shouldBeInPool(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x32D320,0x1032D320,Placemaker,MetaSave,get_shouldBeVisible,public bool get_shouldBeVisible(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x1D4430,0x101D4430,Placemaker,MetaSave.<>c,<.ctor>b__32_0,internal void <.ctor>b__32_0(),read,the empty default delegates; compiler plumbing
+0x1D4430,0x101D4430,Placemaker,MetaSave.<>c,<.ctor>b__32_1,internal void <.ctor>b__32_1(int <p0>),read,the empty default delegates; compiler plumbing
+0x1E73E0,0x101E73E0,Placemaker,MetaSave.<>c,.ctor,public void .ctor(),read,the empty default delegates; compiler plumbing
+0x1F2D10,0x101F2D10,Placemaker,MetaSave.<>c,.cctor,private static void .cctor(),read,the empty default delegates; compiler plumbing
 0x3208C0,0x103208C0,Placemaker,MiscReferences,.ctor,public void .ctor(),ported,placemaker::timing (Default)
 0x334420,0x10334420,Placemaker,Module,.ctor,public void .ctor(),ported,placemaker::modules (empty lists: Default)
 0x32D340,0x1032D340,Placemaker,ModuleBuilder,ApplyDecor,public void ApplyDecor(Qube qube),checked,tests/placemaker_wfc.rs (the fence doubling not reached)
@@ -657,112 +657,112 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F53D0,0x101F53D0,Placemaker,SaveCamera,.ctor,public void .ctor(),ported,placemaker::save_camera (notes/building.md)
 0x965000,0x10965000,Placemaker,SaveCamera,GetImage,public byte[] GetImage(SaveData saveData),checked,placemaker::save_camera (tests/placemaker_save_camera.rs: the camera placing; the render is the host's)
 0x965B60,0x10965B60,Placemaker,SaveCamera,Save,public void Save(SaveData saveData),ported,placemaker::save_camera (notes/building.md)
-0x1D4430,0x101D4430,Placemaker,SaveCardsHandler,OnStart,public void OnStart(UiMaster master),dumped,
-0x1F53D0,0x101F53D0,Placemaker,SaveCardsHandler,.ctor,public void .ctor(),dumped,
-0x9661D0,0x109661D0,Placemaker,SaveCardsHandler,AddCardToActiveCardsList,public void AddCardToActiveCardsList(SaveCard card),dumped,
-0x966370,0x10966370,Placemaker,SaveCardsHandler,BeginLoadingAllSaveCards,public void BeginLoadingAllSaveCards(),dumped,
-0x966380,0x10966380,Placemaker,SaveCardsHandler,BeginLoadingDataIntoCard,public void BeginLoadingDataIntoCard(),dumped,
-0x9663B0,0x109663B0,Placemaker,SaveCardsHandler,CardDataLoadingFailed,private void CardDataLoadingFailed(),dumped,
-0x966420,0x10966420,Placemaker,SaveCardsHandler,DeleteCard,"public IEnumerator DeleteCard(SaveCard card, Action callback)",dumped,
-0x966480,0x10966480,Placemaker,SaveCardsHandler,DuplicateCard,"public IEnumerator DuplicateCard(SaveCard templateCard, Action callback)",dumped,
-0x9664E0,0x109664E0,Placemaker,SaveCardsHandler,FillList,public void FillList(),dumped,
-0x9666D0,0x109666D0,Placemaker,SaveCardsHandler,InstantiateNewCard,public SaveCard InstantiateNewCard(),dumped,
-0x966850,0x10966850,Placemaker,SaveCardsHandler,IsLoadingAllSaveCardsDone,public bool IsLoadingAllSaveCardsDone(),dumped,
-0x966860,0x10966860,Placemaker,SaveCardsHandler,LoadDataIntoCard,private void LoadDataIntoCard(),dumped,
-0x966B80,0x10966B80,Placemaker,SaveCardsHandler,LoadingAllSaveCards,private void LoadingAllSaveCards(),dumped,
-0x966D00,0x10966D00,Placemaker,SaveCardsHandler,OnSetup,public void OnSetup(UiMaster master),dumped,
-0x966DD0,0x10966DD0,Placemaker,SaveCardsHandler,ResetActiveCards,public void ResetActiveCards(),dumped,
-0x966EC0,0x10966EC0,Placemaker,SaveCardsHandler,ResetCardPool,public void ResetCardPool(),dumped,
-0x9670B0,0x109670B0,Placemaker,SaveCardsHandler,SetCardImages,public void SetCardImages(),dumped,
-0x9671D0,0x109671D0,Placemaker,SaveCardsHandler,SetCurrentCardImage,public void SetCurrentCardImage(),dumped,
-0x9672F0,0x109672F0,Placemaker,SaveCardsHandler,SetLastSaveCard,public bool SetLastSaveCard(),dumped,
-0x967400,0x10967400,Placemaker,SaveCardsHandler,SetNewCard,"public void SetNewCard(SaveData saveData, string fileName, string filePath)",dumped,
-0x967450,0x10967450,Placemaker,SaveCardsHandler,SortActiveCards,public void SortActiveCards(),dumped,
-0x967700,0x10967700,Placemaker,SaveCardsHandler,UpdateCardLastWriteTime,"public void UpdateCardLastWriteTime(string fileName, long time)",dumped,
-0x967840,0x10967840,Placemaker,SaveCardsHandler,Update,private void Update(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,SaveCardsHandler.<DeleteCard>d__36,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FE160,0x104FE160,Placemaker,SaveCardsHandler.<DeleteCard>d__36,MoveNext,private bool MoveNext(),dumped,
-0x4FE360,0x104FE360,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FE390,0x104FE390,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,MoveNext,private bool MoveNext(),dumped,
-0x4FE6A0,0x104FE6A0,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
+0x1D4430,0x101D4430,Placemaker,SaveCardsHandler,OnStart,public void OnStart(UiMaster master),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1F53D0,0x101F53D0,Placemaker,SaveCardsHandler,.ctor,public void .ctor(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9661D0,0x109661D0,Placemaker,SaveCardsHandler,AddCardToActiveCardsList,public void AddCardToActiveCardsList(SaveCard card),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966370,0x10966370,Placemaker,SaveCardsHandler,BeginLoadingAllSaveCards,public void BeginLoadingAllSaveCards(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966380,0x10966380,Placemaker,SaveCardsHandler,BeginLoadingDataIntoCard,public void BeginLoadingDataIntoCard(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9663B0,0x109663B0,Placemaker,SaveCardsHandler,CardDataLoadingFailed,private void CardDataLoadingFailed(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966420,0x10966420,Placemaker,SaveCardsHandler,DeleteCard,"public IEnumerator DeleteCard(SaveCard card, Action callback)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966480,0x10966480,Placemaker,SaveCardsHandler,DuplicateCard,"public IEnumerator DuplicateCard(SaveCard templateCard, Action callback)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9664E0,0x109664E0,Placemaker,SaveCardsHandler,FillList,public void FillList(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9666D0,0x109666D0,Placemaker,SaveCardsHandler,InstantiateNewCard,public SaveCard InstantiateNewCard(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966850,0x10966850,Placemaker,SaveCardsHandler,IsLoadingAllSaveCardsDone,public bool IsLoadingAllSaveCardsDone(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966860,0x10966860,Placemaker,SaveCardsHandler,LoadDataIntoCard,private void LoadDataIntoCard(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966B80,0x10966B80,Placemaker,SaveCardsHandler,LoadingAllSaveCards,private void LoadingAllSaveCards(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966D00,0x10966D00,Placemaker,SaveCardsHandler,OnSetup,public void OnSetup(UiMaster master),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966DD0,0x10966DD0,Placemaker,SaveCardsHandler,ResetActiveCards,public void ResetActiveCards(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x966EC0,0x10966EC0,Placemaker,SaveCardsHandler,ResetCardPool,public void ResetCardPool(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9670B0,0x109670B0,Placemaker,SaveCardsHandler,SetCardImages,public void SetCardImages(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9671D0,0x109671D0,Placemaker,SaveCardsHandler,SetCurrentCardImage,public void SetCurrentCardImage(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x9672F0,0x109672F0,Placemaker,SaveCardsHandler,SetLastSaveCard,public bool SetLastSaveCard(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x967400,0x10967400,Placemaker,SaveCardsHandler,SetNewCard,"public void SetNewCard(SaveData saveData, string fileName, string filePath)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x967450,0x10967450,Placemaker,SaveCardsHandler,SortActiveCards,public void SortActiveCards(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x967700,0x10967700,Placemaker,SaveCardsHandler,UpdateCardLastWriteTime,"public void UpdateCardLastWriteTime(string fileName, long time)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x967840,0x10967840,Placemaker,SaveCardsHandler,Update,private void Update(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,SaveCardsHandler.<DeleteCard>d__36,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE160,0x104FE160,Placemaker,SaveCardsHandler.<DeleteCard>d__36,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE360,0x104FE360,Placemaker,SaveCardsHandler.<DeleteCard>d__36,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE390,0x104FE390,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE6A0,0x104FE6A0,Placemaker,SaveCardsHandler.<DuplicateCard>d__35,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
 0x967850,0x10967850,Placemaker,SaveData,Clear,public void Clear(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x9678D0,0x109678D0,Placemaker,SaveData,CopyFrom,public void CopyFrom(SaveData other),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x967A10,0x10967A10,Placemaker,SaveData,ReadNonImageDataFrom,public void ReadNonImageDataFrom(SaveData other),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x967AE0,0x10967AE0,Placemaker,SaveData,.ctor,public void .ctor(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
 0x4FAD70,0x104FAD70,Placemaker,SaveData.C,ToString,public override string ToString(),ported,placemaker::save_data (notes/saving.md; its files checked in tests/placemaker_save_files.rs)
-0x3208C0,0x103208C0,Placemaker,SaveDataScripableObject,.ctor,public void .ctor(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem,MaybeFixWrongDirectory,private void MaybeFixWrongDirectory(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem,LogTime,private void LogTime(),dumped,
-0x96B420,0x1096B420,Placemaker,SaveSystem,ChangeState,"private void ChangeState(MetaSave metaSave, MetaSave.State state)",dumped,
-0x96B520,0x1096B520,Placemaker,SaveSystem,DeleteMetaSaveFromDisk,"public bool DeleteMetaSaveFromDisk(MetaSave metaSave, out bool wasCurrent)",dumped,
-0x96B760,0x1096B760,Placemaker,SaveSystem,DuplicateSave,public void DuplicateSave(MetaSave oldMetaSave),dumped,
-0x96B8A0,0x1096B8A0,Placemaker,SaveSystem,GetAndMaybeCreateCurrent,public MetaSave GetAndMaybeCreateCurrent(),dumped,
-0x96B920,0x1096B920,Placemaker,SaveSystem,GetDateTimeLong,public static long GetDateTimeLong(DateTime dateTime),dumped,
-0x96B960,0x1096B960,Placemaker,SaveSystem,GetMetaSaveCount,public int GetMetaSaveCount(),dumped,
-0x96B990,0x1096B990,Placemaker,SaveSystem,GetMetaSave,public MetaSave GetMetaSave(int index),dumped,
-0x96B9F0,0x1096B9F0,Placemaker,SaveSystem,GetNewMetaSave,"public MetaSave GetNewMetaSave(MetaSave.State state, string path = ""no path"")",dumped,
-0x96BC00,0x1096BC00,Placemaker,SaveSystem,GetSaveFilePath,private string GetSaveFilePath(string fileName),dumped,
-0x96BCA0,0x1096BCA0,Placemaker,SaveSystem,GetUniqueSaveName,public string GetUniqueSaveName(),dumped,
-0x96BE00,0x1096BE00,Placemaker,SaveSystem,IsMetaSaveLoading,public bool IsMetaSaveLoading(MetaSave metaSave),dumped,
-0x96BE60,0x1096BE60,Placemaker,SaveSystem,IterateBoot,public bool IterateBoot(Func<bool> keepGoing),dumped,
-0x96C5A0,0x1096C5A0,Placemaker,SaveSystem,IterateRefresh,public bool IterateRefresh(Func<bool> keepGoing),dumped,
-0x96CB80,0x1096CB80,Placemaker,SaveSystem,LoadMetaSaveFromDisk,private void LoadMetaSaveFromDisk(MetaSave metaSave),dumped,
-0x96CD60,0x1096CD60,Placemaker,SaveSystem,LoadSave,public bool LoadSave(MetaSave metaSave),dumped,
-0x96CFC0,0x1096CFC0,Placemaker,SaveSystem,MaybeSaveAndUnloadCurrent,public void MaybeSaveAndUnloadCurrent(),dumped,
-0x96D060,0x1096D060,Placemaker,SaveSystem,MaybeSaveCurrent,public bool MaybeSaveCurrent(),dumped,
-0x96D120,0x1096D120,Placemaker,SaveSystem,MaybeSaveSettings,public bool MaybeSaveSettings(float margin = 0),dumped,
-0x96D170,0x1096D170,Placemaker,SaveSystem,MaybeUpdateOldSettings,private void MaybeUpdateOldSettings(),dumped,
-0x96D4E0,0x1096D4E0,Placemaker,SaveSystem,MaybeUpdateTexture,public bool MaybeUpdateTexture(MetaSave metaSave),dumped,
-0x96D530,0x1096D530,Placemaker,SaveSystem,OnApplicationQuit,private void OnApplicationQuit(),dumped,
-0x96D590,0x1096D590,Placemaker,SaveSystem,OnSaveMenuOpen,public void OnSaveMenuOpen(),dumped,
-0x96D850,0x1096D850,Placemaker,SaveSystem,PopulateSaveData,public void PopulateSaveData(MetaSave metaSave),dumped,
-0x96D8A0,0x1096D8A0,Placemaker,SaveSystem,ResetBoot,public void ResetBoot(),dumped,
-0x96D8D0,0x1096D8D0,Placemaker,SaveSystem,SaveAndQuit,public IEnumerator SaveAndQuit(Action callback),dumped,
-0x96D930,0x1096D930,Placemaker,SaveSystem,SaveMetaSaveToDisk,"public void SaveMetaSaveToDisk(MetaSave metaSave, bool setAsLastSave = False)",dumped,
-0x96DA70,0x1096DA70,Placemaker,SaveSystem,SaveSettings,public void SaveSettings(),dumped,
-0x96DCD0,0x1096DCD0,Placemaker,SaveSystem,SetCurrentMetaSave,public void SetCurrentMetaSave(MetaSave metaSave),dumped,
-0x96DD80,0x1096DD80,Placemaker,SaveSystem,SetSettingsDirty,public void SetSettingsDirty(),dumped,
-0x96DDB0,0x1096DDB0,Placemaker,SaveSystem,SetSiblingIndex,"private void SetSiblingIndex(MetaSave metaSave, int index)",dumped,
-0x96DE30,0x1096DE30,Placemaker,SaveSystem,SortAll,public void SortAll(),dumped,
-0x96E020,0x1096E020,Placemaker,SaveSystem,StartMaybeSaveSaves,public void StartMaybeSaveSaves(),dumped,
-0x96E060,0x1096E060,Placemaker,SaveSystem,StartRefreshSaves,public void StartRefreshSaves(),dumped,
-0x96E080,0x1096E080,Placemaker,SaveSystem,<IterateRefresh>g__IsValid|51_0,internal static bool <IterateRefresh>g__IsValid|51_0(ref SaveSystem.<>c__DisplayClass51_0 ),dumped,
-0x96E150,0x1096E150,Placemaker,SaveSystem,<SaveSettings>b__56_0,private void <SaveSettings>b__56_0(),dumped,
-0x96E1F0,0x1096E1F0,Placemaker,SaveSystem,UpdateAllTextures,public void UpdateAllTextures(),dumped,
-0x96E320,0x1096E320,Placemaker,SaveSystem,.ctor,public void .ctor(),dumped,
-0x96E5D0,0x1096E5D0,Placemaker,SaveSystem,get_storageContainer,private IStorageContainer get_storageContainer(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c,<.ctor>b__78_0,internal void <.ctor>b__78_0(MetaSave <p0>),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c,<.ctor>b__78_1,"internal void <.ctor>b__78_1(int <p0>, int <p1>)",dumped,
-0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c,.ctor,public void .ctor(),dumped,
-0x507500,0x10507500,Placemaker,SaveSystem.<>c,.cctor,private static void .cctor(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass54_0,.ctor,public void .ctor(),dumped,
-0x5056D0,0x105056D0,Placemaker,SaveSystem.<>c__DisplayClass54_0,<LoadMetaSaveFromDisk>b__0,internal void <LoadMetaSaveFromDisk>b__0(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass55_0,.ctor,public void .ctor(),dumped,
-0x505B00,0x10505B00,Placemaker,SaveSystem.<>c__DisplayClass55_0,<SaveMetaSaveToDisk>g__NoPathRoutine|1,internal IEnumerator <SaveMetaSaveToDisk>g__NoPathRoutine|1(),dumped,
-0x505B50,0x10505B50,Placemaker,SaveSystem.<>c__DisplayClass55_0,<SaveMetaSaveToDisk>g__SaveSave|0,internal void <SaveMetaSaveToDisk>g__SaveSave|0(bool isNewSave),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,.ctor,public void .ctor(int <>1__state),dumped,
-0x501A70,0x10501A70,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,MoveNext,private bool MoveNext(),dumped,
-0x501E80,0x10501E80,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass55_1,.ctor,public void .ctor(),dumped,
-0x505EA0,0x10505EA0,Placemaker,SaveSystem.<>c__DisplayClass55_1,<SaveMetaSaveToDisk>b__2,internal void <SaveMetaSaveToDisk>b__2(),dumped,
-0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass65_0,.ctor,public void .ctor(),dumped,
-0x506150,0x10506150,Placemaker,SaveSystem.<>c__DisplayClass65_0,<DeleteMetaSaveFromDisk>b__0,internal void <DeleteMetaSaveFromDisk>b__0(),dumped,
-0x1D4430,0x101D4430,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,SaveSystem.<SaveAndQuit>d__72,.ctor,public void .ctor(int <>1__state),dumped,
-0x500540,0x10500540,Placemaker,SaveSystem.<SaveAndQuit>d__72,MoveNext,private bool MoveNext(),dumped,
-0x500620,0x10500620,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
+0x3208C0,0x103208C0,Placemaker,SaveDataScripableObject,.ctor,public void .ctor(),ported,placemaker::save_system (the host's default_save_data)
+0x1D4430,0x101D4430,Placemaker,SaveSystem,MaybeFixWrongDirectory,private void MaybeFixWrongDirectory(),read,empty in the build; notes/saving.md
+0x1D4430,0x101D4430,Placemaker,SaveSystem,LogTime,private void LogTime(),read,empty in the build; notes/saving.md
+0x96B420,0x1096B420,Placemaker,SaveSystem,ChangeState,"private void ChangeState(MetaSave metaSave, MetaSave.State state)",checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96B520,0x1096B520,Placemaker,SaveSystem,DeleteMetaSaveFromDisk,"public bool DeleteMetaSaveFromDisk(MetaSave metaSave, out bool wasCurrent)",ported,placemaker::save_system (notes/saving.md)
+0x96B760,0x1096B760,Placemaker,SaveSystem,DuplicateSave,public void DuplicateSave(MetaSave oldMetaSave),ported,placemaker::save_system (notes/saving.md)
+0x96B8A0,0x1096B8A0,Placemaker,SaveSystem,GetAndMaybeCreateCurrent,public MetaSave GetAndMaybeCreateCurrent(),ported,placemaker::save_system (notes/saving.md)
+0x96B920,0x1096B920,Placemaker,SaveSystem,GetDateTimeLong,public static long GetDateTimeLong(DateTime dateTime),checked,unity::dotnet (tests/unity_dotnet.rs)
+0x96B960,0x1096B960,Placemaker,SaveSystem,GetMetaSaveCount,public int GetMetaSaveCount(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96B990,0x1096B990,Placemaker,SaveSystem,GetMetaSave,public MetaSave GetMetaSave(int index),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96B9F0,0x1096B9F0,Placemaker,SaveSystem,GetNewMetaSave,"public MetaSave GetNewMetaSave(MetaSave.State state, string path = ""no path"")",checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96BC00,0x1096BC00,Placemaker,SaveSystem,GetSaveFilePath,private string GetSaveFilePath(string fileName),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96BCA0,0x1096BCA0,Placemaker,SaveSystem,GetUniqueSaveName,public string GetUniqueSaveName(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96BE00,0x1096BE00,Placemaker,SaveSystem,IsMetaSaveLoading,public bool IsMetaSaveLoading(MetaSave metaSave),ported,placemaker::save_system (notes/saving.md)
+0x96BE60,0x1096BE60,Placemaker,SaveSystem,IterateBoot,public bool IterateBoot(Func<bool> keepGoing),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96C5A0,0x1096C5A0,Placemaker,SaveSystem,IterateRefresh,public bool IterateRefresh(Func<bool> keepGoing),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96CB80,0x1096CB80,Placemaker,SaveSystem,LoadMetaSaveFromDisk,private void LoadMetaSaveFromDisk(MetaSave metaSave),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96CD60,0x1096CD60,Placemaker,SaveSystem,LoadSave,public bool LoadSave(MetaSave metaSave),ported,placemaker::save_system (notes/saving.md)
+0x96CFC0,0x1096CFC0,Placemaker,SaveSystem,MaybeSaveAndUnloadCurrent,public void MaybeSaveAndUnloadCurrent(),ported,placemaker::save_system (notes/saving.md)
+0x96D060,0x1096D060,Placemaker,SaveSystem,MaybeSaveCurrent,public bool MaybeSaveCurrent(),ported,placemaker::save_system (notes/saving.md)
+0x96D120,0x1096D120,Placemaker,SaveSystem,MaybeSaveSettings,public bool MaybeSaveSettings(float margin = 0),ported,placemaker::save_system (notes/saving.md)
+0x96D170,0x1096D170,Placemaker,SaveSystem,MaybeUpdateOldSettings,private void MaybeUpdateOldSettings(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96D4E0,0x1096D4E0,Placemaker,SaveSystem,MaybeUpdateTexture,public bool MaybeUpdateTexture(MetaSave metaSave),ported,placemaker::save_system (notes/saving.md)
+0x96D530,0x1096D530,Placemaker,SaveSystem,OnApplicationQuit,private void OnApplicationQuit(),ported,placemaker::save_system (notes/saving.md)
+0x96D590,0x1096D590,Placemaker,SaveSystem,OnSaveMenuOpen,public void OnSaveMenuOpen(),ported,placemaker::save_system (notes/saving.md)
+0x96D850,0x1096D850,Placemaker,SaveSystem,PopulateSaveData,public void PopulateSaveData(MetaSave metaSave),ported,placemaker::save_system (notes/saving.md)
+0x96D8A0,0x1096D8A0,Placemaker,SaveSystem,ResetBoot,public void ResetBoot(),ported,placemaker::save_system (notes/saving.md)
+0x96D8D0,0x1096D8D0,Placemaker,SaveSystem,SaveAndQuit,public IEnumerator SaveAndQuit(Action callback),ported,placemaker::save_system (notes/saving.md)
+0x96D930,0x1096D930,Placemaker,SaveSystem,SaveMetaSaveToDisk,"public void SaveMetaSaveToDisk(MetaSave metaSave, bool setAsLastSave = False)",ported,placemaker::save_system (notes/saving.md)
+0x96DA70,0x1096DA70,Placemaker,SaveSystem,SaveSettings,public void SaveSettings(),ported,placemaker::save_system (notes/saving.md)
+0x96DCD0,0x1096DCD0,Placemaker,SaveSystem,SetCurrentMetaSave,public void SetCurrentMetaSave(MetaSave metaSave),ported,placemaker::save_system (notes/saving.md)
+0x96DD80,0x1096DD80,Placemaker,SaveSystem,SetSettingsDirty,public void SetSettingsDirty(),ported,placemaker::save_system (notes/saving.md)
+0x96DDB0,0x1096DDB0,Placemaker,SaveSystem,SetSiblingIndex,"private void SetSiblingIndex(MetaSave metaSave, int index)",checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96DE30,0x1096DE30,Placemaker,SaveSystem,SortAll,public void SortAll(),ported,placemaker::save_system (notes/saving.md)
+0x96E020,0x1096E020,Placemaker,SaveSystem,StartMaybeSaveSaves,public void StartMaybeSaveSaves(),ported,placemaker::save_system (notes/saving.md)
+0x96E060,0x1096E060,Placemaker,SaveSystem,StartRefreshSaves,public void StartRefreshSaves(),ported,placemaker::save_system (notes/saving.md)
+0x96E080,0x1096E080,Placemaker,SaveSystem,<IterateRefresh>g__IsValid|51_0,internal static bool <IterateRefresh>g__IsValid|51_0(ref SaveSystem.<>c__DisplayClass51_0 ),read,"no caller (inlined into IterateRefresh), not ported"
+0x96E150,0x1096E150,Placemaker,SaveSystem,<SaveSettings>b__56_0,private void <SaveSettings>b__56_0(),ported,placemaker::save_system (notes/saving.md)
+0x96E1F0,0x1096E1F0,Placemaker,SaveSystem,UpdateAllTextures,public void UpdateAllTextures(),ported,placemaker::save_system (notes/saving.md)
+0x96E320,0x1096E320,Placemaker,SaveSystem,.ctor,public void .ctor(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x96E5D0,0x1096E5D0,Placemaker,SaveSystem,get_storageContainer,private IStorageContainer get_storageContainer(),ported,placemaker::save_system (notes/saving.md)
+0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c,<.ctor>b__78_0,internal void <.ctor>b__78_0(MetaSave <p0>),read,the empty default delegates; compiler plumbing
+0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c,<.ctor>b__78_1,"internal void <.ctor>b__78_1(int <p0>, int <p1>)",read,the empty default delegates; compiler plumbing
+0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c,.ctor,public void .ctor(),read,the empty default delegates; compiler plumbing
+0x507500,0x10507500,Placemaker,SaveSystem.<>c,.cctor,private static void .cctor(),read,the empty default delegates; compiler plumbing
+0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass54_0,.ctor,public void .ctor(),read,compiler plumbing of a closure / coroutine ported with it
+0x5056D0,0x105056D0,Placemaker,SaveSystem.<>c__DisplayClass54_0,<LoadMetaSaveFromDisk>b__0,internal void <LoadMetaSaveFromDisk>b__0(),checked,placemaker::save_system (tests/placemaker_save_system.rs; notes/saving.md)
+0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass55_0,.ctor,public void .ctor(),read,compiler plumbing of a closure / coroutine ported with it
+0x505B00,0x10505B00,Placemaker,SaveSystem.<>c__DisplayClass55_0,<SaveMetaSaveToDisk>g__NoPathRoutine|1,internal IEnumerator <SaveMetaSaveToDisk>g__NoPathRoutine|1(),ported,placemaker::save_system (notes/saving.md)
+0x505B50,0x10505B50,Placemaker,SaveSystem.<>c__DisplayClass55_0,<SaveMetaSaveToDisk>g__SaveSave|0,internal void <SaveMetaSaveToDisk>g__SaveSave|0(bool isNewSave),ported,placemaker::save_system (notes/saving.md)
+0x1D4430,0x101D4430,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,compiler plumbing of a closure / coroutine ported with it
+0x1E4050,0x101E4050,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),ported,placemaker::save_system (notes/saving.md)
+0x1E4050,0x101E4050,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,compiler plumbing of a closure / coroutine ported with it
+0x1EEF60,0x101EEF60,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,.ctor,public void .ctor(int <>1__state),read,compiler plumbing of a closure / coroutine ported with it
+0x501A70,0x10501A70,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,MoveNext,private bool MoveNext(),ported,placemaker::save_system (notes/saving.md)
+0x501E80,0x10501E80,Placemaker,SaveSystem.<>c__DisplayClass55_0.<<SaveMetaSaveToDisk>g__NoPathRoutine|1>d,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,compiler plumbing of a closure / coroutine ported with it
+0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass55_1,.ctor,public void .ctor(),read,compiler plumbing of a closure / coroutine ported with it
+0x505EA0,0x10505EA0,Placemaker,SaveSystem.<>c__DisplayClass55_1,<SaveMetaSaveToDisk>b__2,internal void <SaveMetaSaveToDisk>b__2(),ported,placemaker::save_system (notes/saving.md)
+0x1E73E0,0x101E73E0,Placemaker,SaveSystem.<>c__DisplayClass65_0,.ctor,public void .ctor(),read,compiler plumbing of a closure / coroutine ported with it
+0x506150,0x10506150,Placemaker,SaveSystem.<>c__DisplayClass65_0,<DeleteMetaSaveFromDisk>b__0,internal void <DeleteMetaSaveFromDisk>b__0(),ported,placemaker::save_system (notes/saving.md)
+0x1D4430,0x101D4430,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,compiler plumbing of a closure / coroutine ported with it
+0x1E4050,0x101E4050,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),ported,placemaker::save_system (notes/saving.md)
+0x1E4050,0x101E4050,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,compiler plumbing of a closure / coroutine ported with it
+0x1EEF60,0x101EEF60,Placemaker,SaveSystem.<SaveAndQuit>d__72,.ctor,public void .ctor(int <>1__state),read,compiler plumbing of a closure / coroutine ported with it
+0x500540,0x10500540,Placemaker,SaveSystem.<SaveAndQuit>d__72,MoveNext,private bool MoveNext(),ported,placemaker::save_system (notes/saving.md)
+0x500620,0x10500620,Placemaker,SaveSystem.<SaveAndQuit>d__72,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,compiler plumbing of a closure / coroutine ported with it
 0x1F53D0,0x101F53D0,Placemaker,ScreenshotCamera,.ctor,public void .ctor(),dumped,
 0x970700,0x10970700,Placemaker,ScreenshotCamera,Capture,"public Texture2D Capture(RectTransform rt, int width, int height, int screenWidth, int screenHeight, Camera refCamera, Camera refSkyboxCam)",dumped,
 0x9717E0,0x109717E0,Placemaker,ScreenshotCamera,OnStart,public void OnStart(),dumped,
@@ -798,101 +798,101 @@ rva,va,namespace,type,method,signature,status,notes
 0x310F80,0x10310F80,Placemaker,SideProfile,IsEmtpy,public bool IsEmtpy(),checked,tests/placemaker_modules.rs
 0x310FC0,0x10310FC0,Placemaker,SideProfile,Set,"public void Set(int index, ushort value0, ushort value1)",checked,tests/placemaker_modules.rs
 0x311090,0x10311090,Placemaker,SideProfile,ToString,public override string ToString(),checked,tests/placemaker_modules.rs
-0x1D8290,0x101D8290,Placemaker,StorageUtils,GetSettingsFilePath,private string GetSettingsFilePath(string fileName),dumped,
-0x318C60,0x10318C60,Placemaker,StorageUtils,CreateAndSaveSettingsData,public IEnumerator CreateAndSaveSettingsData(Action callback),dumped,
-0x318CC0,0x10318CC0,Placemaker,StorageUtils,DeleteCard,public IEnumerator DeleteCard(SaveCard card),dumped,
-0x318D20,0x10318D20,Placemaker,StorageUtils,FilesListChanged,public IEnumerator<bool> FilesListChanged(Action callback),dumped,
-0x318D80,0x10318D80,Placemaker,StorageUtils,FillSaveCard,public IEnumerator FillSaveCard(SaveCard card),dumped,
-0x318DE0,0x10318DE0,Placemaker,StorageUtils,GetFileNameFromAbsolutePath,public string GetFileNameFromAbsolutePath(string fullPath),dumped,
-0x318EA0,0x10318EA0,Placemaker,StorageUtils,GetSaveFilePath,private string GetSaveFilePath(string fileName),dumped,
-0x318F40,0x10318F40,Placemaker,StorageUtils,GetUniqueSaveName,public IEnumerator<string> GetUniqueSaveName(),dumped,
-0x318F90,0x10318F90,Placemaker,StorageUtils,LastSaveIsEmpty,public bool LastSaveIsEmpty(),dumped,
-0x319020,0x10319020,Placemaker,StorageUtils,LoadSaveToByteArray,"public IEnumerator<byte[]> LoadSaveToByteArray(string filePath, Action callback)",dumped,
-0x319080,0x10319080,Placemaker,StorageUtils,LoadSettingsData,public IEnumerator LoadSettingsData(Action callback),dumped,
-0x3190E0,0x103190E0,Placemaker,StorageUtils,MoveAllSaves,private IEnumerator MoveAllSaves(),dumped,
-0x319130,0x10319130,Placemaker,StorageUtils,RefreshFilesList,public IEnumerator RefreshFilesList(Action callback),dumped,
-0x319190,0x10319190,Placemaker,StorageUtils,SaveCurrent,"public IEnumerator SaveCurrent(WorldMaster worldMaster, Action callback)",dumped,
-0x3191F0,0x103191F0,Placemaker,StorageUtils,SaveSettings,public IEnumerator SaveSettings(Action callback),dumped,
-0x319250,0x10319250,Placemaker,StorageUtils,SaveToPath,"private IEnumerator SaveToPath(string path, SaveData data)",dumped,
-0x3192B0,0x103192B0,Placemaker,StorageUtils,TryDeserilizeSaveData,public SaveData TryDeserilizeSaveData(byte[] data),dumped,
-0x319450,0x10319450,Placemaker,StorageUtils,.ctor,public void .ctor(),dumped,
-0x319580,0x10319580,Placemaker,StorageUtils,get_files,public ReadOnlyCollection<string> get_files(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FDA90,0x104FDA90,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,MoveNext,private bool MoveNext(),dumped,
-0x4FDE80,0x104FDE80,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x4FDEB0,0x104FDEB0,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x4FDF10,0x104FDF10,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,<>m__Finally1,private void <>m__Finally1(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<DeleteCard>d__24,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<DeleteCard>d__24,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FDF60,0x104FDF60,Placemaker,StorageUtils.<DeleteCard>d__24,MoveNext,private bool MoveNext(),dumped,
-0x4FE130,0x104FE130,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<FilesListChanged>d__26,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E6D70,0x101E6D70,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.Generic.IEnumerator<System.Boolean>.get_Current,private bool System.Collections.Generic.IEnumerator<System.Boolean>.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<FilesListChanged>d__26,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FE6D0,0x104FE6D0,Placemaker,StorageUtils.<FilesListChanged>d__26,MoveNext,private bool MoveNext(),dumped,
-0x4FE990,0x104FE990,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x4FE9C0,0x104FE9C0,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<FillSaveCard>d__22,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<FillSaveCard>d__22,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FEA00,0x104FEA00,Placemaker,StorageUtils.<FillSaveCard>d__22,MoveNext,private bool MoveNext(),dumped,
-0x4FEB50,0x104FEB50,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.Generic.IEnumerator<System.String>.get_Current,private string System.Collections.Generic.IEnumerator<System.String>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FEE20,0x104FEE20,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,MoveNext,private bool MoveNext(),dumped,
-0x4FF0E0,0x104FF0E0,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.Generic.IEnumerator<System.Byte[]>.get_Current,private byte[] System.Collections.Generic.IEnumerator<System.Byte[]>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FF260,0x104FF260,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,MoveNext,private bool MoveNext(),dumped,
-0x4FF500,0x104FF500,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<LoadSettingsData>d__17,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FF530,0x104FF530,Placemaker,StorageUtils.<LoadSettingsData>d__17,MoveNext,private bool MoveNext(),dumped,
-0x4FF990,0x104FF990,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<MoveAllSaves>d__25,.ctor,public void .ctor(int <>1__state),dumped,
-0x4FF9C0,0x104FF9C0,Placemaker,StorageUtils.<MoveAllSaves>d__25,MoveNext,private bool MoveNext(),dumped,
-0x4FFEF0,0x104FFEF0,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x4FFF20,0x104FFF20,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x4FFF80,0x104FFF80,Placemaker,StorageUtils.<MoveAllSaves>d__25,<>m__Finally1,private void <>m__Finally1(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<RefreshFilesList>d__27,.ctor,public void .ctor(int <>1__state),dumped,
-0x5001B0,0x105001B0,Placemaker,StorageUtils.<RefreshFilesList>d__27,MoveNext,private bool MoveNext(),dumped,
-0x500510,0x10500510,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1D4430,0x101D4430,Placemaker,StorageUtils.<SaveCurrent>d__19,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveCurrent>d__19,.ctor,public void .ctor(int <>1__state),dumped,
-0x500650,0x10500650,Placemaker,StorageUtils.<SaveCurrent>d__19,MoveNext,private bool MoveNext(),dumped,
-0x500950,0x10500950,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveSettings>d__16,.ctor,public void .ctor(int <>1__state),dumped,
-0x500980,0x10500980,Placemaker,StorageUtils.<SaveSettings>d__16,MoveNext,private bool MoveNext(),dumped,
-0x500C20,0x10500C20,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x500C50,0x10500C50,Placemaker,StorageUtils.<SaveSettings>d__16,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x500CB0,0x10500CB0,Placemaker,StorageUtils.<SaveSettings>d__16,<>m__Finally1,private void <>m__Finally1(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),dumped,
-0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),dumped,
-0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveToPath>d__23,.ctor,public void .ctor(int <>1__state),dumped,
-0x500D00,0x10500D00,Placemaker,StorageUtils.<SaveToPath>d__23,MoveNext,private bool MoveNext(),dumped,
-0x501070,0x10501070,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),dumped,
-0x5010A0,0x105010A0,Placemaker,StorageUtils.<SaveToPath>d__23,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),dumped,
-0x501100,0x10501100,Placemaker,StorageUtils.<SaveToPath>d__23,<>m__Finally1,private void <>m__Finally1(),dumped,
+0x1D8290,0x101D8290,Placemaker,StorageUtils,GetSettingsFilePath,private string GetSettingsFilePath(string fileName),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318C60,0x10318C60,Placemaker,StorageUtils,CreateAndSaveSettingsData,public IEnumerator CreateAndSaveSettingsData(Action callback),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318CC0,0x10318CC0,Placemaker,StorageUtils,DeleteCard,public IEnumerator DeleteCard(SaveCard card),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318D20,0x10318D20,Placemaker,StorageUtils,FilesListChanged,public IEnumerator<bool> FilesListChanged(Action callback),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318D80,0x10318D80,Placemaker,StorageUtils,FillSaveCard,public IEnumerator FillSaveCard(SaveCard card),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318DE0,0x10318DE0,Placemaker,StorageUtils,GetFileNameFromAbsolutePath,public string GetFileNameFromAbsolutePath(string fullPath),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318EA0,0x10318EA0,Placemaker,StorageUtils,GetSaveFilePath,private string GetSaveFilePath(string fileName),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318F40,0x10318F40,Placemaker,StorageUtils,GetUniqueSaveName,public IEnumerator<string> GetUniqueSaveName(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x318F90,0x10318F90,Placemaker,StorageUtils,LastSaveIsEmpty,public bool LastSaveIsEmpty(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319020,0x10319020,Placemaker,StorageUtils,LoadSaveToByteArray,"public IEnumerator<byte[]> LoadSaveToByteArray(string filePath, Action callback)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319080,0x10319080,Placemaker,StorageUtils,LoadSettingsData,public IEnumerator LoadSettingsData(Action callback),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x3190E0,0x103190E0,Placemaker,StorageUtils,MoveAllSaves,private IEnumerator MoveAllSaves(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319130,0x10319130,Placemaker,StorageUtils,RefreshFilesList,public IEnumerator RefreshFilesList(Action callback),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319190,0x10319190,Placemaker,StorageUtils,SaveCurrent,"public IEnumerator SaveCurrent(WorldMaster worldMaster, Action callback)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x3191F0,0x103191F0,Placemaker,StorageUtils,SaveSettings,public IEnumerator SaveSettings(Action callback),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319250,0x10319250,Placemaker,StorageUtils,SaveToPath,"private IEnumerator SaveToPath(string path, SaveData data)",read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x3192B0,0x103192B0,Placemaker,StorageUtils,TryDeserilizeSaveData,public SaveData TryDeserilizeSaveData(byte[] data),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319450,0x10319450,Placemaker,StorageUtils,.ctor,public void .ctor(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x319580,0x10319580,Placemaker,StorageUtils,get_files,public ReadOnlyCollection<string> get_files(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FDA90,0x104FDA90,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FDE80,0x104FDE80,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FDEB0,0x104FDEB0,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FDF10,0x104FDF10,Placemaker,StorageUtils.<CreateAndSaveSettingsData>d__18,<>m__Finally1,private void <>m__Finally1(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<DeleteCard>d__24,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<DeleteCard>d__24,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FDF60,0x104FDF60,Placemaker,StorageUtils.<DeleteCard>d__24,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE130,0x104FE130,Placemaker,StorageUtils.<DeleteCard>d__24,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<FilesListChanged>d__26,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E6D70,0x101E6D70,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.Generic.IEnumerator<System.Boolean>.get_Current,private bool System.Collections.Generic.IEnumerator<System.Boolean>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<FilesListChanged>d__26,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE6D0,0x104FE6D0,Placemaker,StorageUtils.<FilesListChanged>d__26,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE990,0x104FE990,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FE9C0,0x104FE9C0,Placemaker,StorageUtils.<FilesListChanged>d__26,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<FillSaveCard>d__22,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<FillSaveCard>d__22,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FEA00,0x104FEA00,Placemaker,StorageUtils.<FillSaveCard>d__22,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FEB50,0x104FEB50,Placemaker,StorageUtils.<FillSaveCard>d__22,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.Generic.IEnumerator<System.String>.get_Current,private string System.Collections.Generic.IEnumerator<System.String>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FEE20,0x104FEE20,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF0E0,0x104FF0E0,Placemaker,StorageUtils.<GetUniqueSaveName>d__28,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.Generic.IEnumerator<System.Byte[]>.get_Current,private byte[] System.Collections.Generic.IEnumerator<System.Byte[]>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF260,0x104FF260,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF500,0x104FF500,Placemaker,StorageUtils.<LoadSaveToByteArray>d__20,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<LoadSettingsData>d__17,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF530,0x104FF530,Placemaker,StorageUtils.<LoadSettingsData>d__17,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF990,0x104FF990,Placemaker,StorageUtils.<LoadSettingsData>d__17,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<MoveAllSaves>d__25,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FF9C0,0x104FF9C0,Placemaker,StorageUtils.<MoveAllSaves>d__25,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FFEF0,0x104FFEF0,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FFF20,0x104FFF20,Placemaker,StorageUtils.<MoveAllSaves>d__25,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x4FFF80,0x104FFF80,Placemaker,StorageUtils.<MoveAllSaves>d__25,<>m__Finally1,private void <>m__Finally1(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<RefreshFilesList>d__27,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x5001B0,0x105001B0,Placemaker,StorageUtils.<RefreshFilesList>d__27,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500510,0x10500510,Placemaker,StorageUtils.<RefreshFilesList>d__27,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1D4430,0x101D4430,Placemaker,StorageUtils.<SaveCurrent>d__19,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveCurrent>d__19,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500650,0x10500650,Placemaker,StorageUtils.<SaveCurrent>d__19,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500950,0x10500950,Placemaker,StorageUtils.<SaveCurrent>d__19,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveSettings>d__16,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500980,0x10500980,Placemaker,StorageUtils.<SaveSettings>d__16,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500C20,0x10500C20,Placemaker,StorageUtils.<SaveSettings>d__16,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500C50,0x10500C50,Placemaker,StorageUtils.<SaveSettings>d__16,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500CB0,0x10500CB0,Placemaker,StorageUtils.<SaveSettings>d__16,<>m__Finally1,private void <>m__Finally1(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.Generic.IEnumerator<System.Object>.get_Current,private object System.Collections.Generic.IEnumerator<System.Object>.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1E4050,0x101E4050,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.IEnumerator.get_Current,private object System.Collections.IEnumerator.get_Current(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x1EEF60,0x101EEF60,Placemaker,StorageUtils.<SaveToPath>d__23,.ctor,public void .ctor(int <>1__state),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x500D00,0x10500D00,Placemaker,StorageUtils.<SaveToPath>d__23,MoveNext,private bool MoveNext(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x501070,0x10501070,Placemaker,StorageUtils.<SaveToPath>d__23,System.Collections.IEnumerator.Reset,private void System.Collections.IEnumerator.Reset(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x5010A0,0x105010A0,Placemaker,StorageUtils.<SaveToPath>d__23,System.IDisposable.Dispose,private void System.IDisposable.Dispose(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
+0x501100,0x10501100,Placemaker,StorageUtils.<SaveToPath>d__23,<>m__Finally1,private void <>m__Finally1(),read,"in no scene or loaded asset of this build (an older save path), not ported; notes/saving.md"
 0x31CD00,0x1031CD00,Placemaker,TextSaveAlphabet,.cctor,private static void .cctor(),checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)
 0x1F53D0,0x101F53D0,Placemaker,TextSaveSystem,.ctor,public void .ctor(),read,a component with no members of its own; not ported
 0x31D1F0,0x1031D1F0,Placemaker,TextSaveSystem,AddValue,"public static void AddValue(List<int> values, int value, int bitCount)",checked,placemaker::text_save_system (tests/placemaker_text_save.rs; notes/saving.md)

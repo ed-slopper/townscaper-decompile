@@ -25,6 +25,7 @@ pub mod sandbanker;
 pub mod text_save_system;
 pub mod save_camera;
 pub mod save_data;
+pub mod save_system;
 pub mod save_xml;
 pub mod shadow_baker;
 pub mod timing;

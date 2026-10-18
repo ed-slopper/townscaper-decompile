@@ -54,3 +54,39 @@ throw).
   and keeps bits from earlier calls: our `BitArray` carries that state, so damaged strings read the same
   leftovers. What a failed read appended stays in the lists. Messages as the game logs them.
 - `GetSpacedString` and `LogBitArray` have no callers.
+
+## The save system (G3b, proven on the boot)
+
+`placemaker::save_system`, checked by booting ours on the player's own save folder (read only, through a
+file-system storage container) and comparing with the harness game, which booted and refreshed on the same
+folder (`tests/placemaker_save_system.rs`): the menu's order of towns, each meta's path, file name, state, write
+time and flags, the visible and total counts, boot and refresh states, the current town and the settings.
+`GetUniqueSaveName` matches the game's (35 rounds with a still clock).
+
+- Storage is the Fury SDK's `IStorageContainer` (`Platform.SDK.GetStorage("storage")`, middleware): relative
+  paths under the save folder (`Saves\Town….scape`, `Sett.ings`), asynchronous requests polled with `MoveNext`
+  and finishing through `OnComplete` delegates (ours: the host calls `SaveSystem::complete`).
+- `MetaSave.State` flags: unclear 1, needs updating 2, up to date 4, not yet saved 8, new from duplicate 16,
+  failed to load 32, did not exist on disk 64, deleted 128, returned to pool 256; broken = 480, invisible = 483,
+  belongs in the pool = 448. `ChangeState` tells the card, clears the data of a newly broken meta, shows or hides
+  it (keeping `validMetaSaveCount`) and moves pool-bound ones to the pool.
+- Metas live in `metaSaveContainer` (the menu order) and `metaSavePool` (child 0 is the scene's template, state
+  unclear, copied with a new 512² texture when the pool is otherwise empty; else the last pooled one is reset).
+- Boot (`IterateBoot`): every container meta back to the pool; `Sett.ings` exists? read it (its `lastSave` gets
+  `\` for `/`, settings dirty, old version-0 towns moved from the root into `Saves`, version 2) : new settings
+  (version 2); the last save exists? a meta for it, loaded; whole → valid last save, broken → the list. The
+  list refresh runs; with no files a new town from `WorldMaster.defaultSaveData`.
+- Refresh (`IterateRefresh`): list files; keep `*.scape` / `*.binscape` directly in `Saves` (counted as the total);
+  metas whose file is gone are dropped (write time 0, did not exist on disk), the others reloaded (all but the
+  current one); a meta for each new file; the current one on top; then each one after it, once loaded, inserted
+  by `CompareTo` (whole ones first, newest write time, then instance id) with `ExtraMath.BinarySearchComponent`
+  (whose range stops one short of the meta in `SortAll`, as compiled).
+- A load (`<LoadMetaSaveFromDisk>b__0`): the bytes deserialized; no data → fresh data, failed to load (and the meta
+  stays "loading"); else the file's `GetLastWriteTimeUtc`, the texture, up to date, shown, on disk, not loading.
+  An unreadable XML file throws out of the callback in the game: the meta stays loading.
+- Saving writes the meta's bytes (`SaveSave`: sync and write times stamped); a meta without a file first draws
+  names (`Unity.Mathematics.Random` from `DateTime.Now.GetHashCode()`, 16 letters filled from the end) until one
+  is free. `saveRequest` is never set in the build, so `isSaving` is always false and nothing waits on it.
+  The current town's file name becomes the settings' `lastSave` when it saves.
+- `StorageUtils` and `SaveCardsHandler` are an older save path in no scene or loaded asset of this build: read,
+  not ported. `TexturePngMaster` (the palette PNG cache) is row G3d.
