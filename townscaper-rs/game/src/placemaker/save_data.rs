@@ -1,5 +1,6 @@
 //! `Placemaker.SaveData` (row G3): so far the town itself, the corner and voxel lists `Graph.Save` writes and
-//! `Graph.IterateLoad` reads (row E4d). The camera, sun, thumbnail and the file side come with G3.
+//! `Graph.IterateLoad` reads (row E4d), and the camera bytes (`OrbitalCamera.Save` / `Load`, row G2). The
+//! sun, thumbnail and the file side come with G3.
 
 /// `Placemaker.SaveData.C`: a corner with voxels, and how many of the voxel list are its.
 #[repr(C)]
@@ -16,6 +17,15 @@ pub struct SaveCorner {
 pub struct SaveVoxel {
     pub t: u8,
     pub h: u8,
+}
+
+/// `Placemaker.SaveData.Cam`: the camera's tilt (`x`), turn (`y`) and zoom (`z`), each `0..1` as a byte.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct SaveCam {
+    pub x: u8,
+    pub y: u8,
+    pub z: u8,
 }
 
 /// `Placemaker.SaveData`: the town part.

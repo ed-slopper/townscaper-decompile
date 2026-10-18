@@ -29,7 +29,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | E1d | The Unity glue in `Os.Utils`: `UnityFunctions` (+ `HirearchyEnumerator`), `Extensions`, `ListPoolExtension` / `DictPoolExtension`, `ScopedProfiler`, `UnityEvent_Float` / `_Int`: port what game logic needs, the rest as Bevy-side helpers | unowned | E1a, E11 | | Split of E1 |
-| E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | | Gap of F11f; needed by G3/G3a |
+| E13 | .NET text formatting and parsing where it reaches files: `int`/`float`/`DateTime` `ToString` and `Parse` (invariant culture, float round-trip rules), `StringBuilder`, string hashing if used for keys; checked with the harness | unowned | F11a | ed-slopper/wren (2026-10-18)
 
 ## P2 Gameplay systems
 
@@ -37,7 +37,6 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
-| G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8d | ed-slopper/wren (2026-10-18) | |
 | G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
 | G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9, E13 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
 | G4 | Undo / redo: find where it lives (`Graph` actions? `UndoRedoFeedback`, `UndoRedoButtons`), port it | unowned | E4 | | |
@@ -49,7 +48,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G7c | Look controls: `PaletteMenu` (21), `PalettePicker`, `SunButton`, `SunButtonGamepad`, `SunSlider`, `ShadingButtons` (17), `GridButtons`, `ToolsButton` | unowned | G7a | | |
 | G7d | Input and controls: `ActionInputManager`, `InputModeManager`, `GamepadScreenCursor`, `ControlBinding` (26), `ControlBindingKey`, `KeyboardAndMouseControlRemap` (22), `KeyboardControlsMenu` (22), `GenericControlsMenu`, `GamepadControlsRow`, `ControlLegend`, `BindingRow` | unowned | G7a, F7 | | All on Rewired |
 | G7e | Widgets and dialogs: `BaseButton`, `StandardButton`, `ToggleButton`, `NavigableButton`, `DisableableButton`, `ProgressBarButton`, `Slider`, `GamepadStepper`, `BetterScrollRect`, `DialogSystem`, `DialogWindow`, `SimpleMessage`, `GenericMenuNavigator`, `ButtonNavigator`, `ButtonAudio*`, `DistanceFieldMask`/`Settings`, `EmptyGraphic`, `CornerImage`, `CloseSymbol`, `CommandFeedbacker`, `Toucher` | unowned | G7a | | |
-| G7f | Menus and the rest: `SettingsMenu`, `CreditsMenu`/`CreditsData`, `LanguageButtons`, `Localization`, `LocalizeRTLFlipper`, `SoundButton`, `FullscreenButton`, `ScreenshotButtons`, `ScreenshotFrame`, `ScreenshotSwitch` (16), `ObjExporter`, `UndoRedoButtons`, `Username`, `WebLinkButton`, `XBoxSignoutButton`, `GamepadXboxDialog` | unowned | G7a | | |
+| G7f | Menus and the rest: `SettingsMenu`, `CreditsMenu`/`CreditsData`, `LanguageButtons`, `Localization`, `LocalizeRTLFlipper`, `SoundButton`, `FullscreenButton`, `ScreenshotButtons`, `ScreenshotCamera` (from G2), `ScreenshotFrame`, `ScreenshotSwitch` (16), `ObjExporter`, `UndoRedoButtons`, `Username`, `WebLinkButton`, `XBoxSignoutButton`, `GamepadXboxDialog` | unowned | G7a | | |
 | G8 | Platform glue: `PlatformManager`, `FurySystemMessenger`, `LocalizationService`, `Placemaker.SceneProcessing` (`PlatformDependent`, `TargetPlatformFlags`), achievements (`PropAchievements`), the Fury SDK calls | unowned | F7 | | PC/GOG paths first; console paths are L1 |
 
 ## P3 Content
@@ -152,6 +151,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G1c | Input in `placemaker::ui::master_clicker`: `MasterClicker` pointer events (hover, press bob and hold-to-remove timing, click add / remove / colour pick, drag rotate with fling, pan, scroll zoom), touch down / up, menu-state enabling `ported` (its clicks run the checked Maker); `RapidButton` `ported`; `GroundClicker` (in no scene) and the four caller-less tools `read`; `GamepadAddMove` split to G1e; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | 2b35ca3 |
 | G1d | Feel in `placemaker::click_effect` and `placemaker::voxel_bob_effect`: `ClickEffect.Click` `checked` on 200 clicks (Unity `Random` draws in order with the flock between, the pitch walk, timing), `VoxelBobEffect.Update` `checked` on 300 springs; `ColorPick`, the hover `Click`, `SetColor`, the bob setters `ported`; `VoxelBounceEffect` (in no scene), `ClickBig`, `SetColorPickColor` (no callers) `read`; `HoverHightlight` split to G1f; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | 8febf60 |
 | G1f | The hover outline in `placemaker::hover_hightlight`: `HoverHightlight.Draw` (top / bottom and side hovers, the ground quad) and `AddQube` (LookAt-frame uvs, the module builder's placement, the game's tangents-for-normals quirk) `checked` on 150 draws against a fresh game HoverHightlight (every vertex, normal, both uv sets, triangle); `OnStart`, `Update` `ported`; E12's camera now reuses `quaternion::invert_full`; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | 018ba94 |
+| G2 | The camera in `placemaker::ui::orbital_camera` and `placemaker::save_camera`: `OrbitalCamera.LateUpdate` (easing, fling decay, bounds radius, zoom distance, tilt, the off-centre view shift with its x-only scaling) `checked` on 300 frames on the scene's camera; `RotateCamera`, `SetRotationSpeed`, the three zooms, `Focus`, `RemapPans`, `GetWorldPos`, `GetRelativePos`, `Save` / `Load` `checked` on 400 calls; `PanCamera`, `WASDCamera` `checked` on 400 (both the town and the empty-town recentre, with a fresh WorldMaster swapped in); `SaveCamera.GetImage`'s placing `checked` on 12 thumbnails (render left to the host); `CustomCameraProjection`, `BoundsUpdated`, `SetBounds`, setup `ported`; gizmos `read`; `ScreenshotCamera` moved to G7f; `SaveData.Cam` added; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | |
 
 ## Changes to the board
 
@@ -244,3 +244,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: G1c done (GamepadAddMove split to G1e); claim G1d.
 - 2026-10-18 ed-slopper/wren: G1d done (HoverHightlight split to G1f); claim G1f.
 - 2026-10-18 ed-slopper/wren: G1f done; claim G2.
+- 2026-10-18 ed-slopper/wren: G2 done (ScreenshotCamera, the photo mode's render pipeline, moved to G7f with its only caller); claim E13 (G3 and G3a need it).

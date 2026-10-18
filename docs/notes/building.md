@@ -146,3 +146,45 @@ sides, then hovers through the scene camera; `_HoverPos` and the whole mesh comp
   the world vertex `qube position + ModuleBuilder.MultiplyPoint(square, GetTs(p), p)` and normal
   `MultiplyVector(…, t)`; the triangles reversed unless the orientation is inverted.
 - Bounds: centre 0, size `float.MaxValue` (never culled).
+
+## The camera: `OrbitalCamera`, `SaveCamera`, `CustomCameraProjection` (G2, proven)
+
+`placemaker::ui::orbital_camera` and `placemaker::save_camera`, checked on the scene's own components
+(`tests/placemaker_orbital_camera.rs`, `tests/placemaker_save_camera.rs`): random state set, the game's method
+run in the same batch as the frame's inputs are read, every field (and the camera pose) compared to the bit.
+
+- State: targets and eased currents for zoom (0..1), pan (`panHex{X,Y}`: shares of the town's hex bounds;
+  `panHeight`: a share of `heightCurrent`), the bounds (`float3x2`) and height; turn `rotationY` (0..1 = 360°)
+  and tilt `rotationX` (0..1 between the lowest the pan height allows and 88°), with fling speeds.
+- `LateUpdate` 0x6F7F60: currents ease as `(cur - tgt)·t + tgt` with `t = (float)exp(-dt·10)` (zoom
+  `exp(-dt·20)`; 0 on the first frame / after `Load`, `snap`); `anyVoxelsCurrent` towards 0/1. A fling decays by
+  `k = exp(-dt·4) - dt·0.4` (on the x87 unit: one rounding), `Lerp(0, speed, k)`; turn `fmod(dt·speed +
+  (rotationY + 10), 1)` in double; tilt `Clamp01(dt·speed·(1 - Pow2(2·rotX - 1)) + rotX)`.
+  Placing: the pan point `GetWorldPos`; the radius the longest half diagonal of the bounds box (scaled by
+  0.121654496, through `HexMath.HexToPlane`, at least `minRadius` 3.5, NaN skipped); `fit = Max(Max(r·h/w, r),
+  sqrt(r² + (height/2)²))`; fov `Lerp(35, 16, zoom)`; `distMin = 2`, `distMax = Max(fit·1.7, 4)·Lerp(1.4, 1,
+  anyVoxels)`, both times `Lerp(1, 1.03, dim alpha)`; `nonDollyDist = Lerp(distMin, distMax, zoom)`,
+  `currentDist = 2 / tan(fov°)·nonDolly`; tilt `Lerp(asin(Max(pan.y / -currentDist, -0.95))°, 88, rotationX)`;
+  `Euler(tilt, rotationY·360, 0)`; position `pan + rot·(0, 0, -currentDist)`; when the game view rect's centre is
+  off the screen's (`dx² + dy² ≥ 1e-10`), minus `rot·((tan·currentDist/2)/(h/w)·dx, dy, 0)`: **only x is scaled**,
+  y is the raw centre offset (a quirk kept). Far clip `currentDist + 1000`.
+- Inputs: `RotateCamera` (drag: tilt by `delta.y / (88 - minAngle)`, turn by `delta.x / 360`, wrapped by `fmod`
+  then `+1` while negative), `SetRotationSpeed` (fling), `ScrollZoom` (`2^(-4·delta)` times the distance),
+  `PinchZoom`, `GamepadZoom` (`exp(-unscaledDt)·delta/10` as a scroll), `Focus`, `WASDCamera` (keys times
+  `nonDollyDist·unscaledDt·2`, turned with the camera; the pan point clamped to the bounds by `HexClamp`, the
+  height share by the vertical part), `PanCamera` (the two screen rays at `currentDist`; the height share moves
+  by their height difference, the pan point by where the second ray meets the level plane through the first,
+  `target = (p1 - p2) + p2` per axis as compiled). With no voxels both move the empty town's bounds and ask the
+  graph to recentre (`SetEmptyBoundsCenter` + `WorldMaster.ResetState`) when the rounded centre changed: checked
+  with a fresh `WorldMaster` and `Graph` swapped in for one batch.
+- `Save` / `Load`: `SaveData.cam` bytes `(byte)Clamp(v·255, 0, 255)` (tilt, turn, zoom); load is `byte·(1/255)`
+  clamped, pans centred, `snap`. `BoundsUpdated` (the graph's `onBoundsUpdated`) remaps the pan target when the
+  gamepad cursor is adding so the view stays on it. `OnStart` sets the camera's `opaqueSortMode` to 2.
+- `SaveCamera.GetImage` 0x965000: `Euler(15, cam.y/255·360, 0)` at `PlaneToWorld(HexToPlane(bounds centre),
+  boundsHeight/2)`, then a box (from the origin) round each corner column's first and last voxel in the camera's
+  `worldToLocalMatrix` (columns from the last child), backed off by `Max((ext.x + 1)·h/w, (ext.y + 1)·1.1)·2 /
+  tan(16°)` and shifted by the box centre; rendered 1024² (8× AA) with `_AaLineBoth (2, 0.5, 1, 4)`,
+  `_ShadingTexLightStack (1, 1, 0, 0)`, `_Dim (0, 1, 0, 0)`, blitted to 512², read into the 512² texture, JPEG 90.
+  Checked: the pose on 12 thumbnails of the scene town (camera three transforms deep, read into our model).
+- `CustomCameraProjection` keeps the projection matrix from `Start` and sets it back every `Update`.
+- `ScreenshotCamera` (the photo mode's render pipeline, called from `ScreenshotButtons` only) moved to G7f.

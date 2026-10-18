@@ -15,9 +15,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x443E40,0x10443E40,,CornerImage,get_progress,public float get_progress(),dumped,
 0x443E50,0x10443E50,,CornerImage,set_progress,public void set_progress(float value),dumped,
 0x443E90,0x10443E90,,CornerImage,set_sprite,public void set_sprite(Sprite value),dumped,
-0x4485C0,0x104485C0,,CustomCameraProjection,Start,private void Start(),dumped,
-0x448640,0x10448640,,CustomCameraProjection,Update,private void Update(),dumped,
-0x448690,0x10448690,,CustomCameraProjection,.ctor,public void .ctor(),dumped,
+0x4485C0,0x104485C0,,CustomCameraProjection,Start,private void Start(),ported,placemaker::save_camera (notes/building.md)
+0x448640,0x10448640,,CustomCameraProjection,Update,private void Update(),ported,placemaker::save_camera (notes/building.md)
+0x448690,0x10448690,,CustomCameraProjection,.ctor,public void .ctor(),ported,placemaker::save_camera (notes/building.md)
 0x1D4430,0x101D4430,,DebugUI,OnStart,public void OnStart(UiMaster master),dumped,
 0x1F53D0,0x101F53D0,,DebugUI,.ctor,public void .ctor(),dumped,
 0x44B900,0x1044B900,,DebugUI,OnGUI,private void OnGUI(),dumped,
@@ -654,9 +654,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x856210,0x10856210,Placemaker,Sandbanker,Reset,public void Reset(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
 0x856220,0x10856220,Placemaker,Sandbanker,UpdateShadeUvs,private void UpdateShadeUvs(),checked,"placemaker::sandbanker (tests/placemaker_sandbanker.rs: a fresh sandbanker stepped Reset to Done on the scene town, lists and both meshes bit-exact)"
 0x8562E0,0x108562E0,Placemaker,Sandbanker,.ctor,public void .ctor(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
-0x1F53D0,0x101F53D0,Placemaker,SaveCamera,.ctor,public void .ctor(),dumped,
-0x965000,0x10965000,Placemaker,SaveCamera,GetImage,public byte[] GetImage(SaveData saveData),dumped,
-0x965B60,0x10965B60,Placemaker,SaveCamera,Save,public void Save(SaveData saveData),dumped,
+0x1F53D0,0x101F53D0,Placemaker,SaveCamera,.ctor,public void .ctor(),ported,placemaker::save_camera (notes/building.md)
+0x965000,0x10965000,Placemaker,SaveCamera,GetImage,public byte[] GetImage(SaveData saveData),checked,placemaker::save_camera (tests/placemaker_save_camera.rs: the camera placing; the render is the host's)
+0x965B60,0x10965B60,Placemaker,SaveCamera,Save,public void Save(SaveData saveData),ported,placemaker::save_camera (notes/building.md)
 0x1D4430,0x101D4430,Placemaker,SaveCardsHandler,OnStart,public void OnStart(UiMaster master),dumped,
 0x1F53D0,0x101F53D0,Placemaker,SaveCardsHandler,.ctor,public void .ctor(),dumped,
 0x9661D0,0x109661D0,Placemaker,SaveCardsHandler,AddCardToActiveCardsList,public void AddCardToActiveCardsList(SaveCard card),dumped,
@@ -1716,29 +1716,29 @@ rva,va,namespace,type,method,signature,status,notes
 0x33A120,0x1033A120,Placemaker.Ui,ObjExporter,Export,public void Export(),dumped,
 0x33A380,0x1033A380,Placemaker.Ui,ObjExporter,.ctor,public void .ctor(),dumped,
 0x1E73E0,0x101E73E0,Placemaker.Ui,ObjExporter.MaterialToExport,.ctor,public void .ctor(),dumped,
-0x6F7670,0x106F7670,Placemaker.Ui,OrbitalCamera,BoundsUpdated,public void BoundsUpdated(),dumped,
-0x6F7950,0x106F7950,Placemaker.Ui,OrbitalCamera,Focus,public void Focus(Vector3 pos),dumped,
-0x6F7AA0,0x106F7AA0,Placemaker.Ui,OrbitalCamera,GamepadZoom,public void GamepadZoom(float delta),dumped,
-0x6F7B40,0x106F7B40,Placemaker.Ui,OrbitalCamera,GetMinAngle,private float GetMinAngle(float dist),dumped,
-0x6F7BA0,0x106F7BA0,Placemaker.Ui,OrbitalCamera,GetRelativePos,"public static ValueTuple<float, float, float> GetRelativePos(Vector3 worldPos, float3x2 bounds, float height)",dumped,
-0x6F7D30,0x106F7D30,Placemaker.Ui,OrbitalCamera,GetWorldPos,"public static Vector3 GetWorldPos(float panHexX, float panHexY, float panHeight, float3x2 bounds, float height)",dumped,
-0x6F7F60,0x106F7F60,Placemaker.Ui,OrbitalCamera,LateUpdate,private void LateUpdate(),dumped,
-0x6F9390,0x106F9390,Placemaker.Ui,OrbitalCamera,Load,public void Load(SaveData saveData),dumped,
-0x6F9460,0x106F9460,Placemaker.Ui,OrbitalCamera,OnDrawGizmos,public void OnDrawGizmos(),dumped,
-0x6F9DF0,0x106F9DF0,Placemaker.Ui,OrbitalCamera,PanCamera,"public void PanCamera(Vector2 pos, Vector2 delta2)",dumped,
-0x6FAC00,0x106FAC00,Placemaker.Ui,OrbitalCamera,PinchZoom,public void PinchZoom(float multiplier),dumped,
-0x6FAC60,0x106FAC60,Placemaker.Ui,OrbitalCamera,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
-0x6FAE80,0x106FAE80,Placemaker.Ui,OrbitalCamera,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
-0x6FAEB0,0x106FAEB0,Placemaker.Ui,OrbitalCamera,RemapPans,"private void RemapPans(float3x2 oldBounds, float3x2 newBounts, float oldHeight, float newHeight)",dumped,
-0x6FB2A0,0x106FB2A0,Placemaker.Ui,OrbitalCamera,RotateCamera,public void RotateCamera(float2 delta),dumped,
-0x6FB3A0,0x106FB3A0,Placemaker.Ui,OrbitalCamera,Save,public void Save(SaveData saveData),dumped,
-0x6FB470,0x106FB470,Placemaker.Ui,OrbitalCamera,ScrollZoom,public void ScrollZoom(float delta),dumped,
-0x6FB4E0,0x106FB4E0,Placemaker.Ui,OrbitalCamera,SetBounds,public void SetBounds(),dumped,
-0x6FB5C0,0x106FB5C0,Placemaker.Ui,OrbitalCamera,SetRotationSpeed,public void SetRotationSpeed(float2 delta),dumped,
-0x6FB680,0x106FB680,Placemaker.Ui,OrbitalCamera,StopRotation,public void StopRotation(),dumped,
-0x6FB6A0,0x106FB6A0,Placemaker.Ui,OrbitalCamera,<OnDrawGizmos>g__GetPanPos|49_0,"private Vector3 <OnDrawGizmos>g__GetPanPos|49_0(float panHexX, float panHexY, float panHeight)",dumped,
-0x6FB870,0x106FB870,Placemaker.Ui,OrbitalCamera,WASDCamera,public void WASDCamera(Vector3 delta),dumped,
-0x6FBF30,0x106FBF30,Placemaker.Ui,OrbitalCamera,.ctor,public void .ctor(),dumped,
+0x6F7670,0x106F7670,Placemaker.Ui,OrbitalCamera,BoundsUpdated,public void BoundsUpdated(),ported,placemaker::ui::orbital_camera (notes/building.md)
+0x6F7950,0x106F7950,Placemaker.Ui,OrbitalCamera,Focus,public void Focus(Vector3 pos),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F7AA0,0x106F7AA0,Placemaker.Ui,OrbitalCamera,GamepadZoom,public void GamepadZoom(float delta),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F7B40,0x106F7B40,Placemaker.Ui,OrbitalCamera,GetMinAngle,private float GetMinAngle(float dist),ported,placemaker::ui::orbital_camera (notes/building.md)
+0x6F7BA0,0x106F7BA0,Placemaker.Ui,OrbitalCamera,GetRelativePos,"public static ValueTuple<float, float, float> GetRelativePos(Vector3 worldPos, float3x2 bounds, float height)",checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F7D30,0x106F7D30,Placemaker.Ui,OrbitalCamera,GetWorldPos,"public static Vector3 GetWorldPos(float panHexX, float panHexY, float panHeight, float3x2 bounds, float height)",checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F7F60,0x106F7F60,Placemaker.Ui,OrbitalCamera,LateUpdate,private void LateUpdate(),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F9390,0x106F9390,Placemaker.Ui,OrbitalCamera,Load,public void Load(SaveData saveData),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6F9460,0x106F9460,Placemaker.Ui,OrbitalCamera,OnDrawGizmos,public void OnDrawGizmos(),read,"editor aid (gizmos), not ported"
+0x6F9DF0,0x106F9DF0,Placemaker.Ui,OrbitalCamera,PanCamera,"public void PanCamera(Vector2 pos, Vector2 delta2)",checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FAC00,0x106FAC00,Placemaker.Ui,OrbitalCamera,PinchZoom,public void PinchZoom(float multiplier),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FAC60,0x106FAC60,Placemaker.Ui,OrbitalCamera,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),ported,placemaker::ui::orbital_camera (notes/building.md)
+0x6FAE80,0x106FAE80,Placemaker.Ui,OrbitalCamera,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),ported,placemaker::ui::orbital_camera (notes/building.md)
+0x6FAEB0,0x106FAEB0,Placemaker.Ui,OrbitalCamera,RemapPans,"private void RemapPans(float3x2 oldBounds, float3x2 newBounts, float oldHeight, float newHeight)",checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB2A0,0x106FB2A0,Placemaker.Ui,OrbitalCamera,RotateCamera,public void RotateCamera(float2 delta),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB3A0,0x106FB3A0,Placemaker.Ui,OrbitalCamera,Save,public void Save(SaveData saveData),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB470,0x106FB470,Placemaker.Ui,OrbitalCamera,ScrollZoom,public void ScrollZoom(float delta),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB4E0,0x106FB4E0,Placemaker.Ui,OrbitalCamera,SetBounds,public void SetBounds(),ported,placemaker::ui::orbital_camera (notes/building.md)
+0x6FB5C0,0x106FB5C0,Placemaker.Ui,OrbitalCamera,SetRotationSpeed,public void SetRotationSpeed(float2 delta),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB680,0x106FB680,Placemaker.Ui,OrbitalCamera,StopRotation,public void StopRotation(),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FB6A0,0x106FB6A0,Placemaker.Ui,OrbitalCamera,<OnDrawGizmos>g__GetPanPos|49_0,"private Vector3 <OnDrawGizmos>g__GetPanPos|49_0(float panHexX, float panHexY, float panHeight)",read,"editor aid (gizmos), not ported"
+0x6FB870,0x106FB870,Placemaker.Ui,OrbitalCamera,WASDCamera,public void WASDCamera(Vector3 delta),checked,placemaker::ui::orbital_camera (tests/placemaker_orbital_camera.rs; notes/building.md)
+0x6FBF30,0x106FBF30,Placemaker.Ui,OrbitalCamera,.ctor,public void .ctor(),ported,placemaker::ui::orbital_camera (notes/building.md)
 0x1D4430,0x101D4430,Placemaker.Ui,PaletteMenu,PushColor,public void PushColor(PalettePicker picker),dumped,
 0x1D4430,0x101D4430,Placemaker.Ui,PaletteMenu,UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag,private void UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(PointerEventData eventData),dumped,
 0x6FCBE0,0x106FCBE0,Placemaker.Ui,PaletteMenu,ClampTargetScroll,private void ClampTargetScroll(),dumped,
