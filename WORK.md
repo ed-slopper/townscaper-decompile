@@ -36,7 +36,10 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
 | G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
 | G7 | UI (`Placemaker.Ui`, 174 types, 963 methods): split before claiming | unowned | E8, F7 | | Split: G7a–G7f |
-| G7a | UI core: `UiMaster` (39), `UpdateState` (25), `SideMenu`/`SideMenuNavigator`, `GameViewRect`, `UiScaler`, `UiElementScaler`, `ScaleUiButtons`, `PinnedUi`/`PinnedUiMobile`, `Dim`, `LoadingUi` | unowned | E8, F7 | ed-slopper/wren (2026-10-18) | |
+| G7a1 | UI animation state: `UpdateState` (49 with its closures): the eased value and target, subscriptions (canvas groups, graphics, audio, scale, tick, target) | unowned | E8, F7 | ed-slopper/wren (2026-10-18) | Split of G7a |
+| G7a2 | UI master: `UiMaster` (83 with nested types): setup order, update loop, safe area, input routing | unowned | G7a1 | | Split of G7a |
+| G7a3 | UI layout: `GameViewRect`, `UiScaler`, `UiElementScaler`, `ScaleUiButtons`, `PinnedUi`, `PinnedUiMobile` | unowned | G7a1 | | Split of G7a |
+| G7a4 | Side menu and overlays: `SideMenu`, `SideMenuNavigator`, `Dim`, `LoadingUi` | unowned | G7a1 | | Split of G7a |
 | G7b | Save menu: `SaveMenu` (35), `SaveCard`, `FocusedSaveCard`, `MaxSavesCounter`, `SavingIndicator`, `TextSaveButtons` | unowned | G3, G7a | | |
 | G7c | Look controls: `PaletteMenu` (21), `PalettePicker`, `SunButton`, `SunButtonGamepad`, `SunSlider`, `ShadingButtons` (17), `GridButtons`, `ToolsButton` | unowned | G7a | | |
 | G7d | Input and controls: `ActionInputManager`, `InputModeManager`, `GamepadScreenCursor`, `ControlBinding` (26), `ControlBindingKey`, `KeyboardAndMouseControlRemap` (22), `KeyboardControlsMenu` (22), `GenericControlsMenu`, `GamepadControlsRow`, `ControlLegend`, `BindingRow` | unowned | G7a, F7 | | All on Rewired |
@@ -265,3 +268,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: split G6 into G6a (sound effects) and G6b (ambience and music); claim G6a.
 - 2026-10-18 ed-slopper/wren: G6a done; claim G6b.
 - 2026-10-18 ed-slopper/wren: G6b done; claim G7a.
+- 2026-10-18 ed-slopper/wren: split G7a into G7a1 (UpdateState), G7a2 (UiMaster), G7a3 (layout) and G7a4 (side menu and overlays); claim G7a1.
