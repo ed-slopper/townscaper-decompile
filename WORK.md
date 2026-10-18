@@ -36,8 +36,8 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | ID | Task | Area | Needs | Who | Notes |
 |---|---|---|---|---|---|
 | G1 | Building: `Maker` (24), `GroundClicker` (23), `HoverData` (21), `HoverHightlight`, `MasterClicker` (27), `ClickEffect`, `RapidButton`, `VoxelBobEffect`, `VoxelBounceEffect`, `ToolType` | unowned | E4, E8, E12 | | Split: G1a–G1d |
-| G1c | Input: `GroundClicker` (23), `MasterClicker` (27), `RapidButton` (3), `ToolType`, `HoverData.GamepadAddMove` (+ `Compare`): pointer and gamepad clicks to `Maker` | unowned | G1b | ed-slopper/wren (2026-10-18) | Split of G1 |
-| G1d | Feel: `HoverHightlight` (6: the hover outline mesh), `ClickEffect` (7), `VoxelBobEffect` (8), `VoxelBounceEffect` (11) | unowned | G1b | | Split of G1 |
+| G1d | Feel: `HoverHightlight` (6: the hover outline mesh), `ClickEffect` (7), `VoxelBobEffect` (8), `VoxelBounceEffect` (11) | unowned | G1b | ed-slopper/wren (2026-10-18) | Split of G1 |
+| G1e | Gamepad hover walk: `HoverData.GamepadAddMove` (+ `<GamepadAddMove>g__Compare`): the gamepad cursor stepping across the plane and onto voxels | unowned | G1a, G7d | | Split of G1c |
 | G2 | Camera: `OrbitalCamera` (23), `CustomCameraProjection`, `SaveCamera`, `ScreenshotCamera` | unowned | E8d | | |
 | G3 | Saving (`ts_game::placemaker::save_system` + the file side in `ts_data`): `SaveSystem` (40), `SaveData`, `MetaSave`, `SettingsData`, `StorageUtils` (19), `SaveCardsHandler` (23), `TexturePngMaster`, `SaveDataScripableObject` | unowned | E4 | | Save files must stay byte-compatible with the original's |
 | G3a | The shareable town string: `TextSaveSystem` (`SaveToString` / `LoadFromString`, bit packing `AddValue`/`ReadValue`/`GetBitCount`), `TextSaveAlphabet` | unowned | E4, F9, E13 | | Easiest end-to-end check: a string from the original must load to the same corners/voxels in ours, and back to the same string |
@@ -150,6 +150,7 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 | E12 | `unity::camera`: world-to-camera / projection / clip matrices, `InvertMatrix4x4_Full`, `ScreenPointToRay`, `ViewportPointToRay`, `WorldToScreenPoint`, `WorldToViewportPoint` bit-exact on 40 random cameras; `unity::physics`: `Physics.Raycast` over convex mesh colliders (scaled too) and boxes as PhysX 4.1 runs it, hit / miss identical on 400 rays at the scene town, 161 of 163 hits bit-exact (hull planes are a STANDIN for PhysX cooking, last ulp on ~1%); notes/unity.md | P1 | ed-slopper/wren | 2026-10-18 | fd98f36 |
 | G1a | Picking in `placemaker::hover_data`: `HoverData.SetHover` (camera ray, voxel colliders, top / bottom / side sector destinations, ground plane) and `TryGetVert` `checked` on 300 hovers against a fresh game HoverData on a stand-in town; the getters, positions, `IsOccupied`, `JumpForwardOnAdd`, gamepad hooks, the bucket flood `Iterate` `ported`; `GamepadAddMove` moved to G1c, `HoverHightlight` to G1d; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | a413b6b |
 | G1b | Placing in `placemaker::maker`: `Maker.AddClick` / `PaintClick` / `RemoveClick`, `BeginNewAction` (998-id trim, redo tail, reset, propagation step), `Undo` / `Redo` through `Graph.ApplyAction`, `AddAction`, `ActionQueueChanged` `checked` on 77 edits against the stand-in master's `Maker` (graph, actions, counters, `lastActionPos`); `Clear`, the commands, `CanX`, `HoldX` `ported`; `hover_common` test scaffolding; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | da9e62c |
+| G1c | Input in `placemaker::ui::master_clicker`: `MasterClicker` pointer events (hover, press bob and hold-to-remove timing, click add / remove / colour pick, drag rotate with fling, pan, scroll zoom), touch down / up, menu-state enabling `ported` (its clicks run the checked Maker); `RapidButton` `ported`; `GroundClicker` (in no scene) and the four caller-less tools `read`; `GamepadAddMove` split to G1e; notes/building.md | P2 | ed-slopper/wren | 2026-10-18 | HASH |
 
 ## Changes to the board
 
@@ -239,3 +240,4 @@ The procedural core, leaf first: maths, the irregular grid, the graph, modules, 
 - 2026-10-18 ed-slopper/wren: split G1 into G1a–G1d; claim G1a.
 - 2026-10-18 ed-slopper/wren: G1a done (GamepadAddMove to G1c, HoverHightlight to G1d); claim G1b.
 - 2026-10-18 ed-slopper/wren: G1b done; claim G1c.
+- 2026-10-18 ed-slopper/wren: G1c done (GamepadAddMove split to G1e); claim G1d.

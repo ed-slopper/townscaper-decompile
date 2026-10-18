@@ -468,29 +468,29 @@ rva,va,namespace,type,method,signature,status,notes
 0x1E73E0,0x101E73E0,Placemaker,GridGenerator.<>c,.ctor,public void .ctor(),checked,the SceneProcessIteration keepGoing lambda (always true); tests/placemaker_bits.rs
 0x1F1440,0x101F1440,Placemaker,GridGenerator.<>c,<SceneProcessIteration>b__46_0,internal bool <SceneProcessIteration>b__46_0(),checked,the SceneProcessIteration keepGoing lambda (always true); tests/placemaker_bits.rs
 0x1F2D60,0x101F2D60,Placemaker,GridGenerator.<>c,.cctor,private static void .cctor(),checked,the SceneProcessIteration keepGoing lambda (always true); tests/placemaker_bits.rs
-0x1D4430,0x101D4430,Placemaker,GroundClicker,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
-0x205130,0x10205130,Placemaker,GroundClicker,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__20_0,private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__20_0(float x),dumped,
-0xD32EB0,0x10D32EB0,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter,private void UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(PointerEventData eventData),dumped,
-0xE39550,0x10E39550,Placemaker,GroundClicker,AddClick,private void AddClick(),dumped,
-0xE395D0,0x10E395D0,Placemaker,GroundClicker,BucketClick,private void BucketClick(),dumped,
-0xE39850,0x10E39850,Placemaker,GroundClicker,BulldozeClick,private void BulldozeClick(),dumped,
-0xE39A60,0x10E39A60,Placemaker,GroundClicker,ColorPick,private void ColorPick(),dumped,
-0xE39B90,0x10E39B90,Placemaker,GroundClicker,LateUpdate,private void LateUpdate(),dumped,
-0xE39C50,0x10E39C50,Placemaker,GroundClicker,MaybeUpdateHover,private void MaybeUpdateHover(Vector2 pos),dumped,
-0xE39CB0,0x10E39CB0,Placemaker,GroundClicker,OnGUI,private void OnGUI(),dumped,
-0xE39D30,0x10E39D30,Placemaker,GroundClicker,PaintClick,private void PaintClick(),dumped,
-0xE39DB0,0x10E39DB0,Placemaker,GroundClicker,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
-0xE39DD0,0x10E39DD0,Placemaker,GroundClicker,RemoveClick,private void RemoveClick(),dumped,
-0xE39E40,0x10E39E40,Placemaker,GroundClicker,UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag,private void UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(PointerEventData eventData),dumped,
-0xE39F30,0x10E39F30,Placemaker,GroundClicker,UnityEngine.EventSystems.IDragHandler.OnDrag,private void UnityEngine.EventSystems.IDragHandler.OnDrag(PointerEventData eventData),dumped,
-0xE3A400,0x10E3A400,Placemaker,GroundClicker,UnityEngine.EventSystems.IEndDragHandler.OnEndDrag,private void UnityEngine.EventSystems.IEndDragHandler.OnEndDrag(PointerEventData eventData),dumped,
-0xE3A580,0x10E3A580,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick,private void UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(PointerEventData eventData),dumped,
-0xE3A780,0x10E3A780,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown,private void UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(PointerEventData eventData),dumped,
-0xE3A840,0x10E3A840,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit,private void UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(PointerEventData eventData),dumped,
-0xE3A880,0x10E3A880,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp,private void UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(PointerEventData eventData),dumped,
-0xE3A8F0,0x10E3A8F0,Placemaker,GroundClicker,Update,private void Update(),dumped,
-0xE3AAA0,0x10E3AAA0,Placemaker,GroundClicker,.ctor,public void .ctor(),dumped,
-0xE3AAF0,0x10E3AAF0,Placemaker,GroundClicker,get_maker,private Maker get_maker(),dumped,
+0x1D4430,0x101D4430,Placemaker,GroundClicker,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0x205130,0x10205130,Placemaker,GroundClicker,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__20_0,private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__20_0(float x),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xD32EB0,0x10D32EB0,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter,private void UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39550,0x10E39550,Placemaker,GroundClicker,AddClick,private void AddClick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE395D0,0x10E395D0,Placemaker,GroundClicker,BucketClick,private void BucketClick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39850,0x10E39850,Placemaker,GroundClicker,BulldozeClick,private void BulldozeClick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39A60,0x10E39A60,Placemaker,GroundClicker,ColorPick,private void ColorPick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39B90,0x10E39B90,Placemaker,GroundClicker,LateUpdate,private void LateUpdate(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39C50,0x10E39C50,Placemaker,GroundClicker,MaybeUpdateHover,private void MaybeUpdateHover(Vector2 pos),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39CB0,0x10E39CB0,Placemaker,GroundClicker,OnGUI,private void OnGUI(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39D30,0x10E39D30,Placemaker,GroundClicker,PaintClick,private void PaintClick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39DB0,0x10E39DB0,Placemaker,GroundClicker,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39DD0,0x10E39DD0,Placemaker,GroundClicker,RemoveClick,private void RemoveClick(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39E40,0x10E39E40,Placemaker,GroundClicker,UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag,private void UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE39F30,0x10E39F30,Placemaker,GroundClicker,UnityEngine.EventSystems.IDragHandler.OnDrag,private void UnityEngine.EventSystems.IDragHandler.OnDrag(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A400,0x10E3A400,Placemaker,GroundClicker,UnityEngine.EventSystems.IEndDragHandler.OnEndDrag,private void UnityEngine.EventSystems.IEndDragHandler.OnEndDrag(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A580,0x10E3A580,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick,private void UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A780,0x10E3A780,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown,private void UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A840,0x10E3A840,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit,private void UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A880,0x10E3A880,Placemaker,GroundClicker,UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp,private void UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(PointerEventData eventData),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3A8F0,0x10E3A8F0,Placemaker,GroundClicker,Update,private void Update(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3AAA0,0x10E3AAA0,Placemaker,GroundClicker,.ctor,public void .ctor(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
+0xE3AAF0,0x10E3AAF0,Placemaker,GroundClicker,get_maker,private Maker get_maker(),read,"legacy copy of MasterClicker, in no scene (the harness finds no instance): not ported"
 0x1D4430,0x101D4430,Placemaker,HoverData,Finish,public void Finish(),ported,empty body (shared stub)
 0x1D4430,0x101D4430,Placemaker,HoverData,Update,private void Update(),ported,empty body (shared stub)
 0x1F53D0,0x101F53D0,Placemaker,HoverData,.ctor,public void .ctor(),ported,placemaker::hover_data (notes/building.md)
@@ -642,9 +642,9 @@ rva,va,namespace,type,method,signature,status,notes
 0x70F2B0,0x1070F2B0,Placemaker,PropPlacer,ReturnProp,public void ReturnProp(Prop prop),checked,placemaker::prop_placer (tests/placemaker_prop_placing.rs; notes/props.md)
 0x70F910,0x1070F910,Placemaker,PropPlacer,<RecursivePropNodeSetup>g__ShouldBeBatched|24_0,private bool <RecursivePropNodeSetup>g__ShouldBeBatched|24_0(MeshFilter mf),checked,"placemaker::prop_placer (tests/placemaker_prop_placer.rs: every prefab and 60 random GetProps, from pools too, instance by instance)"
 0x70FA20,0x1070FA20,Placemaker,PropPlacer,.ctor,public void .ctor(),ported,placemaker::prop_placer
-0x846A20,0x10846A20,Placemaker,RapidButton,Press,public bool Press(float intensity = 1),dumped,
-0x846AF0,0x10846AF0,Placemaker,RapidButton,.cctor,private static void .cctor(),dumped,
-0x846BE0,0x10846BE0,Placemaker,RapidButton,.ctor,"public void .ctor(float slowSpeed, float fastSpeed, int countThreshold)",dumped,
+0x846A20,0x10846A20,Placemaker,RapidButton,Press,public bool Press(float intensity = 1),ported,placemaker::rapid_button
+0x846AF0,0x10846AF0,Placemaker,RapidButton,.cctor,private static void .cctor(),ported,placemaker::rapid_button
+0x846BE0,0x10846BE0,Placemaker,RapidButton,.ctor,"public void .ctor(float slowSpeed, float fastSpeed, int countThreshold)",ported,placemaker::rapid_button
 0x84FB40,0x1084FB40,Placemaker,Sandbanker,Clear,public void Clear(),ported,placemaker::sandbanker (state and mesh resets; the mesh filters are the host's)
 0x84FBA0,0x1084FBA0,Placemaker,Sandbanker,Iterate,public bool Iterate(),checked,"placemaker::sandbanker (tests/placemaker_sandbanker.rs: a fresh sandbanker stepped Reset to Done on the scene town, lists and both meshes bit-exact)"
 0x855BF0,0x10855BF0,Placemaker,Sandbanker,OnDrawGizmos,private void OnDrawGizmos(),read,editor gizmos: not ported (Unity editor only)
@@ -1663,33 +1663,33 @@ rva,va,namespace,type,method,signature,status,notes
 0x1F53D0,0x101F53D0,Placemaker.Ui,LocalizeRTLFlipper,.ctor,public void .ctor(),dumped,
 0x325550,0x10325550,Placemaker.Ui,LocalizeRTLFlipper,OnDisable,public void OnDisable(),dumped,
 0x3255E0,0x103255E0,Placemaker.Ui,LocalizeRTLFlipper,OnEnable,public void OnEnable(),dumped,
-0x1D4430,0x101D4430,Placemaker.Ui,MasterClicker,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),dumped,
-0x1F1440,0x101F1440,Placemaker.Ui,MasterClicker,InputReady,private bool InputReady(),dumped,
-0x32AB40,0x1032AB40,Placemaker.Ui,MasterClicker,AddClick,public Voxel AddClick(),dumped,
-0x32AE10,0x1032AE10,Placemaker.Ui,MasterClicker,BucketClick,private void BucketClick(),dumped,
-0x32B100,0x1032B100,Placemaker.Ui,MasterClicker,BulldozeClick,private void BulldozeClick(),dumped,
-0x32B380,0x1032B380,Placemaker.Ui,MasterClicker,ColorPick,public bool ColorPick(),dumped,
-0x32B4B0,0x1032B4B0,Placemaker.Ui,MasterClicker,LateUpdate,private void LateUpdate(),dumped,
-0x32B5B0,0x1032B5B0,Placemaker.Ui,MasterClicker,MaybeUpdateHover,private void MaybeUpdateHover(Vector2 position),dumped,
-0x32B620,0x1032B620,Placemaker.Ui,MasterClicker,OnGUI,private void OnGUI(),dumped,
-0x32B6A0,0x1032B6A0,Placemaker.Ui,MasterClicker,PaintClick,private void PaintClick(),dumped,
-0x32B830,0x1032B830,Placemaker.Ui,MasterClicker,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),dumped,
-0x32B920,0x1032B920,Placemaker.Ui,MasterClicker,RemoveClick,public bool RemoveClick(),dumped,
-0x32BAC0,0x1032BAC0,Placemaker.Ui,MasterClicker,RemoveHover,private void RemoveHover(),dumped,
-0x32BB00,0x1032BB00,Placemaker.Ui,MasterClicker,TouchDown,public void TouchDown(Vector2 position),dumped,
-0x32BC50,0x1032BC50,Placemaker.Ui,MasterClicker,TouchUp,public void TouchUp(bool couldAct),dumped,
-0x32BD10,0x1032BD10,Placemaker.Ui,MasterClicker,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__49_0,"private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__49_0(UiMaster.MenuState oldState, UiMaster.MenuState newState)",dumped,
-0x32BD40,0x1032BD40,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag,private void UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(PointerEventData eventData),dumped,
-0x32BDF0,0x1032BDF0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IDragHandler.OnDrag,private void UnityEngine.EventSystems.IDragHandler.OnDrag(PointerEventData eventData),dumped,
-0x32BFE0,0x1032BFE0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IEndDragHandler.OnEndDrag,private void UnityEngine.EventSystems.IEndDragHandler.OnEndDrag(PointerEventData eventData),dumped,
-0x32C170,0x1032C170,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick,private void UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(PointerEventData eventData),dumped,
-0x32C260,0x1032C260,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown,private void UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(PointerEventData eventData),dumped,
-0x32C3A0,0x1032C3A0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter,private void UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(PointerEventData eventData),dumped,
-0x32C3D0,0x1032C3D0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit,private void UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(PointerEventData eventData),dumped,
-0x32C420,0x1032C420,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp,private void UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(PointerEventData eventData),dumped,
-0x32C490,0x1032C490,Placemaker.Ui,MasterClicker,Update,private void Update(),dumped,
-0x32C6C0,0x1032C6C0,Placemaker.Ui,MasterClicker,.ctor,public void .ctor(),dumped,
-0x32C710,0x1032C710,Placemaker.Ui,MasterClicker,get_maker,private Maker get_maker(),dumped,
+0x1D4430,0x101D4430,Placemaker.Ui,MasterClicker,Placemaker.Ui.UiMaster.IUiSetup.OnStart,private void Placemaker.Ui.UiMaster.IUiSetup.OnStart(UiMaster master),ported,empty body (shared stub)
+0x1F1440,0x101F1440,Placemaker.Ui,MasterClicker,InputReady,private bool InputReady(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32AB40,0x1032AB40,Placemaker.Ui,MasterClicker,AddClick,public Voxel AddClick(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32AE10,0x1032AE10,Placemaker.Ui,MasterClicker,BucketClick,private void BucketClick(),read,no callers in the build (CallerCount 0): not ported
+0x32B100,0x1032B100,Placemaker.Ui,MasterClicker,BulldozeClick,private void BulldozeClick(),read,no callers in the build (CallerCount 0): not ported
+0x32B380,0x1032B380,Placemaker.Ui,MasterClicker,ColorPick,public bool ColorPick(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32B4B0,0x1032B4B0,Placemaker.Ui,MasterClicker,LateUpdate,private void LateUpdate(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32B5B0,0x1032B5B0,Placemaker.Ui,MasterClicker,MaybeUpdateHover,private void MaybeUpdateHover(Vector2 position),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32B620,0x1032B620,Placemaker.Ui,MasterClicker,OnGUI,private void OnGUI(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32B6A0,0x1032B6A0,Placemaker.Ui,MasterClicker,PaintClick,private void PaintClick(),read,no callers in the build (CallerCount 0): not ported
+0x32B830,0x1032B830,Placemaker.Ui,MasterClicker,Placemaker.Ui.UiMaster.IUiSetup.OnSetup,private void Placemaker.Ui.UiMaster.IUiSetup.OnSetup(UiMaster master),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32B920,0x1032B920,Placemaker.Ui,MasterClicker,RemoveClick,public bool RemoveClick(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BAC0,0x1032BAC0,Placemaker.Ui,MasterClicker,RemoveHover,private void RemoveHover(),read,no callers in the build (CallerCount 0): not ported
+0x32BB00,0x1032BB00,Placemaker.Ui,MasterClicker,TouchDown,public void TouchDown(Vector2 position),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BC50,0x1032BC50,Placemaker.Ui,MasterClicker,TouchUp,public void TouchUp(bool couldAct),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BD10,0x1032BD10,Placemaker.Ui,MasterClicker,<Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__49_0,"private void <Placemaker.Ui.UiMaster.IUiSetup.OnSetup>b__49_0(UiMaster.MenuState oldState, UiMaster.MenuState newState)",ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BD40,0x1032BD40,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag,private void UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BDF0,0x1032BDF0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IDragHandler.OnDrag,private void UnityEngine.EventSystems.IDragHandler.OnDrag(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32BFE0,0x1032BFE0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IEndDragHandler.OnEndDrag,private void UnityEngine.EventSystems.IEndDragHandler.OnEndDrag(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C170,0x1032C170,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick,private void UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C260,0x1032C260,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown,private void UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C3A0,0x1032C3A0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter,private void UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C3D0,0x1032C3D0,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit,private void UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C420,0x1032C420,Placemaker.Ui,MasterClicker,UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp,private void UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(PointerEventData eventData),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C490,0x1032C490,Placemaker.Ui,MasterClicker,Update,private void Update(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C6C0,0x1032C6C0,Placemaker.Ui,MasterClicker,.ctor,public void .ctor(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
+0x32C710,0x1032C710,Placemaker.Ui,MasterClicker,get_maker,private Maker get_maker(),ported,placemaker::ui::master_clicker (notes/building.md; the clicks run the checked Maker)
 0x1FC200,0x101FC200,Placemaker.Ui,MaxSavesCounter,.ctor,public void .ctor(),dumped,
 0x32CAC0,0x1032CAC0,Placemaker.Ui,MaxSavesCounter,UpdateCountText,"public void UpdateCountText(string current, string max)",dumped,
 0x1D4430,0x101D4430,Placemaker.Ui,MenuMusic,OnStart,public void OnStart(UiMaster master),dumped,

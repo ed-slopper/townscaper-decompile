@@ -67,3 +67,33 @@ action list, the counters and `lastActionPos` compared).
   last (next) id's actions applied through `Graph.ApplyAction(…, playEffect: true)`, reversed newest first for
   undo; `actionCount` down (up). `CanUndo`: `actionCount > 0`; `CanRedo`: `actionIndex != actions.Count`.
   The `…Command` forms play the UI sound first; `HoldUndo` / `HoldRedo` wait for `RapidButton.Press(1)` (G1c).
+
+## Input: `MasterClicker` (G1c, ported)
+
+`placemaker::ui::master_clicker`. `GroundClicker` is an older copy that is in no scene (the harness finds no
+instance): read, not ported. In `MasterClicker`, `BucketClick`, `BulldozeClick`, `PaintClick` and `RemoveHover`
+have no callers in this build (the shipped game adds, removes and picks colours only). `InputReady` is a shared
+stub that returns true.
+
+- Unity's EventSystem raises the pointer events; ids -1 left, -2 right, -3 middle, 0 and up touches. The mouse
+  hovers on enter (`Input.mousePresent`), and leaving clears the hover.
+- Each frame: `Update` takes the mouse position; `LateUpdate` hovers there (once a frame, not on a click frame,
+  not while pressed or dragging: `SetHover(position, maker.actionId)`) and draws the hover highlight in the
+  touch-and-mouse input mode; `OnGUI` zooms with the scroll wheel while hovered.
+- Press (`OnPointerDown`, mouse buttons): hover at the press, the press time; on a voxel the bob starts at the
+  source position. While held (`Update`): past 0.35 s "about to remove" (the press sound) and the bob sinks,
+  `Lerp(-0.2, -0.4, 1 - (1 - t)²)` with `t = InverseLerp(0.32, 1.5, held)` eased into `bobCurrent` by
+  `WorldMaster.expTFaster`; at 1.5 s the colour is picked (the press is used up).
+- Click (`OnPointerClick`, once a frame, not while dragging, not when used): left adds, or removes when the press
+  lasted over 0.25 s; right removes; middle picks the colour (voxel types 0..=14: the palette selects it).
+  `AddClick` / `RemoveClick` are `Maker.AddClick` / `RemoveClick` inlined, with the click effect (after an add,
+  before a remove).
+- Drag: a left drag turns the orbital camera by `delta / min(width, height) · 130` (y negated), kept in a ring of
+  five `(x, y, Time.time)`; on release the drags of the last 0.2 s, summed and divided by the oldest one's age,
+  become the camera's rotation speed (the fling). Right and middle drags pan.
+- Touch: `TouchDown` hovers and bobs; `TouchUp(couldAct)` adds, or removes when held over 0.25 s.
+- Enabled only in menu states 0x20 / 0x22 (`UiMaster.SubscribeToMenuState`); `touchLocationThreshold =
+  |screen| · 0.022`.
+- `RapidButton` (`placemaker::rapid_button`): `Press` is true on the first frame of a press, then each time
+  `t += (unscaledDeltaTime · speed) · intensity` passes 1 (the slow speed for the first `countThreshold`
+  repeats). Presets: undo / redo 2 → 10, palette 3 → 6, UI navigation 2 → 6 (threshold 2).
