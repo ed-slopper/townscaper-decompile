@@ -5,6 +5,7 @@
 pub mod ao_baker;
 pub mod big_mesh;
 pub mod boot;
+pub mod click_effect;
 pub mod border_drawer;
 pub mod graphs;
 pub mod grid_generator;
@@ -27,3 +28,4 @@ pub mod wfc;
 pub mod world_master;
 pub mod world_meshes;
 pub mod ui;
+pub mod voxel_bob_effect;

@@ -97,3 +97,27 @@ stub that returns true.
 - `RapidButton` (`placemaker::rapid_button`): `Press` is true on the first frame of a press, then each time
   `t += (unscaledDeltaTime · speed) · intensity` passes 1 (the slow speed for the first `countThreshold`
   repeats). Presets: undo / redo 2 → 10, palette 3 → 6, UI navigation 2 → 6 (threshold 2).
+
+## Feel: `ClickEffect`, `VoxelBobEffect` (G1d, proven)
+
+`placemaker::click_effect`, `placemaker::voxel_bob_effect`, checked on the scene's own components
+(`tests/placemaker_feel.rs`). `VoxelBounceEffect` is in no scene and nothing calls it; `ClickBig` is only
+reached from the caller-less bucket tool; `SetColorPickColor` has no callers: read, not ported.
+
+- `ClickEffect.Click(add, planePos, height, type)` 0x2008A0, at `PlaneToWorld(planePos, height + 0.5)`: the burst
+  (`particle`, shape scale ½, start-colour red = `type / paletteTex.width` on a new type, also for `dust`); at
+  height 0 the water splash at `y = 0` with a splash sound (volume 1, pitch `Random.Range(0.5, 0.8)`), else dust;
+  `VoxelBobEffect.ClickBobEffect(pos, add)`; the add / remove clip (volume 0.4) with the walking pitch: `p = 100`
+  after two quiet seconds (`Time.time - lastClick > 2`), else `lastPitch ± 0.2`, played as
+  `Lerp(0.4, 2, |(float)fmod((double)(p - 0.5), 2) - 1|) · slowmo`; `flock.UprootRadius(pos, 1, 1)`; the second
+  clip (volume 0.25, pitch `(Random.Range(1, 1.2) · first) · slowmo`). Clips are `Random.RangeInt(0, count)` on
+  Unity's global generator; the birds draw from it too, between the two clip draws, so the port calls the flock
+  at that point. Checked: 200 clicks from known `Random` states (the state afterwards, `lastPitch`, `lastClick`,
+  `lastVoxelType`).
+- `Click(hover, add, voxel)`: at the destination (adding) or the source, with the voxel's type. `ColorPick(hover)`:
+  at the voxel, birds within 1 (force 0.5), an upward bob, the pick particles and sound (volume 1, pitch
+  `Range(0.8, 1.2)`).
+- `VoxelBobEffect`: `_PressPosAmount = (bobPos, bobCurrent)`. `Update` steps a spring at 25 Hz of unscaled time,
+  `v = cur·-0.6 + vel; vel = v·0.4; cur += v`, and stops below `|vel| + |cur| < 0.001`. `SetPressed` holds it
+  (the clicker sinks it), `StopPressing(v)` releases with a velocity, `ClickBobEffect` kicks ±0.4. Checked: 300
+  springs stepped by the game's own `Update`.
